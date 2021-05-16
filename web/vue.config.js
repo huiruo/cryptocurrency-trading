@@ -24,5 +24,26 @@ module.exports = {
                   }
               }
           }*/
+      },
+      parallel: false,
+//       chainWebpack(config) {
+//       config.module
+//       .rule('vue')
+//       .use('vue-loader')
+//       .tap((options) => {
+//         options.compiler = require('@fower/vue-template-compiler')
+//         return options
+//       })
+//   },
+configureWebpack: {
+    resolve: {
+      alias: {
+        // assets: "@/assets",
+        // common: "@/common",
+        components: "@/components",
+        // network: "@/network",
+        // views: "@/views"
       }
+    }
+  }
 }

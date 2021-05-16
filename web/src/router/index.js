@@ -1,6 +1,8 @@
 import { createRouter,createWebHashHistory} from 'vue-router'
-import index from '../views/index'
-import account from '../views/account'
+// import index from '../views/index'
+// import account from '../views/account'
+const index =()=>import('../views/index')
+const account =()=>import('../views/account')
 
 const routes = [
   {
