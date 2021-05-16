@@ -1,8 +1,11 @@
 <template>
-  <div class="hello">
+  <!-- <div class="hello">
     <div class="less-test">{{ msg }}
       <div class="web">--test</div>
     </div>
+  </div> -->
+  <div>
+       <router-view />
   </div>
 </template>
 
