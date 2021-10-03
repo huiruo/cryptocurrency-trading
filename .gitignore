@@ -87,3 +87,15 @@ hs_err_pid*
 .cxx
 local.properties
 
+### IntelliJ IDEA ###
+/server/.idea
+/server/target
+*.iml
+
+### AS ###
+app/.gradle
+app/.idea
+app/build
+app/local.properties
+
+

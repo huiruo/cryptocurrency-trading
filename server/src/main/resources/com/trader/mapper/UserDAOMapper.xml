@@ -1,13 +1,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.example.trader.dao.UserDAO">
+<mapper namespace="com.trader.dao.UserDAO">
     <!--用户登录-->
     <select id="findByAccount" parameterType="String" resultType="User">
-        select * from b_user where account = #{account}
+        select * from user where account = #{account}
     </select>
     <!--注册用户-->
     <insert id="register" parameterType="User" useGeneratedKeys="true" keyProperty="id">
-        insert into b_user values(#{id},#{account},#{password},#{email})
+        insert into user values(#{id},#{account},#{password},#{email})
     </insert>
 </mapper>
 
