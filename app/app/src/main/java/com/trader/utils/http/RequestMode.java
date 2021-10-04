@@ -1,12 +1,5 @@
 package com.trader.utils.http;
 
-import android.util.Log;
-
-import java.io.File;
-import java.util.List;
-import com.trader.utils.http.ReqParams;
-import com.trader.utils.http.ResCallback;
-
 public class RequestMode {
     /**
      * GET请求
@@ -28,7 +21,6 @@ public class RequestMode {
      * @param clazz 需要解析的实体类
      */
     public static void postRequest(String url, ReqParams params, ResCallback callback, Class<?> clazz) {
-        Log.d("post----->","post请求");
         CommonOkHttpClient.post(CommonRequest.createPostRequest(url, params),
                 new ResposeDataHandle(callback, clazz));
     }

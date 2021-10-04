@@ -18,8 +18,6 @@ import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
-import com.trader.utils.http.ResCallback;
-import com.trader.utils.http.ReqParams;
 /**
  * 描述： 公共入参
  */

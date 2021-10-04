@@ -84,7 +84,6 @@ public class RegisterActivity extends BaseActivity {
                 Log.d("注册a----------------->",register_url);
                 Log.d("注册b----------------->",account);
                 Log.d("注册c----------------->",password);
-                ///*
                 HttpRequest.postRegisterApi(register_url, params, new ResCallback() {
                     @Override
                     public void onSuccess(Object responseObj) {
@@ -101,10 +100,6 @@ public class RegisterActivity extends BaseActivity {
                         //
                     }
 
-                    //                            @Override
-                    //                            public void onFailure(OhException failuer) {
-                    //
-                    //                            }
                     @Override
                     public void onFailure(OhException failuer) {
                         //Log.e("TAG", "注册失败：" + failuer);
@@ -114,9 +109,7 @@ public class RegisterActivity extends BaseActivity {
                             Toast.makeText(RegisterActivity.this, "注册失败:" + failuer.getMsg(), Toast.LENGTH_SHORT).show();
                         }
                     }
-                }
-                );
-                //*/
+                });
             }
         });
     }
