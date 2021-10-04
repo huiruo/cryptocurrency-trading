@@ -10,4 +10,3 @@
         insert into user values(#{id},#{account},#{password},#{email})
     </insert>
 </mapper>
-

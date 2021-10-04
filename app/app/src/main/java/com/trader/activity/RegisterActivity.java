@@ -13,9 +13,11 @@ import com.trader.R;
 import com.trader.api.HttpRequest;
 import com.trader.utils.ProperUtil;
 import com.trader.utils.User;
+import com.trader.utils.http.OhException;
 import com.trader.utils.net.OkHttpException;
-import com.trader.utils.net.RequestParams;
-import com.trader.utils.net.ResponseCallback;
+import com.trader.utils.http.ReqParams;
+//import com.trader.utils.net.ResponseCallback;
+import com.trader.utils.http.ResCallback;
 
 public class RegisterActivity extends BaseActivity {
     Button btn_register;
@@ -75,13 +77,15 @@ public class RegisterActivity extends BaseActivity {
             }
 
             public void register(String account,String password){
-                RequestParams params = new RequestParams();
+                ReqParams params = new ReqParams();
                 params.put("account", account);
                 params.put("password", password);
                 String register_url = baseUrl + "/user/register";
-
-
-                HttpRequest.postRegisterApi(register_url, params, new ResponseCallback() {
+                Log.d("注册a----------------->",register_url);
+                Log.d("注册b----------------->",account);
+                Log.d("注册c----------------->",password);
+                ///*
+                HttpRequest.postRegisterApi(register_url, params, new ResCallback() {
                     @Override
                     public void onSuccess(Object responseObj) {
                         //UserInfo userInfo = (UserInfo) responseObj;
@@ -91,14 +95,18 @@ public class RegisterActivity extends BaseActivity {
                         System.out.println(user);
                         Log.d("请求返回", user.toString());
                         Toast.makeText(RegisterActivity.this, "注册成功", Toast.LENGTH_SHORT).show();
-                        /*
-                        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                        startActivity(intent);
-                        */
+                        //
+                        //Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                        //startActivity(intent);
+                        //
                     }
 
+                    //                            @Override
+                    //                            public void onFailure(OhException failuer) {
+                    //
+                    //                            }
                     @Override
-                    public void onFailure(OkHttpException failuer) {
+                    public void onFailure(OhException failuer) {
                         //Log.e("TAG", "注册失败：" + failuer);
                         if (failuer.getCode() == 4) {
                             Toast.makeText(RegisterActivity.this, "账号名已经存在，请更换注册账号", Toast.LENGTH_SHORT).show();
@@ -106,8 +114,9 @@ public class RegisterActivity extends BaseActivity {
                             Toast.makeText(RegisterActivity.this, "注册失败:" + failuer.getMsg(), Toast.LENGTH_SHORT).show();
                         }
                     }
-                });
-
+                }
+                );
+                //*/
             }
         });
     }
