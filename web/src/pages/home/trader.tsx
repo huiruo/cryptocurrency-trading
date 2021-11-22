@@ -1,9 +1,9 @@
 // import './Component1.css';
 
-function App() {
+const App =()=>{
   return (
-    <div className="container">
-      404
+    <div>
+     App 
     </div>
   );
 }

@@ -1,9 +1,8 @@
-// import './Component1.css';
 
 function App() {
   return (
-    <div className="container">
-      index
+    <div style={{width:'100px',height:'60px',background:'grey'}}>
+     detail 
     </div>
   );
 }
