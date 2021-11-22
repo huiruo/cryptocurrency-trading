@@ -1,4 +1,4 @@
-// import './Component1.css';
+import { Box } from '@fower/react'
 
 const App =()=>{
   return (

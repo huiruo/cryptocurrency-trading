@@ -1,6 +1,6 @@
 const NotFound=()=>{
   return (
-    <div className="container">
+    <div>
       404
     </div>
   );

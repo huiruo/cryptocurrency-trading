@@ -1,11 +1,11 @@
-// import './Component1.css';
+import { Box } from '@fower/react'
 
-const App =()=>{
+const Trader=()=>{
   return (
-    <div>
-     App 
-    </div>
+    <Box>
+     Trader 
+    </Box>
   );
 }
 
-export default App;
+export default Trader;

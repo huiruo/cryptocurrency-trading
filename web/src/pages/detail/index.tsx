@@ -1,10 +1,10 @@
 
-function App() {
+const Detail=()=>{
   return (
-    <div style={{width:'100px',height:'60px',background:'grey'}}>
-     detail 
+    <div>
+     detail
     </div>
   );
 }
 
-export default App;
+export default Detail;

@@ -2,14 +2,12 @@
 ```
 npx create-react-app my-app
 cd my-app
-npx create-react-app my-app
-cd my-app
 npm start
 ```
 ### router
 ```
-npm install --save react-router
-npm install --save react-router-dom
+yarn add react-router
+yarn add react-router-dom
 ```
 ### build 资源修改相对路径
 ```
@@ -17,6 +15,11 @@ package.json
 
 "homepage": ".",
 ```
+### fower 样式工具库
+```
+yarn add @fower/react
+```
+
 ### 适配
 ```
 npm i lib-flexible --save
