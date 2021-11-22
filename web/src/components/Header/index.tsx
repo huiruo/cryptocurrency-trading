@@ -2,8 +2,8 @@ import { Box } from '@fower/react'
 
 const Header =()=>{
   return (
-    <Box h-64 bgBlue100>
-     header a
+    <Box minH='.64rem' bgBlue100>
+     header
     </Box>
   );
 }

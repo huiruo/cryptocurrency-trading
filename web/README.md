@@ -22,6 +22,17 @@ yarn add @fower/react
 
 ### 适配
 ```
+rem 单位如何转换为像素值
+当使用 rem 单位，他们转化为像素大小取决于页根元素的字体大小，即 html 元素的字体大小。 根元素字体大小乘以你 rem 值。 
+
+例如，根元素的字体大小 16px，10rem 将等同于 160px，即 10 x 16 = 160。
+4rem<---> 64px
+
+14: 10rem -->140px
+    <----->64
+100: 8.5rem <---->850px
+```
+```
 npm i lib-flexible --save
 npm i postcss-px2rem --save
 npm run eject
