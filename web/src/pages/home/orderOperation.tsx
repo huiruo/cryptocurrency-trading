@@ -3,7 +3,7 @@ import { Box } from '@fower/react'
 import {Button} from '../../components/Button/index.tsx'
 import {Input} from '../../components/Input/index.tsx'
 
-const Trader=()=>{
+const OrderOperation =()=>{
 
   const [sellCode, setSellCode] = useState('')
   const [sellPrice, setSellPrice] = useState('')
@@ -39,10 +39,8 @@ const Trader=()=>{
   }
 
   return (
-    <Box minH='8.5rem' style={{margin:'0 auto'}}>
-      <Box>
-        <Box flex>
-          <Box>
+        <Box flex w="50%">
+          <Box p='.16rem'>
               <Box>
                 <Input onChange={(e) => { setSellCode(e.target.value) }} value={sellCode} placeholder="请输入种类"/>
               </Box>
@@ -59,7 +57,7 @@ const Trader=()=>{
             </Button>
           </Box>
 
-          <Box>
+          <Box p='.16rem'>
             <Box>
               <Box>
                 <Input onChange={(e) => { setBuyCode(e.target.value) }} value={buyCode} placeholder="请输入种类"/>
@@ -72,15 +70,14 @@ const Trader=()=>{
               w-100p
               onClick={() => { onSell() }}
               size="lg"
+              colorScheme="#e92424"
             >
               xxxxx
               {/* 新建卖出订单 */}
             </Button>
           </Box>
         </Box>
-      </Box>
-    </Box>
   );
 }
 
-export default Trader;
+export default OrderOperation;
