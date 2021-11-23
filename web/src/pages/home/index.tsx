@@ -7,9 +7,9 @@ const Home = ()=>{
 	// const { history } = props
 	return (
 		<>
-			<Box style={{flex: '1 0 auto'}}>
+			<Box>
 				<Header/>
-				<Box>
+				<Box flex mt='.15rem'>
 					<Trader/>
 				</Box>
 			</Box>
