@@ -1,5 +1,5 @@
 {
-  "name": "react-test",
+  "name": "trader",
   "version": "0.1.0",
   "private": true,
   "homepage": ".",
@@ -23,6 +23,7 @@
     "camelcase": "^6.1.0",
     "case-sensitive-paths-webpack-plugin": "2.3.0",
     "css-loader": "4.3.0",
+    "cross-env": "^7.0.3",
     "dotenv": "8.2.0",
     "dotenv-expand": "5.1.0",
     "eslint": "^7.11.0",
@@ -77,9 +78,9 @@
     "workbox-webpack-plugin": "5.1.4"
   },
   "scripts": {
-    "start": "node APP_ENV=dev node scripts/start.js",
-    "build": "node APP_ENV=preprod node scripts/build.js",
-    "release": "node APP_ENV=prod node scripts/build.js",
+    "start": "cross-env APP_ENV=dev node scripts/start.js",
+    "build": "cross-env APP_ENV=preprod node scripts/build.js",
+    "release": "cross-env APP_ENV=prod node scripts/build.js",
     "test": "node scripts/test.js"
   },
   "eslintConfig": {
