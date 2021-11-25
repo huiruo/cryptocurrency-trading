@@ -17,7 +17,7 @@ public class TraderController {
     @Autowired
     private UserService userService;
 
-    @RequestMapping("/login")
+    @RequestMapping("/buy")
     public Result<User> login(@RequestBody User user, HttpServletRequest request) {
         User entityUser = new User();
         System.out.println("登录------->");
