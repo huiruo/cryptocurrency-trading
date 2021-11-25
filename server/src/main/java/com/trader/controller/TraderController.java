@@ -13,15 +13,9 @@ import com.trader.service.UserService;
 @CrossOrigin
 @RequestMapping("user")
 @Slf4j
-public class UserController {
+public class TraderController {
     @Autowired
     private UserService userService;
-
-    //http://localhost:8089/user/test
-    @RequestMapping("/test")
-    public String test(){
-        return "hello world";
-    }
 
     @RequestMapping("/login")
     public Result<User> login(@RequestBody User user, HttpServletRequest request) {
@@ -34,17 +28,6 @@ public class UserController {
             request.getServletContext().setAttribute(userDb.getId(), userDb);
             return new Result<>(entityUser);
         } catch (Exception e) {
-            return new Result<>(4, e.getMessage());
-        }
-    }
-
-    @RequestMapping("register")
-    public Result<User> register(@RequestBody User user, HttpServletRequest request) {
-        try {
-            userService.register(user);
-            return new Result<>();
-        } catch (Exception e) {
-            //return new Result<>(1, e.getMessage());
             return new Result<>(4, e.getMessage());
         }
     }
