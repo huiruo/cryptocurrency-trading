@@ -1,5 +1,5 @@
 import http from "./http";
-import API_BASE from "./config";
+import {traderApiUrl} from "./config.ts";
 /* 模拟数据
 import {
 	detailMock,
@@ -34,33 +34,33 @@ const getMock = (type) => {
 }
 */
 
-const Api = {
+const traderApi = {
 	getTreeApi(data) {
-		const url = `${API_BASE}/konfi/menu/getTree`;
+		const url = `${traderApiUrl}/trader/menu/getTree`;
 		return http.post2(url, data);
 		// return getMock('tree')
 	},
 	//获取列数据
 	getColumnsDataApi(data) {
-		const url = `${API_BASE}/columns/getByFormKey`;
+		const url = `${traderApiUrl}/columns/getByFormKey`;
 		return http.post2(url, data);
 		// return getMock('columns')
 	},
 	//获取表-行数据
 	getDataSourceApi(data) {
-		const url = `${API_BASE}/data/getFormData`;
+		const url = `${traderApiUrl}/data/getFormData`;
 		return http.post2(url, data);
 		// return getMock('row')
 	},
 	//点击侧边栏获取表的详情
 	getTableDetailByKeyApi(data) {
-		const url = `${API_BASE}/form/getByFolderId`;
+		const url = `${traderApiUrl}/form/getByFolderId`;
 		return http.post2(url, data);
 		// return getMock('detail')
 	},
 	loginApi(data) {
 		/*
-		const url = `${API_BASE}/konfi/menu/getTree`;
+		const url = `${traderApiUrl}/trader/menu/getTree`;
 		return http.get2(url, data);
 		*/
 		return new Promise((resolve) => {
@@ -99,34 +99,34 @@ const Api = {
 	},
 	//添加列
 	addColumnApi(data) {
-		const url = `${API_BASE}/columns/save`;
+		const url = `${traderApiUrl}/columns/save`;
 		return http.post2(url, data);
 		// return getMock('row')
 	},
 	//添加行
 	addRowApi(data) {
-		const url = `${API_BASE}/data/saveOne`;
+		const url = `${traderApiUrl}/data/saveOne`;
 		return http.post(url, data);
 	},
 	//添加文件夹
 	addFileApi(data) {
-		const url = `${API_BASE}/konfi/menu/save`;
+		const url = `${traderApiUrl}/trader/menu/save`;
 		return http.post2(url, data);
 	},
 	//添加表
 	addTableApi(data) {
-		const url = `${API_BASE}/form/save`;
+		const url = `${traderApiUrl}/form/save`;
 		return http.post2(url, data);
 	},
 	//编辑行数据
 	editRowApi(data) {
-		const url = `${API_BASE}/data/updateOne`;
+		const url = `${traderApiUrl}/data/updateOne`;
 		return http.post2(url, data);
 	},
 	//删除行数据
 	deleteRowApi(data) {
-		const url = `${API_BASE}/data/removeOne`;
+		const url = `${traderApiUrl}/data/removeOne`;
 		return http.post2(url, data);
 	},
 }
-export default Api;
+export default traderApi;

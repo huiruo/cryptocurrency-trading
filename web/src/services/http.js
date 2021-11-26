@@ -1,5 +1,5 @@
 import axios from "axios";
-import { setKonfiToken, getKonfiToken } from "./auth";
+import { setTranderToken, getTranderToken } from "./auth.ts";
 
 const CONTENT__TYPE = "application/json;charset=utf-8";
 
@@ -14,7 +14,7 @@ instance.interceptors.request.use(
 		// Do something before request is sent
 		config.headers = {
 			"Content-Type": config.contentType || CONTENT__TYPE,
-			KonfiToken: getKonfiToken()
+			// traderToken: getTranderToken()
 		};
 
 		return config;
@@ -33,9 +33,9 @@ instance.interceptors.response.use(
 			console.log("会话过期，请重新登录")
 			return;
 		}
-		if (response.headers.KonfiToken) {
-			console.log("KonfiToken === ", response.headers.KonfiToken);
-			setKonfiToken(response.headers.KonfiToken);
+		if (response.headers.traderToken) {
+			console.log("traderToken === ", response.headers.traderToken);
+			// setTranderToken(response.headers.traderToken);
 		}
 		// Do something with response data
 		const data = response.data;

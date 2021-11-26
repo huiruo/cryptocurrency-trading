@@ -2,15 +2,15 @@ import Cookies from "js-cookie";
 
 const TokenKey = "Admin-Token-Market";
 const UserTypeKey = "User-Type-Market";
-const KonfiToKenKey = "KonfiToken";
-export function setKonfiToken(value) {
-	Cookies.set(KonfiToKenKey, value);
-	// window.sessionStorage.setItem(KonfiToKenKey, value);
+const traderToKenKey = "Trader-Token";
+export function setTranderToken(value) {
+	Cookies.set(traderToKenKey, value);
+	// window.sessionStorage.setItem(traderToKenKey, value);
 }
 
-export function getKonfiToken() {
-	return Cookies.get(KonfiToKenKey);
-	// return window.sessionStorage.getItem(KonfiToKenKey);
+export function getTranderToken() {
+	return Cookies.get(traderToKenKey);
+	// return window.sessionStorage.getItem(traderToKenKey);
 }
 
 /**
