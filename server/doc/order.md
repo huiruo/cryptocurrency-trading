@@ -12,8 +12,22 @@
 ubuntu:ip
 ifconfig -a
 172.16.1.141:8089/trader/user/test
-abchen
-123456
+
+http://172.16.1.141:8089/trader/user/login
+{
+"account":"abchen",
+"password":"123456"
+}
+
+respons:
+{
+    "data": {
+        "id": "20",
+        "account": "abchen"
+    },
+    "code": 0,
+    "msg": "操作成功！"
+}
 ```
 ### 创建订单(买入)
 ```
