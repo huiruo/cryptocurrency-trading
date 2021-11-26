@@ -19,6 +19,9 @@
 *.tar.gz
 *.rar
 
+# secret
+secret_document
+
 # js
 # js
 node_modules/
