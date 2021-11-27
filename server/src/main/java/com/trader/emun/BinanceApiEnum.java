@@ -1,14 +1,12 @@
 package com.trader.emun;
 
-import lombok.Data;
+public enum BinanceApiEnum {
 
-public enum OkexApiEnum {
-    TICKER("TICKER","/api/spot/v3/instruments/BTC-USDT/ticker")
     ;
     private String url;
     private String value;
 
-    OkexApiEnum(String url, String value) {
+    BinanceApiEnum(String url, String value) {
         this.url=url;
         this.value=value;
     }
