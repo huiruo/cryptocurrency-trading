@@ -2,7 +2,11 @@ package com.trader.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import javax.servlet.http.HttpServletRequest;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import com.trader.entity.Result;
@@ -14,6 +18,10 @@ import com.trader.service.UserService;
 @RequestMapping("user")
 @Slf4j
 public class TraderController {
+
+    @Autowired
+    private RestTemplate restTemplate;
+
     @Autowired
     private UserService userService;
 
@@ -31,4 +39,15 @@ public class TraderController {
             return new Result<>(4, e.getMessage());
         }
     }
+
+    @GetMapping("/getTicker")
+    public String getJson(){
+        String url="https://www.okex.com/api/spot/v3/instruments/BTC-USDT/ticker`";
+        System.out.println("getTicker------->");
+        //String json =restTemplate.getForObject(url,Object.class);
+        //ResponseEntity<String> results = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
+        //String json = results.getBody();
+        return "test";
+    }
+
 }
