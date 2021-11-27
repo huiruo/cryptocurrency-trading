@@ -1,5 +1,7 @@
 # binance 
 建议您尽可能多地使用websocket消息获取相应数据，以减少请求带来的访问限制压力。
+
+https://binance-docs.github.io/apidocs/spot/cn/#185368440e
 ```
 HTTP 返回代码
 https://api.binance.com
