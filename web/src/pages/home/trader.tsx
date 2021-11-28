@@ -1,12 +1,39 @@
-import React,{useEffect} from 'react'
+import React,{useEffect,useState} from 'react'
 import { Box } from '@fower/react'
-// import CenterPanel from './centerPanel.tsx'
 import OrderOperation from './orderOperation.tsx'
-import UserPanel from './userPanel.tsx'
-import traderApi from '../../services/traderApi.ts'
+// import UserPanel from './userPanel.tsx'
+import TraderHeader from './traderHeader.tsx'
+import traderApi from "../../services/traderApi.ts"
+// import {TickerInter} from '../../utils/types.ts'
+
+interface TickerInter{
+  lastPrice: string //最新价格
+  lastQty: string  //最新成交的数量
+  bidPrice: string //买一价
+  bidQty: string   //买一价对应的数量
+  askPrice: string //卖一价
+  askQty: string   //卖一价对应的量
+  highPrice: string//24h最高价
+  lowPrice: string //24h最低价
+  volume: string   //24h成交量(USDT)
+  quoteVolume: string //24h成交额(USDT)
+  openPrice: string //开盘价
+
+  priceChange: string,      //24h涨跌
+  priceChangePercent: string,      //24h涨幅
+  prevClosePrice: string, //上一个收盘价
+  openTime: number,  //integer($int64)
+  closeTime: number, //integer($int64)
+  count: number,  //成交笔数
+}
 
 const Trader =()=>{
-  useEffect(() => {  
+
+  const [ticker,setTicker] = useState<boolean>(222)
+  const [age, setAge] = useState<boolean>(28)
+  // const [ticker,setTicker] = useState()
+
+  useEffect(() => {
     const get24hrTicker = async()=>{
       // const platform = 'binance'
       const platform = 'okex'
@@ -73,22 +100,30 @@ const Trader =()=>{
             prevClosePrice: "54377.08000000", //上一个收盘价
             */
           }
+          // let test:string = ''
+          // test =222
           console.log("tickerData",tickerData)
+          // setTicker(tickerData)
+          setTicker("test")
         }else{
 
         }
       } else {
         alert("请求错误")
-      } 
+      }
     }
     get24hrTicker()
-  })
+  },[])
 
+  console.log("ticker--->1",ticker)
+  console.log("ticker--->2",ticker)
   return (
     <>
       <Box row h="8.4rem" bgBrand400>
         <Box bgGray100 w="80%">
-          <Box bg="#FCD535" h="16%">header</Box>
+          <Box bg="#FCD535" h="16%">
+            <TraderHeader ticker={ticker} callBack={'test'}/>
+          </Box>
           <Box row w="100%" h="84%">
             <Box w='20%' h='100%' bgBlue100>
               <Box bgBrand400 h='50%'>top</Box>

@@ -46,6 +46,7 @@ const OrderOperation =()=>{
               </Box>
               <Box>
                 <Input onChange={(e) => { setSellPrice(e.target.value) }} value={sellPrice} placeholder="请输入价格"/>
+                {/* <Input onChange={(e) => { setSellPrice(e.target.value) }} value={sellPrice} size={2}/> */}
               </Box>
             <Button
               w-100p
