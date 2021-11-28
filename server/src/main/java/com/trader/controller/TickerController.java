@@ -15,13 +15,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/spot/v3/instrument")
+@RequestMapping("api/ticker")
 public class TickerController {
 
     @Value("${OKEX_URL}")
     private String OKEX_URL;
 
-    @GetMapping("ticker")
+    /*
+    获取24小时行情
+    */
+    @GetMapping("24hr")
     public Result ticker(){
         String result = HttpRequest.get(OKEX_URL+ OkexApiEnum.TICKER.getValue())
                 .setHttpProxy("127.0.0.1", 7890)
