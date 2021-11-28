@@ -11,12 +11,23 @@ import traderApi from '../../services/traderApi.ts'
 const Trader=()=>{
 
   useEffect(() => {  
-    const getData = async()=>{
+    const get24hrTicker = async()=>{
+    /*
+      okex:
       const data={
-        symbol:'BTC-USDT'
+        symbol:'BTC-USDT',
+        platform:'okex'
+      }
+    */
+      /*
+      binance:
+      */
+      const data={
+        symbol:'BTCUSDT',
+        platform:'binance'
       }
 
-      const res = await platformApi.getSSprice(data)
+      const res = await traderApi.get24hrTicker(data)
       console.log("res",res)
 
       if (res.status === 200) {
@@ -25,7 +36,7 @@ const Trader=()=>{
 
       } 
     }
-    getData()
+    get24hrTicker()
 
     const testLogin = async()=>{
       const data={
@@ -33,7 +44,7 @@ const Trader=()=>{
         "password":"123456"
       }
 
-      const res = await traderApi.testLogin(data)
+      const res = await traderApi.onLogin(data)
       console.log("res_login",res)
 
       if (res.status === 200) {

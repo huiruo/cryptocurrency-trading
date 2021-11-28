@@ -4,11 +4,6 @@
 //company
 const traderBaseUrl="http://172.16.1.141:8089"
 
-//const bianceApiUrl = 'https://api.binance.com'
-
-let okexApiUrl = 'https://www.okex.com'
-
-
 const getTraderApiUrl = () => {
     switch (process.env.APP_ENV) {
         case 'dev':
@@ -24,26 +19,6 @@ const getTraderApiUrl = () => {
     }
 }
 
-const getPlatformUrl = () => {
-
-    let platformUrl = okexApiUrl
-
-    switch (process.env.APP_ENV) {
-        case 'dev':
-            //开发环境第三方平台跨域
-            return `/okexUrl`;
-            // return okexApiUrl
-        case 'preprod':
-            return platformUrl
-        case 'prod':
-            return platformUrl
-        default:
-            return platformUrl;
-    }
-}
-
 const traderApiUrl = getTraderApiUrl()
 
-const platformUrl = getPlatformUrl()
-
-export {platformUrl,traderApiUrl}
+export {traderApiUrl}
