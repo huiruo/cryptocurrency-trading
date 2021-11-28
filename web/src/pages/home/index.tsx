@@ -8,7 +8,7 @@ import traderApi from '../../services/traderApi.ts'
 const Index=()=>{
 
   useEffect(() => {  
-    const testLogin = async()=>{
+    const onLogin = async()=>{
       const data={
         "account":"abchen",
         "password":"123456"
@@ -20,7 +20,7 @@ const Index=()=>{
 
       } 
     }
-    testLogin()
+    onLogin()
   })
   
   return (
