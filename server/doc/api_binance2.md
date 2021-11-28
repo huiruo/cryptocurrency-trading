@@ -2,6 +2,8 @@
 # 开发人员2_文档
 test:
 http://localhost:8089/trader/user/test
+官方界面：
+https://www.binance.com/zh-CN/trade/BTC_USDT?layout=basic
 
 ### 币安接口
 https://binance-docs.github.io/apidocs/spot/cn/#185368440e
