@@ -27,12 +27,37 @@ https://www.okex.com/api/spot/v3/instruments/BTC-USDT/ticker
     best_bid_size	String	买一价对应的数量
     open_24h	String	24小时开盘价
     high_24h	String	24小时最高价
-    low_24h	String	24小时最低价
+    **low_24h**	String	24小时最低价
     base_volume_24h	String	24小时成交量，按交易货币统计
     quote_volume_24h	String	24小时成交量，按计价货币统计
     timestamp	String	系统时间戳
     open_utc0	String	UTC 0 时开盘价
     open_utc8	String	UTC+8 时开盘价
+}
+
+{
+    "data": {
+        "best_bid_size": "1.8824126",
+        "open_utc8": "54901",
+        "last": "54464.6",
+        "last_qty": "0.00001", 
+        "quote_volume_24h": "539346664.3",
+        "open_utc0": "54721.4",
+        "best_ask": "54464.7",
+        "instrument_id": "BTC-USDT",
+        "best_ask_size": "0.14320013",
+        "best_bid": "54464.6",
+        "product_id": "BTC-USDT",
+        "ask": "54464.7",
+        "high_24h": "55275.6",
+        "low_24h": "53678.9",
+        "bid": "54464.6",
+        "base_volume_24h": "9864.05482244",
+        "open_24h": "54304.6",
+        "timestamp": "2021-11-28T07:19:09.220Z" 系统时间戳
+    },
+    "code": 0,
+    "msg": "操作成功！"
 }
 ```
 ### 全部ticker信息
