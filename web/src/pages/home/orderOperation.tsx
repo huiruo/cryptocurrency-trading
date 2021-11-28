@@ -39,7 +39,7 @@ const OrderOperation =()=>{
   }
 
   return (
-        <Box flex w="50%">
+        <Box flex>
           <Box p='.16rem'>
               <Box>
                 <Input onChange={(e) => { setSellCode(e.target.value) }} value={sellCode} placeholder="请输入种类"/>

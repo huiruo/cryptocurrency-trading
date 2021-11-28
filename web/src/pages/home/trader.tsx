@@ -1,6 +1,6 @@
 import React,{useEffect} from 'react'
 import { Box } from '@fower/react'
-import CenterPanel from './centerPanel.tsx'
+// import CenterPanel from './centerPanel.tsx'
 import OrderOperation from './orderOperation.tsx'
 import UserPanel from './userPanel.tsx'
 import traderApi from '../../services/traderApi.ts'
@@ -86,10 +86,26 @@ const Trader =()=>{
 
   return (
     <>
-      <CenterPanel />
-      <Box flex h='3.88rem'>
-        <UserPanel />
-        <OrderOperation />
+      <Box row h="8.4rem" bgBrand400>
+        <Box bgGray100 w="80%">
+          <Box bg="#FCD535" h="16%">header</Box>
+          <Box row w="100%" h="84%">
+            <Box w='20%' h='100%' bgBlue100>
+              <Box bgBrand400 h='50%'>top</Box>
+              <Box bgBrand h='50%'>bottom</Box>
+            </Box>
+            <Box w='80%' h='100%' bgBrand200>
+              <Box bg='grey' h='50%'>top</Box>
+              <Box bg='beige' h='50%'>
+                <OrderOperation />
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+        <Box bgBrand w="20%" minW=".32rem">
+          <Box bgBrand400 h='50%'>top</Box>
+          <Box bgBrand h='50%'>bottom</Box>
+        </Box>
       </Box>
     </>
   );

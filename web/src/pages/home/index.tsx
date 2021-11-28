@@ -24,9 +24,11 @@ const Index=()=>{
   })
   
   return (
-    <Box column h='100%' w='100%' minH='8.5rem' style={{margin:'0 auto',flex:'1'}}>
+    <Box h='100%' w='100%' minH='8.5rem'>
 			<Header />
-      <Trader />
+      <Box w="15.20rem" minW="15.20rem" style={{margin: '0 auto'}}>
+        <Trader />
+      </Box>
     </Box>
   );
 }

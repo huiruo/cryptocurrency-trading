@@ -2,8 +2,8 @@ import { Box } from '@fower/react'
 
 const Header =()=>{
   return (
-    <Box minH='.64rem' bgBlue100>
-     header
+    <Box minH='.64rem' w='100%' minW="15.20rem" bgBlue100>
+      header
     </Box>
   );
 }
