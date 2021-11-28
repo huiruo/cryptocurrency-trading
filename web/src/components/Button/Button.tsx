@@ -45,7 +45,7 @@ const Button: BoxComponent<'button', ButtonProps> = forwardRef((props: ButtonPro
 
   if (icon) delete sizeStyle?.px // icon button 不要 padding
 
-  const isFilled = variant === 'filled'
+  // const isFilled = variant === 'filled'
   const notAllowed = !!(disabled || loading)
   const iconButtonProps = icon ? { w: sizeStyle.h } : {}
 

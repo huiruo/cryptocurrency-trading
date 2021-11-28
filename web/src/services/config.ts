@@ -2,7 +2,7 @@
 //home
 // const traderBaseUrl = 'http://192.168.50.5:10027'
 //company
-const traderBaseUrl="http://172.16.1.141:8089"
+// const traderBaseUrl="http://172.16.1.141:8089"
 
 const getTraderApiUrl = () => {
     switch (process.env.APP_ENV) {

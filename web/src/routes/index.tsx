@@ -38,7 +38,7 @@ const Routes = withRouter(({ location, history }) => {
 		*/
 		//2.根据条件生成相应的组件
 		const RouteWithSubRoutes = (route) => {
-			console.log("2.根据条件生成相应的组件", route)
+			//console.log("2.根据条件生成相应的组件", route)
 			// if (!route.path) return <Route component={NotFound} />
 			return (
 				<Route
@@ -52,7 +52,7 @@ const Routes = withRouter(({ location, history }) => {
 			/>)
 		}
 
-	console.log("1.动态生成路由", location, history)
+	//console.log("1.动态生成路由", location, history)
 	return (
 		<HashRouter>
 			<Switch>
