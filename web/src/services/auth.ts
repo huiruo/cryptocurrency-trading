@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 const TokenKey = "Admin-Token-Market";
 const UserTypeKey = "User-Type-Market";
 const traderToKenKey = "Trader-Token";
-export function setTranderToken(value) {
+export function setTranderToken(value:any) {
 	Cookies.set(traderToKenKey, value);
 	// window.sessionStorage.setItem(traderToKenKey, value);
 }
@@ -24,7 +24,7 @@ export function getToken() {
  * 设置 账户权限
  * @param {*} token
  */
-export function setToken(token) {
+export function setToken(token:any) {
 	return Cookies.set(TokenKey, token);
 }
 
@@ -45,7 +45,7 @@ export function getUserType() {
  * 设置 账户权限
  * @param {*} token
  */
-export function setUserType(type) {
+export function setUserType(type:any) {
 	return Cookies.set(UserTypeKey, type);
 }
 /**

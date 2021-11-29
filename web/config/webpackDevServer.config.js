@@ -104,17 +104,13 @@ module.exports = function (proxy, allowedHost) {
     // proxy,
     proxy: {
       "/traderUrl": {
-        target: "http://172.16.1.141:8089",
+        //company
+        // target: "http://172.16.1.141:8099",
+        //home
+        target:"http://192.168.31.139:8089",
         changeOrigin: true,
         pathRewrite: {
           "^/traderUrl": ""
-        }
-      },
-      "/okexUrl": {
-        target: "https://www.okex.com",
-        changeOrigin: true,
-        pathRewrite: {
-          "^/okexUrl": ""
         }
       }
     },

@@ -1,5 +1,5 @@
 import React from 'react'
-export * from './array.ts'
+export * from './array'
 
 export const __DEV__ = process.env.NODE_ENV !== 'production'
 

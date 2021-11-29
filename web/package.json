@@ -22,8 +22,8 @@
     "bfj": "^7.0.2",
     "camelcase": "^6.1.0",
     "case-sensitive-paths-webpack-plugin": "2.3.0",
-    "css-loader": "4.3.0",
     "cross-env": "^7.0.3",
+    "css-loader": "4.3.0",
     "dotenv": "8.2.0",
     "dotenv-expand": "5.1.0",
     "eslint": "^7.11.0",
@@ -41,10 +41,10 @@
     "html-webpack-plugin": "4.5.0",
     "identity-obj-proxy": "3.0.0",
     "jest": "26.6.0",
-    "js-cookie": "^3.0.1",
     "jest-circus": "26.6.0",
     "jest-resolve": "26.6.0",
     "jest-watch-typeahead": "0.6.1",
+    "js-cookie": "^3.0.1",
     "lib-flexible": "^0.3.2",
     "mini-css-extract-plugin": "0.11.3",
     "optimize-css-assets-webpack-plugin": "5.0.4",
@@ -158,5 +158,10 @@
     "presets": [
       "react-app"
     ]
+  },
+  "devDependencies": {
+    "@types/js-cookie": "^3.0.1",
+    "@types/react": "^17.0.2",
+    "@types/react-router-dom": "^5.3.2"
   }
 }

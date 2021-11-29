@@ -1,6 +1,7 @@
-import Home from '../pages/home/index.tsx';
-import Detail from '../pages/detail/index.tsx';
-import NotFound from '../pages/notFound/index.tsx'
+import React from 'react';
+import Home from '../pages/home/index';
+import Detail from '../pages/detail/index';
+import NotFound from '../pages/notFound/index'
 import {
 	Switch,
 	Route,
@@ -37,7 +38,7 @@ const Routes = withRouter(({ location, history }) => {
 		});
 		*/
 		//2.根据条件生成相应的组件
-		const RouteWithSubRoutes = (route) => {
+		const RouteWithSubRoutes = (route:any) => {
 			console.log("2.根据条件生成相应的组件", route)
 			// if (!route.path) return <Route component={NotFound} />
 			return (

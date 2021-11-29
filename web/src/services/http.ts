@@ -1,5 +1,5 @@
 import axios from "axios";
-import { setTranderToken, getTranderToken } from "./auth.ts";
+// import { setTranderToken, getTranderToken } from "./auth.ts";
 
 const CONTENT__TYPE = "application/json;charset=utf-8";
 
@@ -13,7 +13,8 @@ instance.interceptors.request.use(
 	config => {
 		// Do something before request is sent
 		config.headers = {
-			"Content-Type": config.contentType || CONTENT__TYPE,
+			"Content-Type": CONTENT__TYPE,
+			// "Content-Type": config.contentType || CONTENT__TYPE,
 			// traderToken: getTranderToken()
 		};
 
@@ -66,7 +67,7 @@ instance.interceptors.response.use(
 
 // http methods
 const http = {
-	get: (url, options) => {
+	get: (url:any, options:any) => {
 		const config = Object.assign(
 			{},
 			{
@@ -77,7 +78,7 @@ const http = {
 		);
 		return instance(config);
 	},
-	get2: (url, body, options) => {
+	get2: (url:any, body:any, options?:any) => {
 		if (body) {
 			url += http.toQueryString(body);
 		}
@@ -91,7 +92,7 @@ const http = {
 		);
 		return instance(config);
 	},
-	post: (url, body, options) => {
+	post: (url:any, body:any, options?:any) => {
 		const config = Object.assign(
 			{},
 			{
@@ -103,7 +104,7 @@ const http = {
 		);
 		return instance(config);
 	},
-	post2: (url, body, options) => {
+	post2: (url:any, body:any, options?:any) => {
 		const config = Object.assign(
 			{},
 			{
@@ -115,7 +116,7 @@ const http = {
 		);
 		return instance(config);
 	},
-	post3: (url, body, options) => {
+	post3: (url:any, body:any, options?:any) => {
 		const config = Object.assign(
 			{},
 			{
@@ -126,7 +127,7 @@ const http = {
 		);
 		return instance(config);
 	},
-	postForm: (url, body, options) => {
+	postForm: (url:any, body:any, options?:any) => {
 		let form = new FormData();
 		for (let key in body) {
 			if (body.hasOwnProperty(key)) {
@@ -146,7 +147,7 @@ const http = {
 		);
 		return instance(config);
 	},
-	postForm2: (url, body, options) => {
+	postForm2: (url:string, body:any, options?:any) => {
 		const config = Object.assign(
 			{},
 			{
@@ -160,7 +161,7 @@ const http = {
 		);
 		return instance(config);
 	},
-	put: (url, body, options) => {
+	put: (url:string, body:any, options?:any) => {
 		const config = Object.assign(
 			{},
 			{
@@ -172,7 +173,7 @@ const http = {
 		);
 		return instance(config);
 	},
-	put2: (url, body, options) => {
+	put2: (url:any, body:any, options?:any) => {
 		const config = Object.assign(
 			{},
 			{
@@ -183,7 +184,7 @@ const http = {
 		);
 		return instance(config);
 	},
-	delete: (url, body, options) => {
+	delete: (url:string, body:any, options?:any) => {
 		const config = Object.assign(
 			{},
 			{
@@ -195,7 +196,7 @@ const http = {
 		);
 		return instance(config);
 	},
-	delete2: (url, body, options) => {
+	delete2: (url:string, body:any, options?:any) => {
 		const config = Object.assign(
 			{},
 			{
@@ -206,6 +207,7 @@ const http = {
 		);
 		return instance(config);
 	},
+	/*
 	blobReq: url => {
 		const config = {
 			url,
@@ -214,7 +216,8 @@ const http = {
 		};
 		return instance(config);
 	},
-	toQueryString(obj) {
+	*/
+	toQueryString(obj:any) {
 		return obj
 			? "?" +
 			Object.keys(obj)

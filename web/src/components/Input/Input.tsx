@@ -4,9 +4,9 @@ import { FowerHTMLProps, Colors } from '@fower/core'
 import { AtomicProps } from '@fower/atomic-props'
 import { upFirst } from '@fower/utils'
 
-import { forwardRef, __DEV__ } from '../utils/index.tsx'
-import { Placement, useInputGroupContext } from './context.ts'
-import { Id } from './types.ts'
+import { forwardRef, __DEV__ } from '../utils/index'
+import { Placement, useInputGroupContext } from './context'
+import { Id } from './types'
 
 type Size = 'sm' | 'md' | 'lg' | number
 

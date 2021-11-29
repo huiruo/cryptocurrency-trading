@@ -20,6 +20,18 @@ package.json
 yarn add @fower/react
 ```
 
+### yarn 添加 对应types/script
+```
+npm install XXXX --save-dev 或则 yarn add XXXX --dev
+npm install XXXX --save 或则 yarn add XXXX
+npm uninstall XXXX --save 或则 yarn remove XXXX
+实例：
+yarn add @types/react-router-dom --dev
+yarn add @types/react@^17.0.2 --dev
+yarn add @types/js-cookie --dev
+yarn remove @types/react
+```
+
 ### 适配
 ```
 rem 单位如何转换为像素值
