@@ -6,27 +6,6 @@ import TraderHeader from './traderHeader'
 import traderApi from "../../services/traderApi"
 import {TickerInter} from '../../utils/types'
 
-// interface TickerInter{
-//   lastPrice: string //最新价格
-//   lastQty: string  //最新成交的数量
-//   bidPrice: string //买一价
-//   bidQty: string   //买一价对应的数量
-//   askPrice: string //卖一价
-//   askQty: string   //卖一价对应的量
-//   highPrice: string//24h最高价
-//   lowPrice: string //24h最低价
-//   volume: string   //24h成交量(USDT)
-//   quoteVolume: string //24h成交额(USDT)
-//   openPrice: string //开盘价
-
-//   priceChange: string,      //24h涨跌
-//   priceChangePercent: string,      //24h涨幅
-//   prevClosePrice: string, //上一个收盘价
-//   openTime: number,  //integer($int64)
-//   closeTime: number, //integer($int64)
-//   count: number,  //成交笔数
-// }
-
 const Trader =()=>{
 
   const [ticker,setTicker] = useState<TickerInter>({ 
@@ -69,7 +48,11 @@ const Trader =()=>{
       }
 
       const res = await traderApi.get24hrTicker(data)
-      if (res.code === 0) {
+      console.log("traderApi.get24hrTicker调用返回:",res)
+      // console.log("traderApi.get24hrTicker调用返回:",res)
+      // if (res.code === 0) {
+        /*
+      if (res) {
         const {
           last,
           last_qty,
@@ -86,6 +69,7 @@ const Trader =()=>{
           // open_utc0,//UTC+8 时开盘价
           // open_utc8,
         } = res.data
+
         if(platform==='okex'){
           const tickerData = {
             lastPrice: last,      //最新价格
@@ -107,14 +91,12 @@ const Trader =()=>{
             closeTime: 0,  //integer($int64)
             count: 0,        //成交笔数
             //以下属性okex没有
-            /*
-            openTime: 1638083673203,  //integer($int64)
-            closeTime: 1638083673203,  //integer($int64)
-            count: 1097514,        //成交笔数
-            priceChange: "135.22000000",      //24h涨跌
-            priceChangePercent: "0.249",      //24h涨幅
-            prevClosePrice: "54377.08000000", //上一个收盘价
-            */
+            //openTime: 1638083673203,  //integer($int64)
+            //closeTime: 1638083673203,  //integer($int64)
+            //count: 1097514,        //成交笔数
+            //priceChange: "135.22000000",      //24h涨跌
+            //priceChangePercent: "0.249",      //24h涨幅
+            //prevClosePrice: "54377.08000000", //上一个收盘价
           }
           console.log("tickerData",tickerData)
           setTicker(tickerData)
@@ -124,11 +106,13 @@ const Trader =()=>{
       } else {
         alert("请求错误")
       }
+      */
     }
     get24hrTicker()
   },[])
 
-  console.log("ticker--->1",ticker)
+  console.log("ticker--->1:",ticker)
+  console.log("ticker--->2:",setTicker)
   return (
     <>
       <Box row h="8.4rem" bgBrand400>

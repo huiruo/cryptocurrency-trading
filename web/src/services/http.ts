@@ -1,242 +1,151 @@
-import axios from "axios";
-// import { setTranderToken, getTranderToken } from "./auth.ts";
+import axios, {AxiosInstance, AxiosRequestConfig} from 'axios'
 
-const CONTENT__TYPE = "application/json;charset=utf-8";
+//自定义拦截器类型
+interface customInterceptorType {
+  requestInterceptor?: (config: AxiosRequestConfig) => AxiosRequestConfig
+  requestInterceptorCatch?: (error: any) => any
+  resInterceptor?: (res: any) => any
+  resInterceptorCatch?: (error: any) => any
+}
 
-axios.defaults.withCredentials = true;
+//定义自己的实例类型
+interface customRequest extends AxiosRequestConfig {
+  interceptor?: customInterceptorType,
+  showLoading?: boolean
+}
 
-const instance = axios.create({
-});
+const DEFAULT_LOADING = true   //loading 的默认值
+const CONTENT_TYPE = "application/json;charset=utf-8";
 
-// instance 拦截,设置 header
-instance.interceptors.request.use(
-	config => {
-		// Do something before request is sent
-		config.headers = {
-			"Content-Type": CONTENT__TYPE,
-			// "Content-Type": config.contentType || CONTENT__TYPE,
-			// traderToken: getTranderToken()
-		};
+class HttpRequest {
+    // private readonly baseUrl: string;
+    // loading?: ILoadingInstance
+    // interceptor?: customInterceptorType
+    protected instance: AxiosInstance
+    showLoading: boolean
 
-		return config;
-	},
-	error => {
-		// Do something with request error
-		const promise = Promise.reject(error);
-		return promise;
-	}
-);
+    constructor(config: customRequest) {
+        // this.baseUrl = 'http://localhost:3000'
+        this.instance = axios.create(config)
+        this.showLoading = config.showLoading || DEFAULT_LOADING
 
-// response 拦截,处理返回结果
-instance.interceptors.response.use(
-	response => {
-		if (response.data.code === 4040) {
-			console.log("会话过期，请重新登录")
-			return;
-		}
-		if (response.headers.traderToken) {
-			console.log("traderToken === ", response.headers.traderToken);
-			// setTranderToken(response.headers.traderToken);
-		}
-		// Do something with response data
-		const data = response.data;
-		let promise = Promise.resolve(data);
-		return promise;
-	},
-	error => {
-		// Do something with response error
-		console.log(error);
-		if (error.response) {
-			switch (error.response.status) {
-				case 401:
-					// 返回 401 清除token信息并跳转到登录页面
-					console.log("返回 401 清除token信息并跳转到登录页面");
-					break;
-				default:
-					console.log("default");
-					break;
-			}
-		}
+        // instance request拦截
+        this.instance.interceptors.request.use((config) => {
+          console.log("request拦截=====>",config)
+            //loading图标加载
+            // if(this.showLoading) {
+            // this.loading = ElLoading.service({
+            //   lock: true,
+            //   text: '正在加载中...'
+            // })
+            // console.log("正在加载中...")
+            // }
+            //token拦截
+            /*
+            const token = localStorage.getItem('token')
+            if(token) {
+              //@ts-ignore
+              config.headers.Authorization = token
+            }
+            */
+            return config
+          },
+          (error) => {
+            return error
+          }
+        )
 
-		const { status, statusText } = error.response;
-		// 返回接口返回的错误信息
-		const promise = Promise.reject({ status, statusText });
-		return promise;
-	}
-);
+        // instance response 拦截,处理返回结果
+        this.instance.interceptors.response.use((res) => {
+          console.log("instance response 拦截,处理返回结果",res)
+            //当响应成功的时候，关闭loading
+            /*
+            setTimeout(() => {
+              this.loading?.close()
+            }, 1000)
+          */
+            return res.data
+          },
+          (error) => {
+            //当响应失败的时候，关闭loading
+            /*
+            this.loading?.close()
+            */
+            return error
+          }
+        )
+    }
+    getInsideConfig() {
+        const config = {
+            // baseURL: this.baseUrl,
+            headers: {
+              "Content-Type": CONTENT_TYPE,
+            }
+        }
+        return config
+    }
 
-// http methods
-const http = {
-	get: (url:any, options:any) => {
-		const config = Object.assign(
-			{},
-			{
-				url,
-				method: "GET"
-			},
-			options
-		);
-		return instance(config);
-	},
-	get2: (url:any, body:any, options?:any) => {
-		if (body) {
-			url += http.toQueryString(body);
-		}
-		const config = Object.assign(
-			{},
-			{
-				url,
-				method: "GET"
-			},
-			options
-		);
-		return instance(config);
-	},
-	post: (url:any, body:any, options?:any) => {
-		const config = Object.assign(
-			{},
-			{
-				url,
-				method: "POST",
-				data: body
-			},
-			options
-		);
-		return instance(config);
-	},
-	post2: (url:any, body:any, options?:any) => {
-		const config = Object.assign(
-			{},
-			{
-				url: url + http.toQueryString(body),
-				method: "POST",
-				data: body
-			},
-			options
-		);
-		return instance(config);
-	},
-	post3: (url:any, body:any, options?:any) => {
-		const config = Object.assign(
-			{},
-			{
-				url: url + http.toQueryString(body),
-				method: "POST"
-			},
-			options
-		);
-		return instance(config);
-	},
-	postForm: (url:any, body:any, options?:any) => {
-		let form = new FormData();
-		for (let key in body) {
-			if (body.hasOwnProperty(key)) {
-				form.append(key, body[key]);
-			}
-		}
-		const config = Object.assign(
-			{},
-			{
-				url: url,
-				method: "POST",
-				data: form,
-				processData: false,
-				contentType: false
-			},
-			options
-		);
-		return instance(config);
-	},
-	postForm2: (url:string, body:any, options?:any) => {
-		const config = Object.assign(
-			{},
-			{
-				url: url,
-				method: "POST",
-				data: body,
-				processData: false,
-				contentType: false
-			},
-			options
-		);
-		return instance(config);
-	},
-	put: (url:string, body:any, options?:any) => {
-		const config = Object.assign(
-			{},
-			{
-				url,
-				method: "PUT",
-				data: body
-			},
-			options
-		);
-		return instance(config);
-	},
-	put2: (url:any, body:any, options?:any) => {
-		const config = Object.assign(
-			{},
-			{
-				url: url + http.toQueryString(body),
-				method: "PUT"
-			},
-			options
-		);
-		return instance(config);
-	},
-	delete: (url:string, body:any, options?:any) => {
-		const config = Object.assign(
-			{},
-			{
-				url,
-				method: "DELETE",
-				data: body
-			},
-			options
-		);
-		return instance(config);
-	},
-	delete2: (url:string, body:any, options?:any) => {
-		const config = Object.assign(
-			{},
-			{
-				url: url + http.toQueryString(body),
-				method: "DELETE"
-			},
-			options
-		);
-		return instance(config);
-	},
-	/*
-	blobReq: url => {
-		const config = {
-			url,
-			method: "GET",
-			responseType: "blob"
-		};
-		return instance(config);
-	},
-	*/
-	toQueryString(obj:any) {
-		return obj
-			? "?" +
-			Object.keys(obj)
-				.sort()
-				.map(key => {
-					let val = obj[key];
-					if (Array.isArray(val)) {
-						return val
-							.sort()
-							.map(function (val2) {
-								return key + "=" + val2;
-							})
-							.join("&");
-					}
-					return key + "=" + val;
-				})
-				.join("&")
-			: "";
-	}
-};
+    request<T>(params: customRequest): Promise<T> {
+      let config:customRequest
+      if(typeof params === 'string') {   //字符串
+        // config = arguments[1] || {}
+        // config.url = arguments[0]   //处理url
+        // if(arguments[2]) {
+        //   config.showLoading = arguments[2] || {}   //处理showLoading
+        // }
+      } else {  //对象
+        config = params || {}
+      }
+  
+      return new Promise((resolve) => {
+        /*
+        if (config.interceptor?.requestInterceptor) {  //可以删除，没有接口拦截器
+          config = config.interceptor.requestInterceptor(config)
+        }
+        */
+        if(config.showLoading === false) {
+          this.showLoading = false
+        }
+        console.log("this.instance.request-----====",config)
+        this.instance.request<any, T>(config).then((res) => {
+          console.log("this.instance.request-----====",res)
+          /*
+          if (config.interceptor?.resInterceptor) {  //可以删除，没有接口拦截器
+            config = config.interceptor.resInterceptor(res)
+          }
+          */
+          resolve(res)
+          this.showLoading = DEFAULT_LOADING
+        })
+      })
+    }
+
+    get<T>(options:customRequest,url:string): Promise<T>{
+      const config = Object.assign(
+        {},
+        {
+          url,
+          options
+        },
+      );
+      return this.request({...config, method: 'GET'})
+    }
+
+    post<T>(options:customRequest,url:string): Promise<T>{
+      const config = Object.assign(
+        {},
+        {
+          url,
+          data: options,
+        }
+      );
+      return this.request({...config,method: 'POST'})
+    }
+}
+
+const http = new HttpRequest({
+    timeout: 10000,
+  }
+)
 
 export default http;
