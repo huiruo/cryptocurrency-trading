@@ -1,12 +1,11 @@
 package com.trader.controller;
 
 import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
+import com.trader.constant.ApiUrlConstant;
+import com.trader.emun.BinanceApiEnum;
 import com.trader.emun.OkexApiEnum;
 import com.trader.entity.Result;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,20 +17,33 @@ import java.util.Map;
 @RequestMapping("api/ticker")
 public class TickerController {
 
-    @Value("${OKEX_URL}")
-    private String OKEX_URL;
-
     /*
     获取24小时行情
     */
     @GetMapping("24hr")
-    public Result ticker(){
-        String result = HttpRequest.get(OKEX_URL+ OkexApiEnum.TICKER.getValue())
-                .setHttpProxy("127.0.0.1", 7890)
+    public Result ticker(String platform,String symbol){
+        Map resultMap=new HashMap();
+        switch (platform){
+            case "okex":
+                //欧易
+                String okexResult = HttpRequest.get(ApiUrlConstant.OKEX_URL+ OkexApiEnum.TICKER.getValue()+symbol+"/ticker")
+                        .setHttpProxy("127.0.0.1", 7890)
 //                .body(json)
-                .execute()
-                .body();
-        Map resultMap = JSON.parseObject(result, Map.class);
+                        .execute()
+                        .body();
+                resultMap = JSON.parseObject(okexResult, Map.class);
+                break;
+            default:
+                //默认币安
+                String binanceResult = HttpRequest.get(ApiUrlConstant.BINANCE_URL+ BinanceApiEnum.PRICE.getValue()+"?symbol="+symbol)
+                        .setHttpProxy("127.0.0.1", 7890)
+//                .body(json)
+                        .execute()
+                        .body();
+                resultMap = JSON.parseObject(binanceResult, Map.class);
+                break;
+        }
+
         return new Result(resultMap);
     }
 }

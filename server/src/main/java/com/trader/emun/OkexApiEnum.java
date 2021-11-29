@@ -3,8 +3,8 @@ package com.trader.emun;
 import lombok.Data;
 
 public enum OkexApiEnum {
-    TICKER("TICKER","/api/spot/v3/instruments/BTC-USDT/ticker"),
-    FFF("FFF","")
+    TICKER("TICKER","/api/spot/v3/instruments/"),
+
     ;
     private String url;
     private String value;

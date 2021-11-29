@@ -1,7 +1,7 @@
 package com.trader.emun;
 
 public enum BinanceApiEnum {
-
+    PRICE("PRICE","/api/v3/ticker/24hr")
     ;
     private String url;
     private String value;
