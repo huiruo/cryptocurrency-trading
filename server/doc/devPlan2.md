@@ -1,4 +1,30 @@
+### 运行访问
+```
+1.公司：
+test:
+    5901:
+    http://172.16.1.141:8099/trader/api/ticker
+    5902:172.16.1.141
+    http://172.16.1.141:8099/trader/api/ticker
+    24小时接口postman测试：
+    http://172.16.1.141:8099/trader/api/ticker/24hr
+web 开发环境配置：
+    proxy: {
+      "/traderUrl": {
+        //company
+        target: "http://172.16.1.141:8099",
+        //home
+        // target:"http://192.168.31.139:8089",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/traderUrl": ""
+        }
+      }
+    },
+    
+2.home：
 
+```
 ### 2021.1127:获取24小时行情
 ```text
 已完成
