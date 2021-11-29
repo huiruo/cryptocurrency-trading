@@ -1,9 +1,9 @@
 import React,{useEffect} from 'react'
-import Header from '../../components/Header/index.tsx'
-// import Footer from '../../components/Footer/index.tsx'
+import Header from '../../components/Header/index'
+// import Footer from '../../components/Footer/index'
 import { Box } from '@fower/react'
-import Trader from './trader.tsx'
-import traderApi from '../../services/traderApi.ts'
+import Trader from './trader'
+import traderApi from '../../services/traderApi'
 
 const Index=()=>{
 

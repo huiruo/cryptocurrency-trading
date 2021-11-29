@@ -1,37 +1,53 @@
 import React,{useEffect,useState} from 'react'
 import { Box } from '@fower/react'
-import OrderOperation from './orderOperation.tsx'
-// import UserPanel from './userPanel.tsx'
-import TraderHeader from './traderHeader.tsx'
-import traderApi from "../../services/traderApi.ts"
-// import {TickerInter} from '../../utils/types.ts'
+import OrderOperation from './orderOperation'
+// import UserPanel from './userPanel'
+import TraderHeader from './traderHeader'
+import traderApi from "../../services/traderApi"
+import {TickerInter} from '../../utils/types'
 
-interface TickerInter{
-  lastPrice: string //最新价格
-  lastQty: string  //最新成交的数量
-  bidPrice: string //买一价
-  bidQty: string   //买一价对应的数量
-  askPrice: string //卖一价
-  askQty: string   //卖一价对应的量
-  highPrice: string//24h最高价
-  lowPrice: string //24h最低价
-  volume: string   //24h成交量(USDT)
-  quoteVolume: string //24h成交额(USDT)
-  openPrice: string //开盘价
+// interface TickerInter{
+//   lastPrice: string //最新价格
+//   lastQty: string  //最新成交的数量
+//   bidPrice: string //买一价
+//   bidQty: string   //买一价对应的数量
+//   askPrice: string //卖一价
+//   askQty: string   //卖一价对应的量
+//   highPrice: string//24h最高价
+//   lowPrice: string //24h最低价
+//   volume: string   //24h成交量(USDT)
+//   quoteVolume: string //24h成交额(USDT)
+//   openPrice: string //开盘价
 
-  priceChange: string,      //24h涨跌
-  priceChangePercent: string,      //24h涨幅
-  prevClosePrice: string, //上一个收盘价
-  openTime: number,  //integer($int64)
-  closeTime: number, //integer($int64)
-  count: number,  //成交笔数
-}
+//   priceChange: string,      //24h涨跌
+//   priceChangePercent: string,      //24h涨幅
+//   prevClosePrice: string, //上一个收盘价
+//   openTime: number,  //integer($int64)
+//   closeTime: number, //integer($int64)
+//   count: number,  //成交笔数
+// }
 
 const Trader =()=>{
 
-  const [ticker,setTicker] = useState<boolean>(222)
-  const [age, setAge] = useState<boolean>(28)
-  // const [ticker,setTicker] = useState()
+  const [ticker,setTicker] = useState<TickerInter>({ 
+    lastPrice:'',
+    lastQty:'', 
+    bidPrice:'',
+    bidQty:'', 
+    askPrice:'',
+    askQty: '',
+    highPrice: '',
+    lowPrice:'',
+    volume:'',
+    quoteVolume: '',
+    openPrice: '',
+    priceChange: '',
+    priceChangePercent: '',
+    prevClosePrice: '',
+    openTime: 0,
+    closeTime: 0,
+    count: 0,
+  })
 
   useEffect(() => {
     const get24hrTicker = async()=>{
@@ -100,13 +116,10 @@ const Trader =()=>{
             prevClosePrice: "54377.08000000", //上一个收盘价
             */
           }
-          // let test:string = ''
-          // test =222
           console.log("tickerData",tickerData)
-          // setTicker(tickerData)
-          setTicker("test")
+          setTicker(tickerData)
         }else{
-
+          console.log("走binance逻辑----->")
         }
       } else {
         alert("请求错误")
@@ -116,13 +129,12 @@ const Trader =()=>{
   },[])
 
   console.log("ticker--->1",ticker)
-  console.log("ticker--->2",ticker)
   return (
     <>
       <Box row h="8.4rem" bgBrand400>
         <Box bgGray100 w="80%">
           <Box bg="#FCD535" h="16%">
-            <TraderHeader ticker={ticker} callBack={'test'}/>
+            <TraderHeader ticker={ticker} />
           </Box>
           <Box row w="100%" h="84%">
             <Box w='20%' h='100%' bgBlue100>

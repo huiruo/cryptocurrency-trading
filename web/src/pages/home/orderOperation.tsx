@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Box } from '@fower/react'
-import {Button} from '../../components/Button/index.tsx'
-import {Input} from '../../components/Input/index.tsx'
+// import {Button} from '../../components/Button/index'
+import {Input} from '../../components/Input/index'
 
 const OrderOperation =()=>{
 
@@ -10,6 +10,7 @@ const OrderOperation =()=>{
   const [buyCode, setBuyCode] = useState('')
   const [buyPrice, setBuyPrice] = useState('')
 
+  /*
   const onBuy=()=>{
 
     if(buyCode){
@@ -36,7 +37,7 @@ const OrderOperation =()=>{
       return
     }
     console.log("onSell",'buyCode:',buyCode,'buyPrice:',buyPrice)
-  }
+  }*/
 
   return (
         <Box flex>
@@ -48,14 +49,14 @@ const OrderOperation =()=>{
                 <Input onChange={(e) => { setSellPrice(e.target.value) }} value={sellPrice} placeholder="请输入价格"/>
                 {/* <Input onChange={(e) => { setSellPrice(e.target.value) }} value={sellPrice} size={2}/> */}
               </Box>
-            <Button
+            {/* <Button
               w-100p
               onClick={() => { onBuy() }}
               size="lg"
             >
             xxxxx
+            </Button> */}
             {/* 新建购买订单 */}
-            </Button>
           </Box>
 
           <Box p='.16rem'>
@@ -67,15 +68,15 @@ const OrderOperation =()=>{
                 <Input onChange={(e) => { setBuyPrice(e.target.value) }} value={buyPrice} placeholder="请输入价格"/>
               </Box>
             </Box>
-            <Button
+            {/* <Button
               w-100p
               onClick={() => { onSell() }}
               size="lg"
               colorScheme="#e92424"
             >
               xxxxx
-              {/* 新建卖出订单 */}
-            </Button>
+            </Button> */}
+            {/* 新建卖出订单 */}
           </Box>
         </Box>
   );
