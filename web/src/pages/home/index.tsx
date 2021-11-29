@@ -14,8 +14,8 @@ const Index=()=>{
         "password":"123456"
       }
       const res = await traderApi.onLogin(data)
-      if (res.status === 200) {
-
+      if (res.code === 0) {
+        console.log("登录成功",res)
       } else {
 
       } 
