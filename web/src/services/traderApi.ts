@@ -19,17 +19,16 @@ interface onLoginInter {
   msg?: string
 }
 const traderApi = {
-
 	/*
 	get24hrTicker(data:any){
 		const url = `${traderApiUrl}/trader/api/ticker/24hr`;
 		return http.get2(url, data);
 	},
+	onLogin(data:any){
+		const url = `${traderApiUrl}/trader/user/login`;
+		return http.post2(url, data);
+	},
 	*/
-	// onLogin(data:any){
-	// 	const url = `${traderApiUrl}/trader/user/login`;
-	// 	return http.post2(url, data);
-	// },
 	onLogin(data:any){
 		const url = `${traderApiUrl}/trader/user/login`;
 		return http.post<onLoginInter>(data,url);

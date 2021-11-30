@@ -1,5 +1,6 @@
 import axios, {AxiosInstance, AxiosRequestConfig} from 'axios'
 
+/*
 //自定义拦截器类型
 interface customInterceptorType {
   requestInterceptor?: (config: AxiosRequestConfig) => AxiosRequestConfig
@@ -7,47 +8,65 @@ interface customInterceptorType {
   resInterceptor?: (res: any) => any
   resInterceptorCatch?: (error: any) => any
 }
+*/
 
 //定义自己的实例类型
 interface customRequest extends AxiosRequestConfig {
-  interceptor?: customInterceptorType,
-  showLoading?: boolean
+  // interceptor?: customInterceptorType,
+  // showLoading?: boolean
+  data?: any, 
+  code?: number,
+  msg?: string
 }
 
-const DEFAULT_LOADING = true   //loading 的默认值
 const CONTENT_TYPE = "application/json;charset=utf-8";
+const codeMessage = new Map([
+  [200, '请求返回成功'],
+  [201, '新建或修改数据成功'],
+  [202, '一个请求已经进入后台排队'],
+  [204, '删除数据成功'],
+  [400, '请求错误(InvalidParameter)'],
+  [401, '用户没有权限'],
+  [403, '用户得到授权，但是访问是被禁止的'],
+  [404, 'Not found'],
+  [408,'请求超时'],
+  [410,'请求的资源被永久删除'],
+  [500, '服务器内部错误(InternalError)'],
+  [502, '网关错误'],
+  [503, '服务不可用，服务器暂时过载或维护'],
+  [504, '请求超时(Gateway Timeout)'],
+]);
 
 class HttpRequest {
     // private readonly baseUrl: string;
     // loading?: ILoadingInstance
     // interceptor?: customInterceptorType
     protected instance: AxiosInstance
-    showLoading: boolean
+    // showLoading: boolean
 
     constructor(config: customRequest) {
         // this.baseUrl = 'http://localhost:3000'
         this.instance = axios.create(config)
-        this.showLoading = config.showLoading || DEFAULT_LOADING
+        // this.showLoading = config.showLoading || DEFAULT_LOADING
 
-        // instance request拦截
+        //1.request拦截
         this.instance.interceptors.request.use((config) => {
-          console.log("request拦截=====>",config)
-            //loading图标加载
-            // if(this.showLoading) {
-            // this.loading = ElLoading.service({
-            //   lock: true,
-            //   text: '正在加载中...'
-            // })
-            // console.log("正在加载中...")
-            // }
-            //token拦截
-            /*
-            const token = localStorage.getItem('token')
-            if(token) {
-              //@ts-ignore
-              config.headers.Authorization = token
-            }
-            */
+          // console.log("request拦截=====>",config)
+
+          // if(this.showLoading) {
+          // this.loading = ElLoading.service({
+          //   lock: true,
+          //   text: '正在加载中...'
+          // })
+          // console.log("正在加载中...")
+          // }
+          //token拦截
+          /*
+          const token = localStorage.getItem('token')
+          if(token) {
+            config.headers.Authorization = token
+          }
+          */
             return config
           },
           (error) => {
@@ -55,11 +74,10 @@ class HttpRequest {
           }
         )
 
-        // instance response 拦截,处理返回结果
-        this.instance.interceptors.response.use((res) => {
-          console.log("instance response 拦截,处理返回结果",res)
-            //当响应成功的时候，关闭loading
-            /*
+        //2.response 拦截,处理返回结果
+        this.instance.interceptors.response.use(res => {
+          //console.log("instance response 拦截,处理返回结果",res)
+          /*
             setTimeout(() => {
               this.loading?.close()
             }, 1000)
@@ -67,11 +85,14 @@ class HttpRequest {
             return res.data
           },
           (error) => {
-            //当响应失败的时候，关闭loading
-            /*
-            this.loading?.close()
-            */
-            return error
+            //console.log("instance response错误处理:",error.response)
+            const {status}=error.response
+            const errorReq:customRequest ={
+              data: null, 
+              code: status,
+              msg:codeMessage.get(status)
+            }
+            return errorReq
           }
         )
     }
@@ -87,35 +108,35 @@ class HttpRequest {
 
     request<T>(params: customRequest): Promise<T> {
       let config:customRequest
-      if(typeof params === 'string') {   //字符串
+      //字符串
+      if(typeof params === 'string') {
         // config = arguments[1] || {}
-        // config.url = arguments[0]   //处理url
+        //处理url
+        // config.url = arguments[0]
         // if(arguments[2]) {
-        //   config.showLoading = arguments[2] || {}   //处理showLoading
+        //   config.showLoading = arguments[2] || {}
         // }
-      } else {  //对象
+      } else {  
         config = params || {}
       }
-  
       return new Promise((resolve) => {
         /*
         if (config.interceptor?.requestInterceptor) {  //可以删除，没有接口拦截器
           config = config.interceptor.requestInterceptor(config)
         }
-        */
         if(config.showLoading === false) {
           this.showLoading = false
         }
-        console.log("this.instance.request-----====",config)
+        */
         this.instance.request<any, T>(config).then((res) => {
-          console.log("this.instance.request-----====",res)
+          // console.log("this.instance.request-----res:",res)
           /*
           if (config.interceptor?.resInterceptor) {  //可以删除，没有接口拦截器
             config = config.interceptor.resInterceptor(res)
           }
+          // this.showLoading = DEFAULT_LOADING
           */
           resolve(res)
-          this.showLoading = DEFAULT_LOADING
         })
       })
     }
