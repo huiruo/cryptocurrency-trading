@@ -53,9 +53,6 @@ public class BinanceScheduled {
                 Method method1 = btcusdt.getClass().getMethod("set" + method, classType);
                 if (classType.isAssignableFrom(Long.class)){
                     value=Long.parseLong(value.toString());
-                }else if (classType.isAssignableFrom(Date.class)){
-                    Date date = new Date(Long.parseLong(value.toString()));
-                    value=date;
                 }
                 method1.invoke(btcusdt,value);
             } catch (Exception e) {

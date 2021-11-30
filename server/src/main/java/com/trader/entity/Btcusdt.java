@@ -26,8 +26,8 @@ public class Btcusdt {
     private String lowPrice;   //24h最低价
     private String volume;  //24h成交量(USDT)
     private String quoteVolume; //24h成交额(USDT)
-    private Date openTime;  //integer($int64)
-    private Date closeTime;  //integer($int64)
+    private Long openTime;  //integer($int64)
+    private Long closeTime;  //integer($int64)
     private Long count;        //成交笔数
     private String prevClosePrice; //上一个收盘价
     private String openPrice; //开盘价
