@@ -50,9 +50,7 @@ const Trader =()=>{
       const res = await traderApi.get24hrTicker(data)
       console.log("traderApi.get24hrTicker调用返回:",res)
       // console.log("traderApi.get24hrTicker调用返回:",res)
-      // if (res.code === 0) {
-        /*
-      if (res) {
+      if (res.code === 0) {
         const {
           last,
           last_qty,
@@ -104,9 +102,8 @@ const Trader =()=>{
           console.log("走binance逻辑----->")
         }
       } else {
-        alert("请求错误")
+        alert(res.msg)
       }
-      */
     }
     get24hrTicker()
   },[])

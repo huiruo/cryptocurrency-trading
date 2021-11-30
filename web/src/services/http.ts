@@ -85,7 +85,15 @@ class HttpRequest {
             return res.data
           },
           (error) => {
-            //console.log("instance response错误处理:",error.response)
+            console.log("instance response错误处理1:",error.response)
+            console.log("instance response错误处理2:",error)
+            if(!error.response){
+             return {
+              data: null, 
+              code: 408,
+              msg:error
+             }
+            }
             const {status}=error.response
             const errorReq:customRequest ={
               data: null, 
@@ -141,7 +149,31 @@ class HttpRequest {
       })
     }
 
+    toQueryString(obj:any) {
+      return obj
+        ? "?" +
+        Object.keys(obj)
+          .sort()
+          .map(key => {
+            let val = obj[key];
+            if (Array.isArray(val)) {
+              return val
+                .sort()
+                .map(function (val2) {
+                  return key + "=" + val2;
+                })
+                .join("&");
+            }
+            return key + "=" + val;
+          })
+          .join("&")
+        : "";
+    }
+
     get<T>(options:customRequest,url:string): Promise<T>{
+      if (options) {
+        url += http.toQueryString(options);
+      }
       const config = Object.assign(
         {},
         {
@@ -165,7 +197,7 @@ class HttpRequest {
 }
 
 const http = new HttpRequest({
-    timeout: 10000,
+    timeout: 30000,
   }
 )
 
