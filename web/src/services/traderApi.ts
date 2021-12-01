@@ -21,7 +21,7 @@ interface onLoginInter {
 const traderApi = {
 	/*
 	get24hrTicker(data:any){
-		const url = `${traderApiUrl}/trader/api/ticker/24hr`;
+		const url = `${traderApiUrl}/trader/ticker/24hr`;
 		return http.get2(url, data);
 	},
 	onLogin(data:any){
@@ -34,7 +34,7 @@ const traderApi = {
 		return http.post<onLoginInter>(data,url);
 	},
 	get24hrTicker(data:any){
-		const url:string = `${traderApiUrl}/trader/api/ticker/24hr`;
+		const url:string = `${traderApiUrl}/trader/ticker/24hr`;
 		return http.get<Ticker24hrInter>(data,url);
 	},
 }
