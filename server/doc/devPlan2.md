@@ -3,11 +3,11 @@
 1.公司：
 test:
     5901:
-    http://172.16.1.141:8099/trader/api/ticker
+    http://172.16.1.141:8099/trader/ticker
     5902:172.16.1.141
-    http://172.16.1.141:8099/trader/api/ticker
+    http://172.16.1.141:8099/trader/ticker
     24小时接口postman测试：
-    http://172.16.1.141:8099/trader/api/ticker/24hr
+    http://172.16.1.141:8099/trader/ticker/24hr
 web 开发环境配置：
     proxy: {
       "/traderUrl": {

@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/ticker")
+@RequestMapping("ticker")
 public class TickerController {
 
     /*

@@ -31,7 +31,7 @@ public class BinanceScheduled {
     private Snowflake snowflake;
 
 
-    @Scheduled(fixedRate = 1000*60*15)
+    //@Scheduled(fixedRate = 1000*60*15)
     public void binanceJob(){
         //默认币安
         String binanceResult = HttpRequest.get(ApiUrlConstant.BINANCE_URL+ BinanceApiEnum.PRICE.getValue()+"?symbol=BTCUSDT")

@@ -4,7 +4,7 @@
 ```text
 http://localhost:8089/trader/api/spot/v3/instrument/ticker
 修改后：
-http://localhost:8089/trader/api/ticker/24hr
+http://localhost:8089/trader/ticker/24hr
 
 对比:
     币安：
