@@ -22,6 +22,7 @@
 # secret
 secret_document
 server/src/main/resources/application-prod.properties
+server_node/config/config.ts
 
 # js
 # js
