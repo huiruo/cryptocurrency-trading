@@ -26,7 +26,8 @@ public class UserController {
     @RequestMapping("/login")
     public Result<User> login(@RequestBody User user, HttpServletRequest request) {
         User entityUser = new User();
-        System.out.println("登录------->");
+        System.out.println("登录------->"+user.getAccount());
+        System.out.println("登录------->"+user.getPassword());
         try {
             User userDb = userService.login(user);
             entityUser.setAccount(userDb.getAccount()).setEmail(userDb.getEmail()).setId(userDb.getId());

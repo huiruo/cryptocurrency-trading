@@ -26,6 +26,7 @@
     "@nestjs/platform-express": "^8.0.0",
     "got": "^11.8.3",
     "hpagent": "^0.1.2",
+    "crypto-js": "^4.1.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0"
