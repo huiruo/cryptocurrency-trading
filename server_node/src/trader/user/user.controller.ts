@@ -4,7 +4,13 @@ import got from 'got';
 const crypto = require('crypto');
 import {HttpsProxyAgent} from 'hpagent';
 
+const { Spot } = require('@binance/connector')
+const {BinanceSpot}  = require('@binance/connector2')
 
+const apiSecret =''
+const apiKey =''
+const okexApiSecret = ''
+const okexApiKey = ''
 @Controller('trader/ticker')
 export class UserController {
     //http://localhost:1788/trader/ticker/ticker/find
@@ -105,5 +111,28 @@ export class UserController {
 
         //const url = baseURL + path
         //const signature = hash_signature(payload_to_sign)
+    }
+
+    //http://localhost:1788/trader/ticker/gensignature2
+    @Get('gensignature2')
+    async generateSignature2(payload={}){
+        console.log("generateSignature2---->")
+        const client = new Spot(apiKey, apiSecret)
+        // Get account information
+        client.account().then(response =>{
+            console.log("response.data",response)
+            return client.logger.log(response.data)
+        })
+    }
+
+    @Get('gensignature3')
+    async generateSignature3(payload={}){
+        // client.getHello()
+        const client = new BinanceSpot(apiKey, apiSecret)
+        // Get account information
+        client.account().then(response =>{
+            console.log("response.data",response)
+            return client.logger.log(response.data)
+        })
     }
 }

@@ -5,6 +5,12 @@ https://docs.nestjs.cn/
 产品哲学：从Angular、React和Vue中得到的启发，在后端的开发中，面对大量优秀的类库，却没有一个有效解决架构问题的产品。而Nest的诞生，就是为了提供一个开箱即用的架构，实现了各种类库之间的松耦合。因此，严格意义上定义NestJS并不是一款Web服务框架，而是一个IoC容器（IoC Container ）
 ```
 
+### binance
+```
+yarn add @binance/connector
+
+```
+
 ### got 代理请求
 ```
 const data = await got.get(ticker24URL,{
