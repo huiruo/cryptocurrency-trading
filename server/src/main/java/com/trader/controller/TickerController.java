@@ -2,10 +2,11 @@ package com.trader.controller;
 
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSON;
-import com.trader.constant.ApiUrlConstant;
+import com.trader.constant.UrlConstant;
 import com.trader.emun.BinanceApiEnum;
 import com.trader.emun.OkexApiEnum;
 import com.trader.entity.Result;
+import com.trader.utils.BinanceHttpRequestUtil;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,21 +27,13 @@ public class TickerController {
         switch (platform){
             case "okex":
                 //欧易
-                String okexResult = HttpRequest.get(ApiUrlConstant.OKEX_URL+ OkexApiEnum.TICKER.getValue()+symbol+"/ticker")
-                        .setHttpProxy("127.0.0.1", 7890)
-//                .body(json)
-                        .execute()
-                        .body();
-                resultMap = JSON.parseObject(okexResult, Map.class);
+                Object obj = BinanceHttpRequestUtil.get(UrlConstant.OKEX_URL+ OkexApiEnum.TICKER.getUrl()+symbol+"/ticker");
+                resultMap = (Map) obj;
                 break;
             default:
                 //默认币安
-                String binanceResult = HttpRequest.get(ApiUrlConstant.BINANCE_URL+ BinanceApiEnum.PRICE.getValue()+"?symbol="+symbol)
-                        .setHttpProxy("127.0.0.1", 7890)
-//                .body(json)
-                        .execute()
-                        .body();
-                resultMap = JSON.parseObject(binanceResult, Map.class);
+                Object binanceObj = BinanceHttpRequestUtil.get(UrlConstant.BINANCE_URL+ BinanceApiEnum.HR_24.getUrl()+"?symbol="+symbol);
+                resultMap = (Map) binanceObj;
                 break;
         }
 

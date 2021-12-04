@@ -3,15 +3,15 @@ package com.trader.emun;
 import lombok.Data;
 
 public enum OkexApiEnum {
-    TICKER("TICKER","/api/spot/v3/instruments/"),
+    TICKER("/api/spot/v3/instruments/","欧易二十四小时价格变动情况"),
 
     ;
     private String url;
-    private String value;
+    private String desc;
 
-    OkexApiEnum(String url, String value) {
-        this.url=url;
-        this.value=value;
+    OkexApiEnum(String url, String desc) {
+        this.url = url;
+        this.desc = desc;
     }
 
     public String getUrl() {
@@ -22,11 +22,11 @@ public enum OkexApiEnum {
         this.url = url;
     }
 
-    public String getValue() {
-        return value;
+    public String getDesc() {
+        return desc;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 }

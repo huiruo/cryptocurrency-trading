@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ApiUrlConstant {
+public class UrlConstant {
     /**
      * 欧易
      */
@@ -13,10 +13,6 @@ public class ApiUrlConstant {
      * 币安
      */
     public static String BINANCE_URL;
-
-    private static String okexUrl;
-
-    private static String binanceUrl;
 
     @Value("${OKEX_URL}")
     public void setOkexUrl(String okexUrl) {

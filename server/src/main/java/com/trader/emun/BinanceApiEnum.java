@@ -1,14 +1,17 @@
 package com.trader.emun;
 
 public enum BinanceApiEnum {
-    PRICE("PRICE","/api/v3/ticker/24hr")
+    HR_24("/api/v3/ticker/24hr","二十四小时价格变动情况"),
+    GET_FUNDING_ASSET("/sapi/v1/asset/get-funding-asset","资金账户"),
+    API_RESTRICTIONS("/sapi/v1/account/apiRestrictions","查询用户API Key权限"),
+    TIMESTAMP("/api/v3/time","服务器时间戳"),
     ;
     private String url;
-    private String value;
+    private String desc;
 
-    BinanceApiEnum(String url, String value) {
-        this.url=url;
-        this.value=value;
+    BinanceApiEnum(String url, String desc) {
+        this.url = url;
+        this.desc = desc;
     }
 
     public String getUrl() {
@@ -19,11 +22,11 @@ public enum BinanceApiEnum {
         this.url = url;
     }
 
-    public String getValue() {
-        return value;
+    public String getDesc() {
+        return desc;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 }
