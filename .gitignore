@@ -22,7 +22,8 @@
 # secret
 secret_document
 server/src/main/resources/application-prod.properties
-server_node/config/config.ts
+server_node/.env
+server_node/config/env-prod/application-prod.env
 
 # js
 # js
