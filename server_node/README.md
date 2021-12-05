@@ -1,14 +1,85 @@
-# nestjs 文档
+### nestjs 文档
 ```
 https://docs.nestjs.cn/
 
 产品哲学：从Angular、React和Vue中得到的启发，在后端的开发中，面对大量优秀的类库，却没有一个有效解决架构问题的产品。而Nest的诞生，就是为了提供一个开箱即用的架构，实现了各种类库之间的松耦合。因此，严格意义上定义NestJS并不是一款Web服务框架，而是一个IoC容器（IoC Container ）
 ```
-
-### binance
+### 搭建dev和prod环境
 ```
-yarn add @binance/connector
+yarn add cross-env --dev
+```
 
+```
+old：
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
+    "start:prod": "node dist/main",
+    "build": "nest build",
+new:
+    "start:dev": "cross-env NODE_ENV=dev nest start --watch",
+    "start:prod": "cross-env NODE_ENV=dev nest start",
+    "start:debug": "cross-env NODE_ENV=dev nest start --debug --watch",
+    "start:prod": "cross-env NODE_ENV=prod node dist/main",
+    "build": "cross-env NODE_ENV=prod nest build",
+```
+
+### 项目配置:运行时配置(数据库参数)
+```js
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import {env,envNumber} from '../src/utils/env-unit'
+
+const localConfig:TypeOrmModuleOptions={
+  type: "mysql",
+  host: env('host_dev'),
+  port: envNumber('port_dev'),
+  username: env('username_dev'),
+  password: env('password_dev'),
+  database: env('database_dev'),
+  entities: ["dist/**/*.entity{.ts,.js}"],
+  connectTimeout:60000,
+  synchronize: false
+}
+```
+### 项目配置:模块配置
+
+yarn add @nestjs/config 
+
+步骤1.注入配置
+```js
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+
+@Module({
+  imports: [ConfigModule.forRoot(
+      {envFilePath:[...getDirFilenames({environment:process.env.NODE_ENV})]}
+  )],
+})
+export class AppModule {}
+```
+```
+载入并解析一个.env文件，从.env文件和process.env合并环境变量键值对，并将结果存储到一个可以通过ConfigService访问的私有结构。forRoot()方法注册了ConfigService提供者，后者提供了一个get()方法来读取这些解析/合并的配置变量。由于@nestjs/config依赖dotenv，它使用该包的规则来处理冲突的环境变量名称
+```
+
+步骤2.模块中使用
+```js
+import { ConfigService } from '@nestjs/config';
+export class TradingController {
+    
+    constructor(
+        private readonly tradingService:TradingService,
+        private configService: ConfigService,
+    ){}
+
+    hash_signature(query_string) {
+        const binanceApiSecret= this.configService.get<string>('binanceApiSecret')
+        return crypto
+            .createHmac('sha512', binanceApiSecret)
+            .update(query_string)
+            .digest('hex');
+    }
+    ...
+}
 ```
 
 ### got 代理请求
