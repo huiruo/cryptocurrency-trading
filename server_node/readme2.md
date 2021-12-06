@@ -155,3 +155,20 @@ export interface Result {
     data?: any;
 }
 ```
+
+### 其他链接参考文档:typeorm
+```
+Sequelize:数据库
+https://zhuanlan.zhihu.com/p/377487858
+连接数据库:typeorm 
+https://juejin.cn/post/7022177099922276359
+
+NestJs 学习(一) 基础知识
+https://blog.csdn.net/zr15829039341/article/details/89386078?spm=1001.2014.3001.5501
+
+NestJS 7.x 折腾记: (2) 环境变量及配置维护
+https://blog.csdn.net/crper/article/details/109546244
+
+NestJS 下配置信息与环境变量
+https://blog.csdn.net/fwzzzzz/article/details/115958537
+``` 
