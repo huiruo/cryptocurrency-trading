@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import {HttpsProxyAgent} from 'hpagent';
 import got from 'got';
 const {binanceConnector}  = require('../../binance-connector/index')
+const {BinanceSpot} = require('@binance/connector2')
 
 @Controller('trader/ticker')
 export class TradingController {
@@ -57,6 +58,24 @@ export class TradingController {
         }).json();
         return data
     }
+    @Get('gensignature2')
+    async generateSignature2(payload={}){
+        const binance_api_secret= this.configService.get<string>('BINANCE_API_SECRET')
+        const binance_api_key= this.configService.get<string>('BINANCE_API_KEY')
+        const proxy_url= this.configService.get<string>('PROXY_URL')
+        console.log("开始获取---->A",binance_api_secret)
+        console.log("开始获取---->B",binance_api_key)
+        console.log("开始获取---->C",proxy_url)
+        const client = new BinanceSpot(binance_api_key, binance_api_secret)
+        // Get account information
+        // /*
+        // client.account().then(response =>{
+        //     console.log("response.data",response)
+        // })
+        // */
+       const data = await client.account()
+       return { code: 200, message: '查询成功',data};
+    }
 
     @Get('gensignature')
     async generateSignature(payload={}){
@@ -66,13 +85,14 @@ export class TradingController {
         console.log("开始获取---->A",binance_api_secret)
         console.log("开始获取---->B",binance_api_key)
         console.log("开始获取---->C",proxy_url)
+        // const client = new binanceConnector(binance_api_key, binance_api_secret,{},proxy_url)
         const client = new binanceConnector(binance_api_key, binance_api_secret,{},proxy_url)
         // Get account information
-        /*
-        client.account().then(response =>{
-            console.log("response.data",response)
-        })
-        */
+        // /*
+        // client.account().then(response =>{
+        //     console.log("response.data",response)
+        // })
+        // */
        const data = await client.account()
        return { code: 200, message: '查询成功',data};
     //    return { code: 200, message: '查询成功'};

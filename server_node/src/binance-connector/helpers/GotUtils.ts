@@ -1,5 +1,6 @@
 import {gotResType} from '../types'
 const got = require('got');
+const {HttpsProxyAgent}  = require('hpagent')
 const _ = require('lodash');
 
 const HttpMethod = {
@@ -18,15 +19,18 @@ const isNull=(param)=>{
   return _.isNull(param) || _.isUndefined(param);
 }
 
-class GotUtils {
+class gotUtils {
+    constructor(){
+        console.log("constructor--->")
+    }
     /**
      * 初始化选项
      * @param {object}  paramOptions 默认传入的选项
      * @param {string}  paramMethod 要设置的方法 @see HttpMethod
-     * @param {object}  paramheaders http的header选项
+     * @param {object}  headers http的header选项
      * @return {object} 返回初始化的options
      */
-    static initOptions(paramOptions, paramMethod, paramheaders) {
+    static initOptions(paramOptions, paramMethod, headers) {
 
         if (isNull(paramOptions)) {
             paramOptions = {};
@@ -35,35 +39,43 @@ class GotUtils {
         if (!_.isObject(paramOptions)) {
             paramOptions = {};
         }
-        if (isNull(paramheaders)) {
-            paramheaders = {};
+        if (isNull(headers)) {
+            headers = {};
         }
 
-        if (!_.isObject(paramheaders)) {
-            paramheaders = {};
+        if (!_.isObject(headers)) {
+            headers = {};
         }
         let options = _.clone(paramOptions);
 
-        options.headers = _.clone(paramheaders);
+        options.headers = _.clone(headers);
         options.method = paramMethod;
         return options;
     }
 
     /**
      * 通过 application/x-www-form-urlencoded 方式上传参数
-     * @param {string} paramURL
+     * @param {string} reqUrl
      * @param {object} paramBody
      * @param {object} paramOptions
-     * @param {object} paramHeaders
+     * @param {object} headers
      * @returns {{error ?: object, statusCode ?: number, statusMessage ?: string, body ?: string, response ?: any}} 响应结果
      */
-    static async postForm(paramURL, paramBody, paramOptions = {}, paramheaders = {}) {
-        let options = this.initOptions(paramOptions, HttpMethod.post, paramheaders);
+    static async postForm(reqUrl, paramBody, paramOptions = {}, headers = {},proxyUrl) {
+        let options = this.initOptions(paramOptions, HttpMethod.post, headers);
         options.form = paramBody;
-
+        options.agent={
+            https: new HttpsProxyAgent({
+                keepAlive: true,
+                keepAliveMsecs: 10000,
+                maxSockets: 256,
+                maxFreeSockets: 256,
+                proxy: proxyUrl
+            })
+        }
         try {
-            const r = await got(paramURL, options);
-            return {error: undefined, statusCode: r.statusCode, statusMessage: r.statusMessage, body: r.body, response: r.response};
+            const res:gotResType = await got(reqUrl, options);
+            return {error: null, statusCode: res.statusCode, statusMessage: res.statusMessage, body: res.body, response: res.response};
         }catch(e) {
             let ret:gotResType = { error: e };
             if (!_.isNull(e.response)) {
@@ -79,19 +91,18 @@ class GotUtils {
     }
     /**
      * 通过 application/json 方式上传参数
-     * @param {string} paramURL
+     * @param {string} reqUrl
      * @param {object} paramBody
      * @param {object} paramOptions
-     * @param {object} paramHeaders
+     * @param {object} headers
      * @returns {{error ?: object, statusCode ?: number, statusMessage ?: string, body ?: string, response ?: any}} 响应结果
      */
-    static async post(paramURL, paramBody, paramOptions = {}, paramheaders = {}) {
-        let options = this.initOptions(paramOptions, HttpMethod.post, paramheaders);
+    static async post(reqUrl, paramBody, paramOptions = {}, headers = {}) {
+        let options = this.initOptions(paramOptions, HttpMethod.post, headers);
         options.json = paramBody;
-
         try {
-            const r = await got(paramURL, options);
-            return {error: undefined, statusCode: r.statusCode, statusMessage: r.statusMessage, body: r.body, response: r.response};
+            const res:gotResType = await got(reqUrl, options);
+            return {error: null, statusCode: res.statusCode, statusMessage: res.statusMessage, body: JSON.parse(res.body), response: res.response};
         }catch(e) {
             let ret:gotResType = { error: e };
             if (!_.isNull(e.response)) {
@@ -106,19 +117,47 @@ class GotUtils {
         }
     }
     /**
-     * @param {string} paramURLRL
+     * @param {string} reqUrl
      * @param {object} paramBody
      * @param {object} paramOptions
-     * @param {object} paramHeaders
+     * @param {object} headers
      * @returns {{error ?: object, statusCode ?: number, statusMessage ?: string, body ?: string, response ?: any}} 响应结果
      */
-    static async get(paramURL, paramBody, paramOptions = {}, paramheaders = {}) {
-        let options = this.initOptions(paramOptions, HttpMethod.get, paramheaders = {});
-        options.searchParams = new URLSearchParams(paramBody);
-
+    // static async get(reqUrl,headers = {},proxyUrl,paramBody, paramOptions = {}, ) {
+    static async get(reqUrl:string,headers?,proxyUrl?:string) {
+        // let options = this.initOptions(paramOptions, HttpMethod.get, headers = {});
+        // options.searchParams = new URLSearchParams(paramBody);
+        // console.log("option",options)
+        // options.agent={
+        //     https: new HttpsProxyAgent({
+        //         keepAlive: true,
+        //         keepAliveMsecs: 10000,
+        //         maxSockets: 256,
+        //         maxFreeSockets: 256,
+        //         proxy: proxyUrl
+        //     })
+        // }
+        // /*
+        console.log("proxyUrl",proxyUrl)
+        const agent = proxyUrl?{
+                        https: new HttpsProxyAgent({
+                        keepAlive: true,
+                        keepAliveMsecs: 10000,
+                        maxSockets: 256,
+                        maxFreeSockets: 256,
+                        proxy: proxyUrl
+                    })
+                }:null
+        console.log("agent",agent)
         try {
-            const r = await got(paramURL, options);
-            return {error: undefined, statusCode: r.statusCode, statusMessage: r.statusMessage, body: r.body, response: r.response};
+            const res = await got.get(reqUrl, {
+                headers,
+                agent,
+            });
+            // }).json();
+            console.log("res.statusCode",res.statusCode)
+            console.log("res.statusCode",res.statusMessage)
+            return {error: null, statusCode: res.statusCode, statusMessage: res.statusMessage, body: JSON.parse(res.body)};
         }catch(e) {
             let ret:gotResType = { error: e };
             if (!_.isNull(e.response)) {
@@ -129,10 +168,11 @@ class GotUtils {
                 ret.statusCode = -1;
                 ret.statusMessage = e.message;
             }
-            console.log("GotUtils:",ret)
+
+            console.log("请求错误:",ret)
             return ret;
         }
     }
 }
 
-exports.GotUtils = GotUtils;
+exports.gotUtils = gotUtils;

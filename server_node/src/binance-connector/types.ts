@@ -23,6 +23,7 @@ export interface binanceConnectorType{
 }
 
 export interface gotResType{
+  body?:any
   statusCode?:string|number
   error?:string|number
   statusMessage?:string|number

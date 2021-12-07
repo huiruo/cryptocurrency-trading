@@ -1,6 +1,7 @@
 const got = require('got')
 const {HttpsProxyAgent}  = require('hpagent')
 const { Console } = require('console')
+const {gotUtils} = require('./gotUtils')
 // const constants = require('./constants')
 // const axios = require('axios')
 
@@ -48,47 +49,16 @@ const getRequestInstance = (config) => {
 // const createRequest = (config) => {
 const createRequest = async(config) => {
   const { baseURL, apiKey, method, url,proxyUrl='' } = config
-  /*
-  return getRequestInstance({
-    baseURL,
-    headers: {
-      'Content-Type': 'application/json',
-      'X-MBX-APIKEY': apiKey,
-      'User-Agent': `${constants.appName}/${constants.appVersion}`
-    }
-  }).request({
-    method,
-    url
-  })
-  */
+
   const reqUrl = baseURL+url
   console.log("req_url:",reqUrl)
   console.log("req_parm:",config)
-  console.log(proxyUrl&&{
-        https: new HttpsProxyAgent({
-            keepAlive: true,
-            keepAliveMsecs: 10000,
-            maxSockets: 256,
-            maxFreeSockets: 256,
-            proxy: proxyUrl
-        })
-  })
-  const data = await got.get(reqUrl,{
-    headers: {
-      'Content-Type': 'application/json',
-      'X-MBX-APIKEY': apiKey,
-      // 'User-Agent': `${constants.appName}/${constants.appVersion}`
-    },
-    agent: {
-        https: new HttpsProxyAgent({
-            keepAlive: true,
-            keepAliveMsecs: 10000,
-            maxSockets: 256,
-            maxFreeSockets: 256,
-            proxy: proxyUrl
-        })
-    }
-  }).json();
+  const headers={
+        'Content-Type': 'application/json',
+        'X-MBX-APIKEY': apiKey,
+  }
+  let proxyUrl_test = 'http://127.0.0.1:7890'
+  const data = gotUtils.get(reqUrl,headers,proxyUrl_test)
   return data
 }
 
