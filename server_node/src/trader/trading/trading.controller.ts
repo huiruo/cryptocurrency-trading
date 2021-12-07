@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import {HttpsProxyAgent} from 'hpagent';
 import got from 'got';
 const {binanceConnector}  = require('../../binance-connector/index')
-const {BinanceSpot} = require('@binance/connector2')
+// const {BinanceSpot} = require('@binance/connector2')
 
 @Controller('trader/ticker')
 export class TradingController {
@@ -66,15 +66,11 @@ export class TradingController {
         console.log("开始获取---->A",binance_api_secret)
         console.log("开始获取---->B",binance_api_key)
         console.log("开始获取---->C",proxy_url)
+        /*
         const client = new BinanceSpot(binance_api_key, binance_api_secret)
-        // Get account information
-        // /*
-        // client.account().then(response =>{
-        //     console.log("response.data",response)
-        // })
-        // */
        const data = await client.account()
        return { code: 200, message: '查询成功',data};
+        */
     }
 
     @Get('gensignature')
