@@ -9,7 +9,7 @@ import {binanceConnectorType,optionsType} from './types'
 export {}
 class binanceConnector extends flowRight(Blvt, Bswap, SubAccount, Websocket, Stream,
   Savings, Margin, Mining, Wallet, Market, Trade, Futures, Fiat, C2C)(APIBase){
-  constructor(apiKey = '', apiSecret = '', options:optionsType = {},proxyUrl){
+  constructor(apiKey = '', apiSecret = '', proxyUrl,options:optionsType = {},){
     console.log("binanceConnector--->1",apiKey)
     console.log("binanceConnector--->2",apiSecret)
     console.log("binanceConnector--->3",options)
