@@ -61,28 +61,35 @@ class gotUtils {
      * @param {object} headers
      * @returns {{error ?: object, statusCode ?: number, statusMessage ?: string, body ?: string, response ?: any}} 响应结果
      */
-    static async postForm(reqUrl, paramBody, paramOptions = {}, headers = {},proxyUrl) {
-        let options = this.initOptions(paramOptions, HttpMethod.post, headers);
-        options.form = paramBody;
-        options.agent={
-            https: new HttpsProxyAgent({
-                keepAlive: true,
-                keepAliveMsecs: 10000,
-                maxSockets: 256,
-                maxFreeSockets: 256,
-                proxy: proxyUrl
-            })
-        }
+    static async postForm(reqUrl,headers?,proxyUrl?:string,paramOptions = {}) {
+        // let options = this.initOptions(paramOptions, HttpMethod.post, headers);
+        // options.form = paramBody;
+        console.log("post-proxyUrl",proxyUrl)
+        const agent = proxyUrl?{
+                        https: new HttpsProxyAgent({
+                        keepAlive: true,
+                        keepAliveMsecs: 10000,
+                        maxSockets: 256,
+                        maxFreeSockets: 256,
+                        proxy: proxyUrl
+                    })
+                }:null
         try {
-            const res:gotResType = await got(reqUrl, options);
-            return {error: null, statusCode: res.statusCode, statusMessage: res.statusMessage, body: res.body, response: res.response};
+            // const res:gotResType = await got(reqUrl, options);
+            const res = await got.post(reqUrl, {
+                headers,
+                agent,
+            });
+            return {error: null, statusCode: res.statusCode, statusMessage: res.statusMessage, body: JSON.parse(res.body), response: res.response};
         }catch(e) {
-            let ret:gotResType = { error: e };
-            if (!_.isNull(e.response)) {
+            let ret:gotResType = {};
+            if (isNull(e.response)) {
+                ret.error = e;
                 ret.statusCode = e.response.statusCode;
                 ret.statusMessage = e.response.statusMessage;
                 ret.response = e.response;
             } else {
+                ret.error = e;
                 ret.statusCode = -1;
                 ret.statusMessage = e.message;
             }
@@ -97,25 +104,45 @@ class gotUtils {
      * @param {object} headers
      * @returns {{error ?: object, statusCode ?: number, statusMessage ?: string, body ?: string, response ?: any}} 响应结果
      */
-    static async post(reqUrl, paramBody, paramOptions = {}, headers = {}) {
-        let options = this.initOptions(paramOptions, HttpMethod.post, headers);
-        options.json = paramBody;
+    static async post(reqUrl,headers?,proxyUrl?:string,paramOptions = {}) {
         try {
-            const res:gotResType = await got(reqUrl, options);
+            console.log("post-proxyUrl",proxyUrl)
+            const agent = proxyUrl?{
+                            https: new HttpsProxyAgent({
+                            keepAlive: true,
+                            keepAliveMsecs: 10000,
+                            maxSockets: 256,
+                            maxFreeSockets: 256,
+                            proxy: proxyUrl
+                        })
+                    }:null
+            console.log("post-agent",agent)
+            const res = await got.post(reqUrl, {
+                headers,
+                agent,
+            });
+            // }).json();
+            // console.log("post-res.statusCode",JSON.parse(res.statusCode))
+            // console.log("post-res.statusCode",res.statusMessage)
+            console.log("post-----res.body:",JSON.parse(res.body))
             return {error: null, statusCode: res.statusCode, statusMessage: res.statusMessage, body: JSON.parse(res.body), response: res.response};
         }catch(e) {
-            let ret:gotResType = { error: e };
-            if (!_.isNull(e.response)) {
+            let ret:gotResType = {};
+            if (!isNull(e.response)) {
                 ret.statusCode = e.response.statusCode;
                 ret.statusMessage = e.response.statusMessage;
                 ret.response = e.response;
+                ret.error = e
             } else {
                 ret.statusCode = -1;
                 ret.statusMessage = e.message;
+                ret.error = e
             }
+            console.log("post请求错误:",ret)
             return ret;
         }
     }
+
     /**
      * @param {string} reqUrl
      * @param {object} paramBody
@@ -155,21 +182,19 @@ class gotUtils {
                 agent,
             });
             // }).json();
-            console.log("res.statusCode",res.statusCode)
-            console.log("res.statusCode",res.statusMessage)
             return {error: null, statusCode: res.statusCode, statusMessage: res.statusMessage, body: JSON.parse(res.body)};
         }catch(e) {
-            let ret:gotResType = { error: e };
-            if (!_.isNull(e.response)) {
+            let ret:gotResType = { };
+            if (!isNull(e.response)) {
+                ret.error = e;
                 ret.statusCode = e.response.statusCode;
                 ret.statusMessage = e.response.statusMessage;
                 ret.response = e.response;
             } else {
+                ret.error = e;
                 ret.statusCode = -1;
                 ret.statusMessage = e.message;
             }
-
-            console.log("请求错误:",ret)
             return ret;
         }
     }

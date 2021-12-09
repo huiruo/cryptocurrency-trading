@@ -44,7 +44,6 @@ class APIBase {
       .createHmac('sha256', this.apiSecret)
       .update(queryString)
       .digest('hex')
-    console.log("步骤1：signRequest1-->",signature)
     console.log("步骤1:signRequest2-->",params)
 
     return createRequest({

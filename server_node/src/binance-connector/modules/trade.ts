@@ -27,6 +27,14 @@ const Trade = superclass => class extends superclass {
    * @param {string} [options.newOrderRespType] - Set the response JSON. ACK, RESULT, or FULL;
    *    MARKET and LIMIT order types default to FULL, all other orders default to ACK.
    * @param {number} [options.recvWindow] - The value cannot be greater than 60000
+    symbol	STRING	YES	
+    side	ENUM	YES	详见枚举定义：订单方向
+    type	ENUM	YES	详见枚举定义：订单类型
+    quantity(数量)
+    newClientOrderId	STRING	NO	客户自定义的唯一订单ID。 如果未发送，则自动生成
+    stopPrice	DECIMAL	NO	仅 STOP_LOSS, STOP_LOSS_LIMIT, TAKE_PROFIT, 和TAKE_PROFIT_LIMIT 需要此参数。
+    icebergQty	DECIMAL	NO	仅使用 LIMIT, STOP_LOSS_LIMIT, 和 TAKE_PROFIT_LIMIT 创建新的 iceberg 订单时需要此参数 
+    newOrderRespType	ENUM	NO	设置响应JSON。 ACK，RESULT或FULL； "MARKET"和" LIMIT"订单类型默认为"FULL"，所有其他订单默认为"ACK"。
    */
   newOrderTest (symbol, side, type, options = {}) {
     validateRequiredParameters({ symbol, side, type })
@@ -373,6 +381,7 @@ const Trade = superclass => class extends superclass {
   myTrades (symbol, options = {}) {
     validateRequiredParameters({ symbol })
     console.log("myTrades:",symbol)
+    console.log("myTrades:",)
     return this.signRequest(
       'GET',
       '/api/v3/myTrades',

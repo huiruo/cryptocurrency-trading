@@ -53,13 +53,23 @@ const createRequest = async(config) => {
   const reqUrl = baseURL+url
   console.log("req_url:",reqUrl)
   console.log("req_parm:",config)
+
   const headers={
         'Content-Type': 'application/json',
         'X-MBX-APIKEY': apiKey,
   }
+
   let proxyUrl_test = 'http://127.0.0.1:7890'
-  const data = gotUtils.get(reqUrl,headers,proxyUrl_test)
-  return data
+
+  if(method==='GET'){
+    console.log("GET开始请求--->")
+    const data = gotUtils.get(reqUrl,headers,proxyUrl_test)
+    return data
+  }else if(method==='POST'){
+    console.log("POST开始请求--->")
+    const data = await gotUtils.post(reqUrl,headers,proxyUrl_test,{});
+    return data
+  }
 }
 
 const flowRight = (...functions) => input => functions.reduceRight(

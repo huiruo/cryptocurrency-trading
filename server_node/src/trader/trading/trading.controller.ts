@@ -95,15 +95,13 @@ export class TradingController {
     //    return { code: 200, message: '查询成功'};
     }
 
-    //
+    //所属：现货账户和交易接口----账户成交历史
     @Get('myTrades')
     async myTrades(payload={}){
         const binance_api_secret= this.configService.get<string>('BINANCE_API_SECRET')
         const binance_api_key= this.configService.get<string>('BINANCE_API_KEY')
         const proxy_url= this.configService.get<string>('PROXY_URL')
-        // const client = new binanceConnector(binance_api_key, binance_api_secret,{},proxy_url)
         const client = new binanceConnector(binance_api_key, binance_api_secret,proxy_url,{})
-        // const data = await client.myTrades('BTCUSDT')
         /*
         名称	类型	是否必需	描述
         symbol	STRING	YES	
@@ -120,8 +118,70 @@ export class TradingController {
         const options = {
             limit:20
         }
+        /*
+        myTrades (symbol, options = {}) {
+            validateRequiredParameters({ symbol })
+            console.log("myTrades:",symbol)
+            return this.signRequest(
+            'GET',
+            '/api/v3/myTrades',
+            Object.assign(options, {
+                symbol: symbol.toUpperCase()
+            })
+            )
+        }
+        */
         const data = await client.myTrades('ETHUSDT',options)
         return { code: 200, message: '查询成功',data};
     //    return { code: 200, message: '查询成功'};
+    }
+
+    //所属：现货账户和交易接口----测试下单 (TRADE)
+    @Post('myTrades2')
+    async myTrades2(payload={}){
+        const binance_api_secret= this.configService.get<string>('BINANCE_API_SECRET')
+        const binance_api_key= this.configService.get<string>('BINANCE_API_KEY')
+        const proxy_url= this.configService.get<string>('PROXY_URL')
+        const client = new binanceConnector(binance_api_key, binance_api_secret,proxy_url,{})
+
+        let symbol = 'ETHUSDT'
+        let side = 'SELL'
+        let type = 'MARKET'
+        const options = {
+            timeInForce:'GTC',
+            limit:20,
+            timestamp:Date.now(),
+            price:4300,
+            quantity:0.01,
+        }
+
+        const data = await client.newOrderTest(symbol,side,type,options)
+        console.log("路由返回",data)
+       /*
+       {
+        "symbol": "BTCUSDT", // 交易对
+        "orderId": 28, // 系统的订单ID
+        "orderListId": -1, // OCO订单ID，否则为 -1
+        "clientOrderId": "6gCrw2kRUAF9CvJDGP16IP", // 客户自己设置的ID
+        "transactTime": 1507725176595, // 交易的时间戳
+        "price": "0.00000000", // 订单价格
+        "origQty": "10.00000000", // 用户设置的原始订单数量
+        "executedQty": "10.00000000", // 交易的订单数量
+        "cummulativeQuoteQty": "10.00000000", // 累计交易的金额
+        "status": "FILLED", // 订单状态
+        "timeInForce": "GTC", // 订单的时效方式
+        "type": "MARKET", // 订单类型， 比如市价单，现价单等
+        "side": "SELL", // 订单方向，买还是卖
+        "fills": [ // 订单中交易的信息
+            {
+            "price": "4000.00000000", // 交易的价格
+            "qty": "1.00000000", // 交易的数量
+            "commission": "4.00000000", // 手续费金额
+            "commissionAsset": "USDT" // 手续费的币种
+            }, 
+        ]
+      }
+      */
+        return { code: 200, message: '查询成功',data};
     }
 }
