@@ -59,7 +59,8 @@ const createRequest = async(config) => {
         'X-MBX-APIKEY': apiKey,
   }
 
-  let proxyUrl_test = 'http://127.0.0.1:7890'
+  // let proxyUrl_test = 'http://127.0.0.1:7890'
+  let proxyUrl_test = ''
 
   if(method==='GET'){
     console.log("GET开始请求--->")
