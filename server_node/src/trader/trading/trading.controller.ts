@@ -1,9 +1,10 @@
 import { Controller,Body,Post,Get } from '@nestjs/common';
 import { TradingService } from './trading.service';
 import { ConfigService } from '@nestjs/config';
-import {HttpsProxyAgent} from 'hpagent';
+import { HttpsProxyAgent } from 'hpagent';
 import got from 'got';
-const {binanceConnector}  = require('../../binance-connector/index')
+import { myTradesRes } from '../../mock/myTradesRes'
+const { binanceConnector }  = require('../../binance-connector/index')
 // const {BinanceSpot} = require('@binance/connector2')
 // const {Spot} = require('@binance/connector')
 
@@ -14,7 +15,6 @@ export class TradingController {
         private readonly tradingService:TradingService,
         private configService: ConfigService,
     ){
-
     }
 
     @Post('find')
@@ -24,7 +24,7 @@ export class TradingController {
     }
 
     @Post('login')
-    //http://localhost:1788/trader/ticker/ticker/login
+    //http://localhost:1788/trader/ticker/login
     async login(@Body() body:any){
         let testUrl ='http://localhost:8089/trader/user/login'
         const {data} = await got.post(testUrl, {
@@ -61,48 +61,6 @@ export class TradingController {
         }).json();
         return data
     }
-
-    /*
-    @Get('binanceSpotTest')
-    async binanceSpotTest(payload={}){
-        const binance_api_secret= this.configService.get<string>('BINANCE_API_SECRET')
-        const binance_api_key= this.configService.get<string>('BINANCE_API_KEY')
-        const proxy_url= this.configService.get<string>('PROXY_URL')
-        console.log("开始获取---->A",binance_api_secret)
-        console.log("开始获取---->B",binance_api_key)
-        console.log("开始获取---->C",proxy_url)
-        const client = new BinanceSpot(binance_api_key, binance_api_secret)
-       const data = await client.account()
-       return { code: 200, message: '查询成功',data};
-    }
-    */
-
-    /*
-    @Get('spotReqTest')
-    //http://localhost:1788/trader/ticker/spotReqTest
-    async spotReqTest(payload={}){
-        const binance_api_secret= this.configService.get<string>('BINANCE_API_SECRET')
-        const binance_api_key= this.configService.get<string>('BINANCE_API_KEY')
-        const proxy_url= this.configService.get<string>('PROXY_URL')
-        console.log("开始获取---->spotReqTest",binance_api_secret)
-        const client = new Spot(binance_api_key, binance_api_secret)
-        //test1
-        // const data = await client.account()
-        //test2
-        let symbol = 'ETHUSDT'
-        let side = 'SELL'
-        let type = 'MARKET'
-        const options = {
-            timeInForce:'GTC',
-            limit:20,
-            timestamp:Date.now(),
-            price:4300,
-            quantity:0.01,
-        }
-        const data = await client.newOrderTest(symbol,side,type,options)
-       return { code: 200, message: '查询成功',data};
-    }
-    */
 
     @Get('account/info')
     //http://localhost:1788/trader/ticker/account/info
@@ -146,11 +104,25 @@ export class TradingController {
         注意:
         如果设定 fromId , 获取订单 >= fromId. 否则返回最近订单。
         */
+
+        /*
         const options = {
             limit:20
         }
         const data = await client.myTrades('ETHUSDT',options)
         return { code: 200, message: '查询成功',data};
+        */
+
+        //mock数据,调试
+        // await this.tradingService.findOne('test');
+        const myTrades={
+            account:'test1',
+            password:'123456',
+            email:'1234@gmail.com',
+            id:null
+        }
+        await this.tradingService.createMyTrades(myTrades);
+        return myTradesRes;
     }
 
     //所属：现货账户和交易接口----测试下单 (TRADE)
@@ -203,4 +175,46 @@ export class TradingController {
       */
       return { code: 200, message: '查询成功',data};
     }
+
+    /*
+    @Get('binanceSpotTest')
+    async binanceSpotTest(payload={}){
+        const binance_api_secret= this.configService.get<string>('BINANCE_API_SECRET')
+        const binance_api_key= this.configService.get<string>('BINANCE_API_KEY')
+        const proxy_url= this.configService.get<string>('PROXY_URL')
+        console.log("开始获取---->A",binance_api_secret)
+        console.log("开始获取---->B",binance_api_key)
+        console.log("开始获取---->C",proxy_url)
+        const client = new BinanceSpot(binance_api_key, binance_api_secret)
+       const data = await client.account()
+       return { code: 200, message: '查询成功',data};
+    }
+    */
+
+    /*
+    @Get('spotReqTest')
+    //http://localhost:1788/trader/ticker/spotReqTest
+    async spotReqTest(payload={}){
+        const binance_api_secret= this.configService.get<string>('BINANCE_API_SECRET')
+        const binance_api_key= this.configService.get<string>('BINANCE_API_KEY')
+        const proxy_url= this.configService.get<string>('PROXY_URL')
+        console.log("开始获取---->spotReqTest",binance_api_secret)
+        const client = new Spot(binance_api_key, binance_api_secret)
+        //test1
+        // const data = await client.account()
+        //test2
+        let symbol = 'ETHUSDT'
+        let side = 'SELL'
+        let type = 'MARKET'
+        const options = {
+            timeInForce:'GTC',
+            limit:20,
+            timestamp:Date.now(),
+            price:4300,
+            quantity:0.01,
+        }
+        const data = await client.newOrderTest(symbol,side,type,options)
+       return { code: 200, message: '查询成功',data};
+    }
+    */
 }
