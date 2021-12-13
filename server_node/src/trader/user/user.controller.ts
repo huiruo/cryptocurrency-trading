@@ -2,7 +2,6 @@ import { Body, Controller, Delete, Get, Inject, Param, Post, Put } from '@nestjs
 import { Result } from '../../common/result.interface';
 import { User } from './user.entity';
 import { UserService } from './user.service';
-import { getDirFilenames } from '../../utils/getDirFilenames';
 
 
 @Controller('user')
@@ -32,10 +31,6 @@ export class UserController {
     @Get(':id')
     //http://localhost:1788/user/22
     async findOneUser(@Param('id') id: number): Promise<Result> {
-        console.log("...getDirAllFileNameArr()--->",...getDirFilenames())
-        console.log("get_user",id)
-        console.log("binanceApiSecret:",process.env.binanceApiSecret);
-        console.log("binanceApiKey:",process.env.binanceApiKey);
         const data = await this.UserService.findOneUser(id);
         return { code: 200, message: '查询成功', data };
     }

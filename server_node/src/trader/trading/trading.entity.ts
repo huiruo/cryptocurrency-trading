@@ -2,29 +2,71 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('myTrades')
 export class MyTrades {
-// @Entity('Trading')
-// export class Trading {
     /**
-     * 自增主键
+     * 主键
      */
     @PrimaryGeneratedColumn({
-        comment: '自增ID'
+        comment: 'ID'
     })
     id: number;
 
-    /**
-     * 账户
-     */
     @Column({
-        comment: '账户'
+        comment: 'symbol'
     })
-    account: string;
+    symbol: string;
 
-    /**
-     * 密码
-     */
     @Column({
-        comment: '密码'
+        comment: 'orderId'
     })
-    password: string;
+    orderId: string;
+
+    @Column({
+        comment: 'orderListId'
+    })
+    orderListId: string;
+
+    @Column({
+        comment: 'price'
+    })
+    price: number;
+    
+    @Column({
+        comment: 'qty'
+    })
+    qty: string;
+
+    @Column({
+        comment: 'quoteQty'
+    })
+    quoteQty: string;
+
+    @Column({
+        comment: 'commission'
+    })
+    commission: string;
+    
+    @Column({
+        comment: 'commissionAsset'
+    })
+    commissionAsset: string;
+
+    @Column({
+        comment: 'time'
+    })
+    time: number;
+
+    @Column({
+        comment: 'isBuyer'
+    })
+    isBuyer: boolean;
+
+    @Column({
+        comment: 'isMaker'
+    })
+    isMaker: boolean;
+
+    @Column({
+        comment: 'isBestMatch'
+    })
+    isBestMatch: boolean;
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable,HttpException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { MyTrades } from './trading.entity'
@@ -7,20 +7,29 @@ import { MyTrades } from './trading.entity'
 export class TradingService {
   constructor(
     // 使用泛型注入对应类型的存储库实例
-    @InjectRepository(MyTrades) private readonly userRepo: Repository<MyTrades>,  
+    @InjectRepository(MyTrades) private readonly myTradesRepo: Repository<MyTrades>,  
   ) { }
 
-  findOne(username:string):string{
-    console.log("test--->",)
-    if(username==='huiruo'){
-        return 'I am here';
-    }
-    return 'Who U find?';
-  }
-
+  /*
   async createMyTrades(myTrades: MyTrades): Promise<MyTrades> {
     console.log("myTrades---->",myTrades)
     delete myTrades.id;
-    return this.userRepo.save(myTrades);
+    return this.myTradesRepo.save(myTrades);
+  }
+  */
+
+  async createMyTrades(myTrades: MyTrades[]) {
+    myTrades.forEach(async (element:MyTrades) => {
+      const myTrade = await this.findMyTradeById(element.id)
+      if (!myTrade) {
+        console.log("myTrades insert---->",element)
+        return this.myTradesRepo.save(element);
+      }
+    });
+  }
+
+  private async findMyTradeById(id: number): Promise<MyTrades> {
+      const myTrade = await this.myTradesRepo.findOne(id);
+      return myTrade;
   }
 }
