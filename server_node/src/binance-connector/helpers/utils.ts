@@ -34,15 +34,6 @@ const stringifyKeyValuePair = ([key, value]) => {
   return `${key}=${encodeURIComponent(valueString)}`
 }
 
-/*
-const getRequestInstance = (config) => {
-  return axios.create({
-    ...config
-  })
-}
-*/
-
-// const createRequest = (config) => {
 const createRequest = async(config) => {
   const { baseURL, apiKey, method, url,proxyUrl='' } = config
 
@@ -59,11 +50,9 @@ const createRequest = async(config) => {
   let proxyUrl_test = ''
 
   if(method==='GET'){
-    console.log("GET开始请求--->")
-    const data = gotUtils.get(reqUrl,headers,proxyUrl_test)
+    const data = await gotUtils.get(reqUrl,headers,proxyUrl_test)
     return data
   }else if(method==='POST'){
-    console.log("POST开始请求--->")
     const data = await gotUtils.post(reqUrl,headers,proxyUrl_test,{});
     return data
   }
