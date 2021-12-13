@@ -1,56 +1,14 @@
-import {gotResType} from '../types'
+import { gotResType } from '../types'
 const got = require('got');
-const {HttpsProxyAgent}  = require('hpagent')
+const { HttpsProxyAgent }  = require('hpagent')
 const _ = require('lodash');
 
-const HttpMethod = {
-    get    : 'GET',
-    post   : 'POST',
-    put    : 'PUT',
-    patch  : 'PATCH',
-    head   : 'HEAD',
-    delete : 'DELETE',
-    options: 'OPTIONS',
-    trace  : 'TRACE'
-};
-
 const isNull=(param)=>{
-  console.log("isNull:",param)
   return _.isNull(param) || _.isUndefined(param);
 }
 
 class gotUtils {
     constructor(){
-        console.log("constructor--->")
-    }
-    /**
-     * 初始化选项
-     * @param {object}  paramOptions 默认传入的选项
-     * @param {string}  paramMethod 要设置的方法 @see HttpMethod
-     * @param {object}  headers http的header选项
-     * @return {object} 返回初始化的options
-     */
-    static initOptions(paramOptions, paramMethod, headers) {
-
-        if (isNull(paramOptions)) {
-            paramOptions = {};
-        }
-
-        if (!_.isObject(paramOptions)) {
-            paramOptions = {};
-        }
-        if (isNull(headers)) {
-            headers = {};
-        }
-
-        if (!_.isObject(headers)) {
-            headers = {};
-        }
-        let options = _.clone(paramOptions);
-
-        options.headers = _.clone(headers);
-        options.method = paramMethod;
-        return options;
     }
 
     /**
@@ -62,8 +20,6 @@ class gotUtils {
      * @returns {{error ?: object, statusCode ?: number, statusMessage ?: string, body ?: string, response ?: any}} 响应结果
      */
     static async postForm(reqUrl,headers?,proxyUrl?:string,paramOptions = {}) {
-        // let options = this.initOptions(paramOptions, HttpMethod.post, headers);
-        // options.form = paramBody;
         console.log("post-proxyUrl",proxyUrl)
         const agent = proxyUrl?{
                         https: new HttpsProxyAgent({
@@ -75,7 +31,6 @@ class gotUtils {
                     })
                 }:null
         try {
-            // const res:gotResType = await got(reqUrl, options);
             const res = await got.post(reqUrl, {
                 headers,
                 agent,
@@ -122,10 +77,7 @@ class gotUtils {
                 agent,
             });
             // }).json();
-            // console.log("post-res.statusCode",JSON.parse(res.statusCode))
-            // console.log("post-res.statusCode",res.statusMessage)
-            console.log("post-----res.body:",JSON.parse(res.body))
-            return {error: null, statusCode: res.statusCode, statusMessage: res.statusMessage, body: JSON.parse(res.body), response: res.response};
+            return {error: null, statusCode: res.statusCode, statusMessage: res.statusMessage, data: JSON.parse(res.body), response: res.response};
         }catch(e) {
             let ret:gotResType = {};
             if (!isNull(e.response)) {
@@ -150,21 +102,8 @@ class gotUtils {
      * @param {object} headers
      * @returns {{error ?: object, statusCode ?: number, statusMessage ?: string, body ?: string, response ?: any}} 响应结果
      */
-    // static async get(reqUrl,headers = {},proxyUrl,paramBody, paramOptions = {}, ) {
     static async get(reqUrl:string,headers?,proxyUrl?:string) {
-        // let options = this.initOptions(paramOptions, HttpMethod.get, headers = {});
-        // options.searchParams = new URLSearchParams(paramBody);
-        // console.log("option",options)
-        // options.agent={
-        //     https: new HttpsProxyAgent({
-        //         keepAlive: true,
-        //         keepAliveMsecs: 10000,
-        //         maxSockets: 256,
-        //         maxFreeSockets: 256,
-        //         proxy: proxyUrl
-        //     })
-        // }
-        // /*
+
         console.log("proxyUrl",proxyUrl)
         const agent = proxyUrl?{
                         https: new HttpsProxyAgent({
@@ -182,7 +121,7 @@ class gotUtils {
                 agent,
             });
             // }).json();
-            return {error: null, statusCode: res.statusCode, statusMessage: res.statusMessage, body: JSON.parse(res.body)};
+            return {error: null, statusCode: res.statusCode, statusMessage: res.statusMessage, data: JSON.parse(res.body)};
         }catch(e) {
             let ret:gotResType = { };
             if (!isNull(e.response)) {

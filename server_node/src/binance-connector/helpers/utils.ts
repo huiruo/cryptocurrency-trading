@@ -1,9 +1,5 @@
-const got = require('got')
-const {HttpsProxyAgent}  = require('hpagent')
 const { Console } = require('console')
-const {gotUtils} = require('./gotUtils')
-// const constants = require('./constants')
-// const axios = require('axios')
+const { gotUtils } = require('./gotUtils')
 
 const removeEmptyValue = obj => {
   if (!(obj instanceof Object)) return {}
