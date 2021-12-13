@@ -65,7 +65,7 @@ CREATE TABLE `myTrades`  (
 
 INSERT INTO `myTrades` VALUES (23, '测试1213', '123456', NULL);
 ```
-
+###### myTrades表
 ```
 {
     "symbol": "ETHUSDT",
@@ -84,29 +84,21 @@ INSERT INTO `myTrades` VALUES (23, '测试1213', '123456', NULL);
 }
 
 CREATE TABLE `myTrades`  (
-  `id` int(0) NOT NULL AUTO_INCREMENT,
-
+  `id` bigint(60) NOT NULL,
   `symbol` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-
-  `orderId` bigint(0) NULL DEFAULT NULL,
-  `orderListId` bigint(0) NULL DEFAULT NULL,
+  `orderId` bigint(60) NULL DEFAULT NULL,
+  `orderListId` bigint(60) NULL DEFAULT NULL,
   `price` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `qty` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `quoteQty` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `commission` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `commissionAsset` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `time` bigint(0) NULL DEFAULT NULL,
+  `time` bigint(60) NULL DEFAULT NULL,
   `isBuyer` tinyint(1) NOT NULL,
   `isMaker` tinyint(1) NOT NULL,
   `isBestMatch` tinyint(1) NOT NULL,
-
-
-  `password` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-
-  `email` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 24 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+   PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
 ```
 
 
