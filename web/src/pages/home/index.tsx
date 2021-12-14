@@ -3,11 +3,12 @@ import Header from '../../components/Header/index'
 // import Footer from '../../components/Footer/index'
 import { Box } from '@fower/react'
 import Trader from './trader'
-import traderApi from '../../services/traderApi'
+// import traderApi from '../../services/traderApi'
 
 const Index=()=>{
 
   useEffect(() => {  
+    /*
     const onLogin = async()=>{
       const data={
         "account":"abchen",
@@ -21,6 +22,7 @@ const Index=()=>{
       } 
     }
     onLogin()
+    */
   })
   
   return (

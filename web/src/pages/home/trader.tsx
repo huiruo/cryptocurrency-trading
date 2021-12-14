@@ -1,10 +1,10 @@
 import React,{useEffect,useState} from 'react'
 import { Box } from '@fower/react'
 import OrderOperation from './orderOperation'
-// import UserPanel from './userPanel'
 import TraderHeader from './traderHeader'
-import traderApi from "../../services/traderApi"
 import {TickerInter} from '../../utils/types'
+import CurrencyList from './right/currencyList'
+// import traderApi from "../../services/traderApi"
 
 const Trader =()=>{
 
@@ -29,6 +29,7 @@ const Trader =()=>{
   })
 
   useEffect(() => {
+    /*
     const get24hrTicker = async()=>{
       // const platform = 'binance'
       const platform = 'okex'
@@ -106,18 +107,19 @@ const Trader =()=>{
       }
     }
     get24hrTicker()
+    */
   },[])
 
   console.log("ticker--->1:",ticker)
   console.log("ticker--->2:",setTicker)
   return (
     <>
-      <Box row h="8.4rem" bgBrand400>
-        <Box bgGray100 w="80%">
+      <Box row h="8.4rem"  bg='#FAFAFA'>
+        <Box w="80%">
           <Box bg="#FCD535" h="16%">
             <TraderHeader ticker={ticker} />
           </Box>
-          <Box row w="100%" h="84%">
+          <Box row w="100%" h="84%" id='test'>
             <Box w='20%' h='100%' bgBlue100>
               <Box bgBrand400 h='50%'>top</Box>
               <Box bgBrand h='50%'>bottom</Box>
@@ -130,8 +132,10 @@ const Trader =()=>{
             </Box>
           </Box>
         </Box>
-        <Box bgBrand w="20%" minW=".32rem">
-          <Box bgBrand400 h='50%'>top</Box>
+        <Box w="20%" minW=".32rem">
+          <Box h='50%' style={{border: 'solid 1px #EEF0F2'}}>
+            <CurrencyList />
+          </Box>
           <Box bgBrand h='50%'>bottom</Box>
         </Box>
       </Box>
