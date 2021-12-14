@@ -74,19 +74,20 @@ export class TradingController {
         注意:
         如果设定 fromId , 获取订单 >= fromId. 否则返回最近订单。
         */
+
+        /*
         const options = {
             limit:20
         }
         const {data,statusCode:code,statusMessage:message} = await client.myTrades('ETHUSDT',options)
         await this.tradingService.createMyTrades(data);
         return { code, message,data};
+        */
 
         //mock数据,调试
-        /*
-        const {data,statusCode:code,statusMessage:message} = myTradesRes
+        const {data,code,message} = myTradesRes
         await this.tradingService.createMyTrades(data);
         return { code, message,data};
-        */
     }
 
     //所属：现货账户和交易接口----测试下单 (TRADE)

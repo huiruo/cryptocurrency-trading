@@ -55,7 +55,7 @@ http://localhost:1788/user/22
 ```
 测试表链接
 ```
-CREATE TABLE `myTrades`  (
+CREATE TABLE `mytrades`  (
   `id` int(0) NOT NULL AUTO_INCREMENT,
   `account` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `password` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
@@ -83,7 +83,7 @@ INSERT INTO `myTrades` VALUES (23, '测试1213', '123456', NULL);
     "isBestMatch": true
 }
 
-CREATE TABLE `myTrades`  (
+CREATE TABLE `mytrades`  (
   `id` bigint(60) NOT NULL,
   `symbol` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `orderId` bigint(60) NULL DEFAULT NULL,
@@ -101,5 +101,9 @@ CREATE TABLE `myTrades`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
 ```
 
+### 2021.12.14
+```
+1.前端工作
 
+```
 

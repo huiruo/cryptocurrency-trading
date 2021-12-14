@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('myTrades')
+@Entity('mytrades')
 export class MyTrades {
     /**
      * 主键
@@ -18,17 +18,17 @@ export class MyTrades {
     @Column({
         comment: 'orderId'
     })
-    orderId: string;
+    orderId: number;
 
     @Column({
         comment: 'orderListId'
     })
-    orderListId: string;
+    orderListId: number;
 
     @Column({
         comment: 'price'
     })
-    price: number;
+    price: string;
     
     @Column({
         comment: 'qty'
