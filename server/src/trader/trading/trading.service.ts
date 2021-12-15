@@ -11,13 +11,8 @@ export class TradingService {
   ) { }
 
   /*
-  async createMyTrades(myTrades: MyTrades): Promise<MyTrades> {
-    console.log("myTrades---->",myTrades)
-    delete myTrades.id;
-    return this.myTradesRepo.save(myTrades);
-  }
+  binance 订单储存
   */
-
   async createMyTrades(myTrades: MyTrades[]) {
     myTrades.forEach(async (element:MyTrades) => {
       const myTrade = await this.findMyTradeById(element.id)
@@ -26,6 +21,15 @@ export class TradingService {
         return this.myTradesRepo.save(element);
       }
     });
+  }
+
+  /*
+  查询本地数据库
+  */
+  async getMyTrades(symbol: string):Promise<MyTrades> {
+    const sql = `select * from mytrades where symbol='${symbol}'`
+    const myTrade = await this.myTradesRepo.query(sql);
+    return myTrade;
   }
 
   private async findMyTradeById(id: number): Promise<MyTrades> {

@@ -1,4 +1,4 @@
-import { Controller,Body,Post,Get } from '@nestjs/common';
+import { Controller,Body,Post,Get,Query } from '@nestjs/common';
 import { TradingService } from './trading.service';
 import { ConfigService } from '@nestjs/config';
 import { HttpsProxyAgent } from 'hpagent';
@@ -8,7 +8,7 @@ const { binanceConnector }  = require('../../binance-connector/index')
 // const {BinanceSpot} = require('@binance/connector2')
 // const {Spot} = require('@binance/connector')
 
-@Controller('trader/ticker')
+@Controller('trader')
 export class TradingController {
     
     constructor(
@@ -17,7 +17,7 @@ export class TradingController {
     ){
     }
 
-    @Get('24hr')
+    @Get('binance/24hr')
     //http://localhost:1788/trader/ticker/24hr?symbol=BTC-USDT&platform=okex
     async ticker(){
        const ticker24URL = 'https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT'
@@ -54,8 +54,9 @@ export class TradingController {
     }
 
     //所属：现货账户和交易接口----账户成交历史
-    @Get('myTrades')
-    //http://localhost:1788/trader/ticker/myTrades
+    @Get('binance/myTrades')
+    //http://localhost:1788/trader/binance/myTrades
+    //http://172.18.1.162:1788/trader/binance/myTrades
     async myTrades(payload={}){
         const binance_api_secret= this.configService.get<string>('BINANCE_API_SECRET')
         const binance_api_key= this.configService.get<string>('BINANCE_API_KEY')
@@ -90,8 +91,23 @@ export class TradingController {
         return { code, message,data};
     }
 
+    @Get('api/myTrades')
+    //http://172.18.1.162:1788/trader/api/myTrades
+    /*
+    symbol:'ETHUSDT'
+    */
+    async myTradesApi(@Query() query){
+        const { symbol } = query
+        if(symbol){
+            const data = await this.tradingService.getMyTrades(symbol);
+            return { code:200, message:'ok',data}; 
+        }else{
+            return { code:500, message:'请求参数错误',data:null}; 
+        }
+    }
+
     //所属：现货账户和交易接口----测试下单 (TRADE)
-    @Post('newOrderTest')
+    @Post('binance/newOrderTest')
     //http://localhost:1788/trader/ticker/newOrderTest
     async newOrderTest(payload={}){
         const binance_api_secret= this.configService.get<string>('BINANCE_API_SECRET')
