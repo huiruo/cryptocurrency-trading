@@ -114,15 +114,15 @@ const Trader =()=>{
   console.log("ticker--->2:",setTicker)
   return (
     <>
-      <Box row h="8.4rem"  bg='#FAFAFA'>
+      <Box row h="8.4rem" bg='#FAFAFA'>
         <Box w="80%">
-          <Box bg="#FCD535" h="16%">
+          <Box bg="azure" h="16%">
             <TraderHeader ticker={ticker} />
           </Box>
           <Box row w="100%" h="84%" id='test'>
-            <Box w='20%' h='100%' bgBlue100>
-              <Box bgBrand400 h='50%'>top</Box>
-              <Box bgBrand h='50%'>bottom</Box>
+            <Box w='20%' h='100%'>
+              <Box h='50%'>top</Box>
+              <Box h='50%'>bottom</Box>
             </Box>
             <Box w='80%' h='100%' bgBrand200>
               <Box bg='grey' h='50%'>top</Box>
@@ -136,7 +136,7 @@ const Trader =()=>{
           <Box h='50%' style={{border: 'solid 1px #EEF0F2'}}>
             <CurrencyList />
           </Box>
-          <Box bgBrand h='50%'>bottom</Box>
+          <Box h='50%'>bottom</Box>
         </Box>
       </Box>
     </>

@@ -1,10 +1,15 @@
 import React,{useState} from 'react'
 import { Box } from '@fower/react'
 import {Input} from '../../../components/Input/index'
+import traderApi from "../../../services/traderApi"
 
+interface itemType {
+  id:number,
+  symbol:string
+}
 const App =()=>{
   const [searchVal, setSearchVal] = useState('')
-  const [currencyList] = useState([
+  const [currencyList] = useState<itemType[]>([
     {
       id:12455,
       symbol:'BTCUSDT'
@@ -19,8 +24,10 @@ const App =()=>{
     setSearchVal(e.target.value)
   }
 
-  const onSymbolItem=()=>{
-    console.log("onSymbolItem-->")
+  const onSymbolItem= async(symbol:string)=>{
+    const data = { symbol }
+    const res = await traderApi.getMyTrades(data)
+    console.log("onSymbolItem",res)
   }
 
   return (
@@ -32,7 +39,7 @@ const App =()=>{
         <Box h='.2rem' leading='.2rem'>交易对</Box>
         {currencyList.map(item=>{
           return (
-            <Box key={item.id} onClick={()=>onSymbolItem()} toCenterY h='.24rem' cursor='pointer' bgYellow500--hover>{item.symbol}</Box>
+            <Box key={item.id} onClick={()=>onSymbolItem(item.symbol)} toCenterY h='.24rem' cursor='pointer' bgYellow500--hover>{item.symbol}</Box>
           )
         })}
       </Box>
