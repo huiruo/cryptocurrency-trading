@@ -21,9 +21,9 @@
 
 # secret
 secret_document
-server/src/main/resources/application-prod.properties
-server_node/.env
-server_node/config/env-prod/application-prod.env
+server_jave/src/main/resources/application-prod.properties
+server/.env
+server/config/env-prod/application-prod.env
 
 # js
 # js
