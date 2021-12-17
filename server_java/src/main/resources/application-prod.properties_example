@@ -1,7 +1,7 @@
 
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 spring.datasource.type=com.alibaba.druid.pool.DruidDataSource
-spring.datasource.url=jdbc:mysql://xxxx:3306/trader?characterEncoding=UTF-8&serverTimezone=UTC
+spring.datasource.url=jdbc:mysql://example:3306/trader?characterEncoding=UTF-8&serverTimezone=UTC
 spring.datasource.username=root
-spring.datasource.password=
+spring.datasource.password=example
 
