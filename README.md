@@ -1,29 +1,44 @@
-
-#### 项目目录
+### Project introduction
+```
+A cryptocurrency quantitative trading system, with the help of program-assisted trading, through continuous iteration, continuous trial and error to improve the transaction.The goal is to explore profitable trading.
+```
+### Project directory
 ```
 cryptocurrency-trading
-├── app app端(待开发)
-├── server_java java服务,涉及定时任务等
-├── server nodejs服务端,项目主服务
-├── trading_strategy 交易策略
-├── web 浏览器应用
-├──.gitignore 
-├──README.md 
+├── app (mobile app:Did not start development)
+├── server (Node service,project main service)
+│   ├── config
+│   ├── doc
+│   ├── src
+│   │   ├──binance-connector (Binance api connector)
+│   │   ├──common
+│   │   ├──mock
+│   │   ├──trader (main Module)
+│   │   ├──app.controller.spec.ts
+│   │   ├──app.controller.ts
+│   │   ├──app.module.ts
+│   │   ├──app.service.ts
+│   │   ├──main.ts
+│   ├── ...
+│   │  
+├── server_java (Java service, involving timing tasks, etc.)
+├── trading_strategy (Trading straregy)
+├── web (Browser application)
 ```
 
-#### git提交相关
+### git commit specification
 ```
-feat：新功能（feature）
+feat：new feature
 
-fix：修补bug
+fix：fix bug
 
-docs：文档（documentation）
+docs：documentation
 
-style： 格式（不影响代码运行的变动）
+style： format (does not affect the change of code operation)
 
-refactor：重构（即不是新增功能，也不是修改bug的代码变动）
+refactor：refactoring (that is, it is not a new feature, nor is it a code change to modify a bug)
 
-test：增加测试
+test：add test
 
-chore：构建过程或辅助工具的变动
+chore：Changes in the build process or auxiliary tools
 ```
