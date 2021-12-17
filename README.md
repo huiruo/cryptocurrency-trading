@@ -3,7 +3,7 @@
 ```
 cryptocurrency-trading
 ├── app app端(待开发)
-├── server_java java服务,涉及定时任务等(开发成员退出，待开发)
+├── server_java java服务,涉及定时任务等
 ├── server nodejs服务端,项目主服务
 ├── trading_strategy 交易策略
 ├── web 浏览器应用
