@@ -21,7 +21,7 @@
 
 # secret
 secret_document
-server_jave/src/main/resources/application-prod.properties
+server_java/src/main/resources/application-prod.properties
 server/.env
 server/config/env-prod/application-prod.env
 
