@@ -1,7 +1,8 @@
 ### Project introduction
-```
-A cryptocurrency quantitative trading system, with the help of program-assisted trading, through continuous iteration, continuous trial and error to improve the transaction.The goal is to explore profitable trading.
-```
+A cryptocurrency quantitative trading system.
+With the help of program-assisted trading, through continuous iteration, continuous trial and error to improve the transaction.
+The goal is to explore profitable trading.
+
 ### Project directory
 ```
 cryptocurrency-trading
