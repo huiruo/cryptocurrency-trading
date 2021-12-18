@@ -119,7 +119,7 @@ const Trader =()=>{
           <Box bg="azure" h="16%">
             <TraderHeader ticker={ticker} />
           </Box>
-          <Box row w="100%" h="84%" id='test'>
+          <Box row w="100%" h="84%">
             <Box w='20%' h='100%'>
               <Box h='50%'>top</Box>
               <Box h='50%'>bottom</Box>

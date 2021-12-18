@@ -1,6 +1,7 @@
 import React from 'react';
 import Home from '../pages/home/index';
 import Detail from '../pages/detail/index';
+import Account from '../pages/account/index';
 import NotFound from '../pages/notFound/index'
 import {
 	Switch,
@@ -22,6 +23,10 @@ const Routes = withRouter(({ location, history }) => {
 			{
 				path: '/detail',
 				component: Detail,
+			},
+			{
+				path: '/account',
+				component: Account,
 			},
 		]
 		/*

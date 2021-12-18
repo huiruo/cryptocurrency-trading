@@ -20,3 +20,24 @@ type TickerInter = {
   count: number;  //成交笔数
 }
 export { TickerInter }
+
+export interface itemType {
+  id:number,
+  symbol:string
+}
+
+export interface orderItemType{
+  symbol: string,
+  id: number,
+  orderId: number,
+  orderListId: number,
+  price: string,
+  qty: string,
+  quoteQty: string,
+  commission: string,
+  commissionAsset: string,
+  time: number,
+  isBuyer: boolean,
+  isMaker: boolean,
+  isBestMatch: boolean
+}
