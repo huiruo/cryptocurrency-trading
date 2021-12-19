@@ -6,12 +6,12 @@ import { MyTrades } from './trading.entity'
 @Injectable()
 export class TradingService {
   constructor(
-    // 使用泛型注入对应类型的存储库实例
+    // Use generics to inject the corresponding type of repository instance
     @InjectRepository(MyTrades) private readonly myTradesRepo: Repository<MyTrades>,  
   ) { }
 
   /*
-  binance 订单储存
+  Binance order write into Databasce
   */
   async createMyTrades(myTrades: MyTrades[]) {
     myTrades.forEach(async (element:MyTrades) => {
@@ -24,7 +24,7 @@ export class TradingService {
   }
 
   /*
-  查询本地数据库
+  Query orders from local database
   */
   async getMyTrades(symbol: string):Promise<MyTrades> {
     const sql = `select * from mytrades where symbol='${symbol}'`

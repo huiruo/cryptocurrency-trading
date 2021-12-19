@@ -5,8 +5,6 @@ import { HttpsProxyAgent } from 'hpagent';
 import got from 'got';
 import { myTradesRes } from '../../mock/myTradesRes'
 const { binanceConnector }  = require('../../binance-connector/index')
-// const {BinanceSpot} = require('@binance/connector2')
-// const {Spot} = require('@binance/connector')
 
 @Controller('trader')
 export class TradingController {
@@ -37,22 +35,6 @@ export class TradingController {
         return data
     }
 
-    @Get('account/info')
-    //http://localhost:1788/trader/ticker/account/info
-    async accountInfo(payload={}){
-        const binance_api_secret= this.configService.get<string>('BINANCE_API_SECRET')
-        const binance_api_key= this.configService.get<string>('BINANCE_API_KEY')
-        const proxy_url= this.configService.get<string>('PROXY_URL')
-        const client = new binanceConnector(binance_api_key, binance_api_secret,proxy_url,{})
-        /*
-        client.account().then(response =>{
-            console.log("response.data",response)
-        })
-        */
-        const data = await client.account()
-        return { code: 200, message: '查询成功',data};
-    }
-
     //所属：现货账户和交易接口----账户成交历史
     @Get('binance/myTrades')
     //http://localhost:1788/trader/binance/myTrades
@@ -76,19 +58,23 @@ export class TradingController {
         如果设定 fromId , 获取订单 >= fromId. 否则返回最近订单。
         */
 
-        /*
+        // /*
         const options = {
             limit:20
         }
-        const {data,statusCode:code,statusMessage:message} = await client.myTrades('ETHUSDT',options)
+        let symbol:string = 'BTCUSDT'
+        // let symbol:string = 'ETHUSDT'
+        const {data,statusCode:code,statusMessage:message} = await client.myTrades(symbol,options)
         await this.tradingService.createMyTrades(data);
         return { code, message,data};
-        */
+        // */
 
         //mock数据,调试
+        /*
         const {data,code,message} = myTradesRes
         await this.tradingService.createMyTrades(data);
         return { code, message,data};
+        */
     }
 
     @Get('api/myTrades')
