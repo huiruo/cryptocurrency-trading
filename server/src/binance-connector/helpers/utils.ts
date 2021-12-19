@@ -35,12 +35,9 @@ const stringifyKeyValuePair = ([key, value]) => {
 }
 
 const createRequest = async(config) => {
+
   const { baseURL, apiKey, method, url,proxyUrl='' } = config
-
   const reqUrl = baseURL+url
-  console.log("req_url:",reqUrl)
-  console.log("req_parm:",config)
-
   const headers={
         'Content-Type': 'application/json',
         'X-MBX-APIKEY': apiKey,

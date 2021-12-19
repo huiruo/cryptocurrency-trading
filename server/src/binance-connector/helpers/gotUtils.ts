@@ -12,7 +12,7 @@ class gotUtils {
     }
 
     /**
-     * 通过 application/x-www-form-urlencoded 方式上传参数
+     * application/x-www-form-urlencoded
      * @param {string} reqUrl
      * @param {object} paramBody
      * @param {object} paramOptions
@@ -20,7 +20,6 @@ class gotUtils {
      * @returns {{error ?: object, statusCode ?: number, statusMessage ?: string, body ?: string, response ?: any}} 响应结果
      */
     static async postForm(reqUrl,headers?,proxyUrl?:string,paramOptions = {}) {
-        console.log("post-proxyUrl",proxyUrl)
         const agent = proxyUrl?{
                         https: new HttpsProxyAgent({
                         keepAlive: true,
@@ -31,6 +30,11 @@ class gotUtils {
                     })
                 }:null
         try {
+
+            console.log("agent:",agent)
+            console.log("proxyUrl:",proxyUrl)
+            console.log("reqUrl:",reqUrl)
+
             const res = await got.post(reqUrl, {
                 headers,
                 agent,
@@ -52,7 +56,7 @@ class gotUtils {
         }
     }
     /**
-     * 通过 application/json 方式上传参数
+     * application/json
      * @param {string} reqUrl
      * @param {object} paramBody
      * @param {object} paramOptions
@@ -61,7 +65,6 @@ class gotUtils {
      */
     static async post(reqUrl,headers?,proxyUrl?:string,paramOptions = {}) {
         try {
-            console.log("post-proxyUrl",proxyUrl)
             const agent = proxyUrl?{
                             https: new HttpsProxyAgent({
                             keepAlive: true,
@@ -71,14 +74,18 @@ class gotUtils {
                             proxy: proxyUrl
                         })
                     }:null
-            console.log("post-agent",agent)
+
+            console.log("agent:",agent)
+            console.log("proxyUrl:",proxyUrl)
+            console.log("reqUrl:",reqUrl)
+
             const res = await got.post(reqUrl, {
                 headers,
                 agent,
             });
-            // }).json();
             return {error: null, statusCode: res.statusCode, statusMessage: res.statusMessage, data: JSON.parse(res.body), response: res.response};
         }catch(e) {
+            console.log("post_error:",e)
             let ret:gotResType = {};
             if (!isNull(e.response)) {
                 ret.statusCode = e.response.statusCode;
@@ -90,7 +97,6 @@ class gotUtils {
                 ret.statusMessage = e.message;
                 ret.error = e
             }
-            console.log("post请求错误:",ret)
             return ret;
         }
     }
@@ -103,8 +109,6 @@ class gotUtils {
      * @returns {{error ?: object, statusCode ?: number, statusMessage ?: string, body ?: string, response ?: any}} 响应结果
      */
     static async get(reqUrl:string,headers?,proxyUrl?:string) {
-
-        console.log("proxyUrl",proxyUrl)
         const agent = proxyUrl?{
                         https: new HttpsProxyAgent({
                         keepAlive: true,
@@ -114,15 +118,20 @@ class gotUtils {
                         proxy: proxyUrl
                     })
                 }:null
-        console.log("agent",agent)
+
+        console.log("agent:",agent)
+        console.log("proxyUrl:",proxyUrl)
+        console.log("reqUrl:",reqUrl)
+
         try {
             const res = await got.get(reqUrl, {
                 headers,
                 agent,
             });
-            // }).json();
             return {error: null, statusCode: res.statusCode, statusMessage: res.statusMessage, data: JSON.parse(res.body)};
         }catch(e) {
+            console.log('get_error',e)
+
             let ret:gotResType = { };
             if (!isNull(e.response)) {
                 ret.error = e;
