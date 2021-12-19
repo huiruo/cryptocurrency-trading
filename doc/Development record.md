@@ -53,10 +53,11 @@ http://localhost:1788/user/22
 
 4.创建表
 ```
+
 测试表链接
-```
+```sql
 CREATE TABLE `mytrades`  (
-  `id` int(0) NOT NULL AUTO_INCREMENT,
+  `id` int(1) NOT NULL AUTO_INCREMENT,
   `account` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `password` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `email` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
@@ -65,6 +66,7 @@ CREATE TABLE `mytrades`  (
 
 INSERT INTO `myTrades` VALUES (23, '测试1213', '123456', NULL);
 ```
+
 ###### myTrades表
 ```
 {
@@ -82,7 +84,8 @@ INSERT INTO `myTrades` VALUES (23, '测试1213', '123456', NULL);
     "isMaker": true,
     "isBestMatch": true
 }
-
+```
+```sql
 CREATE TABLE `mytrades`  (
   `id` bigint(60) NOT NULL,
   `symbol` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
@@ -112,6 +115,87 @@ CREATE TABLE `mytrades`  (
 1.编写 myTrades 链接 自己的数据库的数据
 
 2.前端页面
-
 ```
 
+### 2021.12.19
+```
+对接钱包：
+逻辑：先把 api数据，逻辑处理--->本地数据
+```
+
+表设计：
+```json
+"makerCommission": 10,
+"takerCommission": 10,
+"buyerCommission": 0,
+"sellerCommission": 0,
+"canTrade": true,
+"canWithdraw": true,
+"canDeposit": true,
+"updateTime": 1639755096309,
+"accountType": "SPOT",
+"balances": [
+    {
+        "asset": "BTC",
+        "free": "0.2577788",
+        "locked": "0.00000000"
+    },
+    {
+        "asset": "LTC",
+        "free": "0.00000000",
+        "locked": "0.00000000"
+    },
+    {
+        "asset": "DOT",
+        "free": "0.00760000",
+        "locked": "0.00000000"
+    },
+    {
+        "asset": "RUNE",
+        "free": "0.00000000",
+        "locked": "0.00000000"
+    },
+    {
+        "asset": "BNBUP",
+        "free": "0.00000000",
+        "locked": "0.00000000"
+    },
+  ]
+```
+
+  `id` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+```sql
+CREATE TABLE `crypto_wallet`  (
+  `id` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `asset` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `free` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `locked` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `updateTime` bigint(60) NULL DEFAULT NULL,
+   PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+
+CREATE TABLE `wallet_info`  (
+  `id` int(1) NOT NULL AUTO_INCREMENT,
+  `accountType` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `updateTime` bigint(60) NULL DEFAULT NULL,
+  `canTrade` tinyint(1) NOT NULL,
+  `canWithdraw` tinyint(1) NOT NULL,
+  `canDeposit` tinyint(1) NOT NULL,
+  `makerCommission` bigint(60) NULL DEFAULT NULL,
+  `takerCommission` bigint(60) NULL DEFAULT NULL,
+  `buyerCommission` bigint(60) NULL DEFAULT NULL,
+  `sellerCommission` bigint(60) NULL DEFAULT NULL,
+   PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 24 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+```
+
+```
+1.Service:
+nest g service cryptoWallet trader
+2.controller:
+nest g controller cryptoWallet trader
+3.Module
+nest g module cryptoWallet trader
+
+1639897104628
+```
