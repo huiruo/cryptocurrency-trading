@@ -42,6 +42,11 @@ const traderApi = {
 		const url:string = `${traderApiUrl}/trader/api/myTrades`;
 		return http.get<resType>(data,url);
 	},
+
+	cryptoWalletApi(){
+		const url:string = `${traderApiUrl}/account/api/cryptoWallet`;
+		return http.get<resType>({},url);
+	},
 }
 
 export default traderApi;

@@ -41,3 +41,11 @@ export interface orderItemType{
   isMaker: boolean,
   isBestMatch: boolean
 }
+
+export interface balancesType{
+  id?:string,
+  asset:string,
+  free:string,
+  locked:string,
+  updateTime:number
+}
