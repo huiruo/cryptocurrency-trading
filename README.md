@@ -27,6 +27,14 @@ cryptocurrency-trading
 ├── web (Browser application)
 ```
 
+### Secret file
+The necessary configuration parameters for project operation include database account configuration, platform API Key and platform Secret Key.
+```
+server/.env
+server/config/env-prod/application-prod.env
+server_java/src/main/resources/application-prod.properties
+```
+
 ### git commit specification
 ```
 feat：new feature
