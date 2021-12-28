@@ -7,7 +7,6 @@ import { UserModule } from './trader/user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import dbConfig from '../config/db'
 import { getDirFilenames } from './utils/getDirFilenames';
-import { CryptoWalletService } from './trader/crypto-wallet/crypto-wallet.service';
 import { CryptoWalletController } from './trader/crypto-wallet/crypto-wallet.controller';
 import { CryptoWalletModule } from './trader/crypto-wallet/crypto-wallet.module';
 

@@ -150,20 +150,9 @@ CREATE TABLE `mytrades`  (
         "free": "0.00760000",
         "locked": "0.00000000"
     },
-    {
-        "asset": "RUNE",
-        "free": "0.00000000",
-        "locked": "0.00000000"
-    },
-    {
-        "asset": "BNBUP",
-        "free": "0.00000000",
-        "locked": "0.00000000"
-    },
   ]
 ```
 
-  `id` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
 ```sql
 CREATE TABLE `crypto_wallet`  (
   `id` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
@@ -196,6 +185,98 @@ nest g service cryptoWallet trader
 nest g controller cryptoWallet trader
 3.Module
 nest g module cryptoWallet trader
+```
 
-1639897104628
+### tips
+```
+1.如何计算成本价？
+
+2.如何计算波动价格？
+```
+### 计算成本价
+```
+钱包 = 订单 ----> 需要聚合的订单
+方法：targetFree --->计算出需要聚合的订单
+calculateCostPrice
+```
+
+```
+"free": "0.00582422",
+
+BTCUSDT	8764315650	买入	51419.70000000	2021-12-28 03:32:52	0.00295000	151.68811500	0.00000295	BTC	是	是
+BTCUSDT	8764892102	买入	51079.97000000	2021-12-28 04:38:27	0.00195000	99.60594150	0.00000195	BTC	是	是
+
+
+2021-12-28 03:32:52
+0.00295000
+
+SELECT * FROM `mytrades` WHERE qty = 0.00295000;
+1203052962	BTCUSDT	8764315650	-1	51419.70000000	0.00295000	151.68811500	0.00000295	BTC	1640633572086	1	1	1
+
+2021-12-28 04:38:27
+0.00195000
+
+0.0049 + 0.00093000 = 0.00583
+
+
+"targetFree": 0.02723005,
+```
+
+例子1：
+```
+假设用a1元买进了b1手，用c1元卖出了d1手，用a2元买进了b2手，用c2元卖出了d2手，用a3元买进了b3手，用c3元卖出了d3手...，成本价就是（a1 x b1 + a2 x b2 +a3 x b3... - c1 x d1 - c2 x d2- c3 x d3...) / (b1 + b2 +b3 ... - d1 - d2 - d3 ...)
+
+补仓后成本价计算方法：（以补仓1次为例）
+（第一次买入数量*买入价+第二次买入数量*买入价+交易费用）/(第一次买入数量+第二次买入数量）
+
+比如买入某股票，价格为5.2，买入10000股，手续费总共为16元，那么可以算出买入成本价为：〔（5.2*10000）+16〕/10000=5.2016元。
+
+补仓后成本均价=(前期每股均价*前期所购股票数量+补仓每股均价*补仓股票数量)/(前期股票数量+补仓股票数量)
+```
+
+###  策略
+由于计算持仓需要起始订单
+所以需要建立一个策略表，存放正在运行的策略。并且关联起始订单
+```
+quantity double(16,16);
+double(16,2) 16位长度，小数点后16位。
+double类型，长度需大于等于小数点位数，若相等则整数部分必须为0
+假设长度为3，小数点位数为2，则整数位数为1。
+整数位数超出限制会导致插入失败
+小数位数超出限制将对超出位从后往前依次进行五舍六入
+```
+
+```
+trading_strategy
+  id
+  asset string  种类
+  quantity double  数量
+  cost_price double  成本
+  profit_ratio double 盈利比率 100000.33
+  first_order_id string 策略起始订单
+  last_order_id string 策略起始订单
+  is_running tinyint 是否正在运行
+  update_time bigint  更新时间
+```
+
+```sql
+CREATE TABLE `trading_strategy`  (
+  `id` int(1) NOT NULL AUTO_INCREMENT,
+  `asset` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `quantity` double(32,8) NULL DEFAULT NULL,
+  `cost_price` double(32,8) NULL DEFAULT NULL,
+  `profit_ratio` double(8,2) NULL DEFAULT NULL,
+  `first_order_id` bigint(0) NULL DEFAULT NULL,
+  `first_order_price` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `last_order_id` bigint(0) NULL DEFAULT NULL,
+  `last_order_price` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `is_running` tinyint(1) NOT NULL,
+	`update_time`  timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 24 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+```
+```sql
+SELECT * FROM `mytrades` WHERE symbol = "BTCUSDT" and qty = 0.00295000;
+
+SELECT * FROM `mytrades` WHERE symbol = "BTCUSDT" and time >= 1640633572086 order by time desc;
 ```

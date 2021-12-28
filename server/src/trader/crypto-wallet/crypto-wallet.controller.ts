@@ -13,9 +13,12 @@ export class CryptoWalletController {
 ){
 }
 
+  /*
+  Data Api: 更新钱包
+  http://localhost:1788/account/binance/cryptoWallet
+  */
   @Get('binance/cryptoWallet')
-  //http://localhost:1788/account/binance/cryptoWallet
-  async cryptoWallet(payload={}){
+  async cryptoWallet(){
       const binance_api_secret= this.configService.get<string>('BINANCE_API_SECRET')
       const binance_api_key= this.configService.get<string>('BINANCE_API_KEY')
       const proxy_url= this.configService.get<string>('PROXY_URL')
@@ -34,11 +37,71 @@ export class CryptoWalletController {
       }
   }
 
+  /*
+  Server api: 获取钱包详情
+  http://localhost:1788/account/api/cryptoWallet
+  */
   @Get('api/cryptoWallet')
-  //http://localhost:1788/account/api/cryptoWallet
-  async cryptoWalletApi(payload={}){
-        const data = await this.cryptoWalletService.getCryptoWallet();
+  async cryptoWalletApi(){
+    const data = await this.cryptoWalletService.getCryptoWallet();
 
-        return { code: 200, message: '查询成功',data};
+    return { code: 200, message: '查询成功',data};
   }
+
+  /*
+  Server api: 计算持仓成本
+  http://localhost:1788/account/api/calculateCostprice
+  symbol:'ETHUSDT'
+  asset:'ETH'
+  or:
+  symbol:'BTCUSDT'
+  asset:'BTC'
+  */
+  @Get('api/calculateCostPrice')
+  async calculateCostprice(@Query() query){
+    console.log("query:",query.symbol)
+    const { symbol } = query
+
+    // 匹配USDT结尾,并截取asset start
+    const regUSDT = /USDT$/
+    let asset:string = ''
+    if(regUSDT.test(symbol)){
+      asset = symbol.replace(/USDT/g, "");
+    }
+    //end
+    const data = await this.cryptoWalletService.CALC_holdCostprice(symbol,asset);
+    return { code: 200, message: '查询成功',data};
+  }
+
+  /*
+  Server api: 更新单一asset策略
+  http://localhost:1788/account/api/updateStrategy
+  symbol:'ETHUSDT' 
+  or:
+  symbol:'BTCUSDT'
+  asset:'BTC'
+  */
+  @Get('api/updateStrategy')
+  async updateTradingStrategy(@Query() query){
+    console.log("updateStrategy_query:",query.symbol)
+    const { symbol } = query
+
+    // 匹配USDT结尾,并截取asset start
+    const regUSDT = /USDT$/
+    let asset:string = ''
+    if(regUSDT.test(symbol)){
+      asset = symbol.replace(/USDT/g, "");
+    }
+    //end
+
+    if(asset){
+
+      const data = await this.cryptoWalletService.updateTradingStrategy(symbol,asset);
+
+      return { code: 200, message: '更新成功',data};
+    }else{
+
+      return { code: 200, message: 'asset error',data:null};
+    }
+  } 
 }

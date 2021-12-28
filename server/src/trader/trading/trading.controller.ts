@@ -15,8 +15,12 @@ export class TradingController {
     ){
     }
 
+
+    /*
+    Test api: 获取当前 symbol 价格，权重太高，不建议使用
+    http://localhost:1788/trader/ticker/24hr?symbol=BTC-USDT&platform=okex
+    */
     @Get('binance/24hr')
-    //http://localhost:1788/trader/ticker/24hr?symbol=BTC-USDT&platform=okex
     async ticker(){
        const ticker24URL = 'https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT'
        const agent ={
@@ -35,11 +39,14 @@ export class TradingController {
         return data
     }
 
-    //所属：现货账户和交易接口----账户成交历史
+    /*
+    Data Api:从币安更新订单,并写入本地数据库
+    所属：现货账户和交易接口----账户成交历史
+    http://localhost:1788/trader/binance/myTrades
+    http://172.18.1.162:1788/trader/binance/myTrades
+    */
     @Get('binance/myTrades')
-    //http://localhost:1788/trader/binance/myTrades
-    //http://172.18.1.162:1788/trader/binance/myTrades
-    async myTrades(payload={}){
+    async myTrades(){
         const binance_api_secret= this.configService.get<string>('BINANCE_API_SECRET')
         const binance_api_key= this.configService.get<string>('BINANCE_API_KEY')
         const proxy_url= this.configService.get<string>('PROXY_URL')
@@ -77,11 +84,12 @@ export class TradingController {
         */
     }
 
-    @Get('api/myTrades')
-    //http://172.18.1.162:1788/trader/api/myTrades
     /*
+    Server api: 拿本地订单数据，暂时未作分页
+    http://localhost:1788/trader/api/myTrades
     symbol:'ETHUSDT'
     */
+    @Get('api/myTrades')
     async myTradesApi(@Query() query){
         const { symbol } = query
         if(symbol){
@@ -92,9 +100,12 @@ export class TradingController {
         }
     }
 
-    //所属：现货账户和交易接口----测试下单 (TRADE)
+    /*
+    Test api
+    所属：现货账户和交易接口----测试下单 (TRADE)
+    http://localhost:1788/trader/ticker/newOrderTest
+    */
     @Post('binance/newOrderTest')
-    //http://localhost:1788/trader/ticker/newOrderTest
     async newOrderTest(payload={}){
         const binance_api_secret= this.configService.get<string>('BINANCE_API_SECRET')
         const binance_api_key= this.configService.get<string>('BINANCE_API_KEY')

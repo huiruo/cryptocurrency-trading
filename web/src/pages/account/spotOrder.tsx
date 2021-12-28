@@ -62,6 +62,7 @@ const SpotOrder =()=>{
               </div>
             </Box>
             */}
+            <Box as='th'>序号</Box>
             <Box as='th'>交易对</Box>
             <Box as='th'>订单ID</Box>
             <Box as='th'>交易方向</Box>
@@ -76,7 +77,7 @@ const SpotOrder =()=>{
           </tr>
         </Box>
         <tbody>
-          {orderList.map((item:orderItemType) => {
+          {orderList.map((item:orderItemType,index) => {
             return (
               <Box as='tr' key={item.id} border-1 borderSolid borderOrange500>
                 {/*  
@@ -91,6 +92,7 @@ const SpotOrder =()=>{
                     </div>
                   </Box>
                 */}
+                <Box as='td'>{index}</Box>
                 <Box as='td'>{item.symbol}</Box>
                 <Box as='td'>{item.orderId}</Box>
                 <Box as='td'>{item.isBuyer?'买入':'卖出'}</Box>
