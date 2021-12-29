@@ -200,30 +200,9 @@ nest g module cryptoWallet trader
 calculateCostPrice
 ```
 
-```
-"free": "0.00582422",
-
-BTCUSDT	8764315650	买入	51419.70000000	2021-12-28 03:32:52	0.00295000	151.68811500	0.00000295	BTC	是	是
-BTCUSDT	8764892102	买入	51079.97000000	2021-12-28 04:38:27	0.00195000	99.60594150	0.00000195	BTC	是	是
-
-
-2021-12-28 03:32:52
-0.00295000
-
-SELECT * FROM `mytrades` WHERE qty = 0.00295000;
-1203052962	BTCUSDT	8764315650	-1	51419.70000000	0.00295000	151.68811500	0.00000295	BTC	1640633572086	1	1	1
-
-2021-12-28 04:38:27
-0.00195000
-
-0.0049 + 0.00093000 = 0.00583
-
-
-"targetFree": 0.02723005,
-```
-
 例子1：
 ```
+https://www.gupiaojs.cn/
 假设用a1元买进了b1手，用c1元卖出了d1手，用a2元买进了b2手，用c2元卖出了d2手，用a3元买进了b3手，用c3元卖出了d3手...，成本价就是（a1 x b1 + a2 x b2 +a3 x b3... - c1 x d1 - c2 x d2- c3 x d3...) / (b1 + b2 +b3 ... - d1 - d2 - d3 ...)
 
 补仓后成本价计算方法：（以补仓1次为例）
@@ -277,6 +256,64 @@ CREATE TABLE `trading_strategy`  (
 ```
 ```sql
 SELECT * FROM `mytrades` WHERE symbol = "BTCUSDT" and qty = 0.00295000;
-
 SELECT * FROM `mytrades` WHERE symbol = "BTCUSDT" and time >= 1640633572086 order by time desc;
+```
+
+### 2021.12.29
+计算成本调试代码：
+```ts
+/*
+test:
+const tradesQty= targetTrade.map(item=>{
+  return {
+    isBuyer:item.isBuyer,
+    price:parseFloat(Number(item.price).toFixed(8)),
+    qty:parseFloat(Number(item.qty).toFixed(8))
+  }
+})
+*/
+
+targetTrade.forEach(item=>{
+  const isBuyer = item.isBuyer
+  const price = parseFloat(Number(item.price).toFixed(8))
+  const qty = parseFloat(Number(item.qty).toFixed(8))
+
+  if(isBuyer===1){
+    console.log("买入前：totalCost:",totalCost,"totalQty:",totalQty)
+
+    let cost:number = parseFloat((price* qty).toFixed(8))
+    totalQty = parseFloat((qty + totalQty).toFixed(8))
+    totalCost = parseFloat((cost + totalCost).toFixed(8))
+
+    console.log(qty,'单笔花费：',cost,"计算后:",totalCost,'totalQty:',totalQty)
+    console.log("买入=============分割线",Number((totalCost/totalQty).toFixed(8)))
+  }else{
+    console.log("卖出前：totalCost:",totalCost,"totalQty:",totalQty)
+    let cost:number = parseFloat((price* qty).toFixed(8))
+    totalQty = parseFloat((qty - totalQty).toFixed(8))
+    totalCost = parseFloat((cost - totalCost).toFixed(8))
+
+    console.log(qty,'单笔花费：',cost,"计算后:",totalCost,'totalQty:',totalQty)
+    console.log("卖出=============分割线",Number((totalCost/totalQty).toFixed(8)))
+  }
+})
+```
+
+### 计算起始订单调试代码
+```ts
+//获得起始订单 start
+const findFirstOredrsql = `select * from mytrades where id='${symbolTrades[calculatingTargetIndex-1].id}'`
+const firstStrategyOredr:MyTrades[] = await this.myTradesRepo.query(findFirstOredrsql);
+//获得起始订单 end
+
+/*
+//and qty = 0.00295000 这里只是写死测试，start
+const findFirstOredrsql = `select * from mytrades where symbol='${symbol}' and qty = 0.00093000`
+const firstStrategyOredr:MyTrades[] = await this.myTradesRepo.query(findFirstOredrsql);
+// console.log("实际起始订单id",firstStrategyOredr[0].id)
+//end
+*/
+// console.log("计算出起始订单",firstStrategyOredr)
+// console.log("计算出起始订单id",symbolTrades[calculatingTargetIndex-1].id)
+// return firstStrategyOredr
 ```

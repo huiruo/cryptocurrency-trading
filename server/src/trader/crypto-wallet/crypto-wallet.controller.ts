@@ -69,8 +69,13 @@ export class CryptoWalletController {
       asset = symbol.replace(/USDT/g, "");
     }
     //end
-    const data = await this.cryptoWalletService.CALC_holdCostprice(symbol,asset);
-    return { code: 200, message: '查询成功',data};
+
+    if(asset){
+      const data = await this.cryptoWalletService.CALC_holdCostprice(symbol,asset);
+      return { code: 200, message: '查询成功',data};
+    }else{
+      return { code: 200, message: 'asset error',data:null};
+    }
   }
 
   /*

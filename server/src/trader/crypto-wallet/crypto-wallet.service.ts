@@ -51,7 +51,6 @@ export class CryptoWalletService {
 
     if (theWalletInfo) {
       const result = await this.walletInfoRepo.update({ id: theWalletInfo.id }, theWalletInfo);
-      // console.log("updateCryptoWallet---->update2",result)
 
       balances.forEach((item:balancesType)=>{
         const { asset,free,locked } = item
@@ -132,25 +131,50 @@ export class CryptoWalletService {
   private async findTradingStrategyByAsset(asset:string): Promise<TradingStrategy> {
     const sql = `select * from trading_strategy where asset='${asset}' limit 0,1`
     const tradingStrategy = await this.tradingStrategyRepo.query(sql);
-    console.log("tradingStrategy",tradingStrategy)
     return tradingStrategy[0];
   }
 
   /*
-  Export API/Util method: 更新策略 
+  Export API: 更新策略:计算出起始订单，并创建/更新策略
   */
   async updateTradingStrategy(symbol: string,asset: string){
     const assetWallet = await this.findCryptoWalletByAsset(asset)
     const { free:quantity } = assetWallet
 
-    //and qty = 0.00295000 这里只是写死测试，后面具体得改
-    const findFirstOredrsql = `select * from mytrades where symbol='${symbol}' and qty = 0.00295000`
-    const myTrade:MyTrades[] = await this.myTradesRepo.query(findFirstOredrsql);
-    //end
+    //计算出起始订单 start
+    const symbolTrades:MyTrades[] = await this.getMyTradesBySymbol(symbol)
 
-    if(myTrade){
+    let calculatingQuantity:number =0
+    let calculatingTargetIndex:number = 0
+
+    for (let index = 0; index < symbolTrades.length; index++) {
+      const item:MyTrades = symbolTrades[index];
+      const isBuyer = item.isBuyer
+      const qty = parseFloat(Number(item.qty).toFixed(8))
+      if(isBuyer){
+        calculatingQuantity = Number((calculatingQuantity + qty).toFixed(8))
+        if(calculatingQuantity <=0){
+          calculatingTargetIndex=index
+          break;
+        }
+      }else{
+        calculatingQuantity = Number((calculatingQuantity - qty).toFixed(8))
+        if(calculatingQuantity <=0){
+          calculatingTargetIndex=index
+          break;
+        }
+      } 
+    }
+    //计算出起始订单 end
+
+    //获得起始订单 start
+    const findFirstOredrsql = `select * from mytrades where id='${symbolTrades[calculatingTargetIndex-1].id}'`
+    const firstStrategyOredr:MyTrades[] = await this.myTradesRepo.query(findFirstOredrsql);
+    //获得起始订单 end
+
+    if(firstStrategyOredr){
       //根据起始订单---->查询到策略订单区间--->得出操作订单信息
-      const { id:first_order_id, price:first_order_price, time} = myTrade[0]
+      const { id:first_order_id, price:first_order_price, time} = firstStrategyOredr[0]
       const findFirstOredrsql = `select * from mytrades where symbol='${symbol}' and time >= ${time} order by time desc`
       const targetTrade:MyTrades[] = await this.myTradesRepo.query(findFirstOredrsql);
       const { id:last_order_id, price:last_order_price} = targetTrade[0]
@@ -178,7 +202,6 @@ export class CryptoWalletService {
       }else{
         //insert
         result = await this.tradingStrategyRepo.save(strategyRow) 
-        console.log("insert result",result)
       }
 
       return result;
@@ -188,89 +211,42 @@ export class CryptoWalletService {
 
   /*
   Export API: Calculate the hold symbol cost price 
+  计算出成本价，并写入策略表
   */
   async CALC_holdCostprice(symbol:string,asset: string){
-    /*
-    return cryptoWalletByAsset:
-    {
-        "id": "45e75574-918f-4d9c-abcb-7cbac4d2d44b",
-        "asset": "BTC",
-        "free": "0.02723005",
-        "locked": "0.00000000",
-        "updateTime": "1639897104628"
+    const tradingStrategy:TradingStrategy = await this.findTradingStrategyByAsset(asset)
+
+    if(tradingStrategy){
+      const { first_order_id } = tradingStrategy
+      const findFirstOredrsql = `select * from mytrades where symbol='${symbol}' and time >= (select time from mytrades where id ='${first_order_id}') order by time desc`
+      const targetTrade:MyTrades[] = await this.myTradesRepo.query(findFirstOredrsql);
+      let totalCost:number = 0
+      let totalQty:number = 0
+
+      targetTrade.forEach(item=>{
+        const isBuyer = item.isBuyer
+        const price = parseFloat(Number(item.price).toFixed(8))
+        const qty = parseFloat(Number(item.qty).toFixed(8))
+
+        if(isBuyer===1){
+          let cost:number = parseFloat((price* qty).toFixed(8))
+          totalQty = parseFloat((qty + totalQty).toFixed(8))
+          totalCost = parseFloat((cost + totalCost).toFixed(8))
+        }else{
+          let cost:number = parseFloat((price* qty).toFixed(8))
+          totalQty = parseFloat((qty - totalQty).toFixed(8))
+          totalCost = parseFloat((cost - totalCost).toFixed(8))
+        }
+      })
+
+      const theCostPrice:number = Number((totalCost/totalQty).toFixed(8))
+
+      //update
+      let sql = `update trading_strategy set cost_price = "${theCostPrice}" WHERE asset = "${asset}"`;
+      let result = await this.tradingStrategyRepo.query(sql);
+      return result
+    }else{
+      return null
     }
-    */
-    const assetWallet = await this.findCryptoWalletByAsset(asset)
-    const symbolTrades:MyTrades[] = await this.getMyTradesBySymbol(symbol)
-
-    const tradesQty2= symbolTrades.filter(item=>{
-      return !item.isBuyer
-    })
-    const tradesQty3= symbolTrades.filter(item=>{
-      return item.isBuyer
-    })
-
-    const tradesQty= symbolTrades.map(item=>{
-      return {
-        isBuyer:item.isBuyer,
-        qty:item.qty,
-        qtyC:Number(item.qty)*1000,
-        qtyF:parseFloat(Number(item.qty).toFixed(8))
-      }
-    })
-
-    //计算订单 start
-    const { free } = assetWallet
-    const targetOrder :MyTrades[]= []
-    // const targetFree:bigint =BigInt(free)
-    // const targetFree:number =Number(free)*1000
-    const targetFree:number =Number(free);
-    let calculatingFree:number =0
-    /*
-    symbolTrades.forEach(item=>{
-
-      if(item.isBuyer){
-        calculatingFree = calculatingFree + Number(item.qty)*1000
-        console.log("买入A----》计算后",calculatingFree)
-        console.log("=============分割线")
-      }else{
-        calculatingFree = calculatingFree - Number(item.qty)*1000
-        console.log("买出B----》计算后",calculatingFree)
-        console.log("=============分割线")
-      }
-    })
-    */
-    //计算订单 end
-    const test1 = 0.0091
-    const test2 = 0.00028
-    console.log("结果a",test1+test2)
-    console.log("结果b",test1.toFixed(8)+test2.toFixed(8))
-    console.log("结果c",(test1+test2).toFixed(8))
-    console.log("结果d",Number((test1+test2).toFixed(8)))
-    console.log("结果e",parseFloat((test1+test2).toFixed(8)))
-    const v1 = 0.00145217
-    const v2 = 0.00054576
-    const testInint = Number((v1+v2).toFixed(8))
-    calculatingFree = calculatingFree + testInint
-    console.log("结果f",testInint)
-    console.log("结果g",calculatingFree)
-
-    tradesQty.forEach(item=>{
-      if(item.isBuyer){
-        console.log("计算前:",calculatingFree,)
-        calculatingFree = Number((calculatingFree + item.qtyF).toFixed(8))
-        console.log(item.qtyF+"买入A----》计算后:",calculatingFree)
-        console.log("=============分割线")
-      }else{
-        console.log("计算前:",calculatingFree,)
-        calculatingFree = Number((calculatingFree - item.qtyF).toFixed(8))
-        console.log(item.qtyF+"买出B----》计算后:",calculatingFree)
-        console.log("=============分割线")
-      }
-    })
-
-    // return {free,symbolTrades,tradesQty,tradesQty2};
-    // return {free,tradesQty,tradesQty2,tradesQty3};
-    return {free,targetFree,tradesQty};
   }
 }
