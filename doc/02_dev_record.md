@@ -243,14 +243,16 @@ CREATE TABLE `trading_strategy`  (
   `id` int(1) NOT NULL AUTO_INCREMENT,
   `asset` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `quantity` double(32,8) NULL DEFAULT NULL,
+  `price` double(32,8) NULL DEFAULT NULL,
   `cost_price` double(32,8) NULL DEFAULT NULL,
-  `profit_ratio` double(8,2) NULL DEFAULT NULL,
+  `profit_ratio` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `profit_amount` double(8,2) NULL DEFAULT NULL,
+	`update_time`  timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `first_order_id` bigint(0) NULL DEFAULT NULL,
   `first_order_price` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `last_order_id` bigint(0) NULL DEFAULT NULL,
   `last_order_price` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `is_running` tinyint(1) NOT NULL,
-	`update_time`  timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
    PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 24 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
 ```
