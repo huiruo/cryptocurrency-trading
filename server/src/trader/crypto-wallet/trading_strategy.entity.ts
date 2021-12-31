@@ -21,6 +21,11 @@ export class TradingStrategy {
     quantity: number;
 
     @Column({
+        comment: 'price'
+    })
+    price: number;
+
+    @Column({
         comment: 'cost_price'
     })
     cost_price: number;
@@ -28,7 +33,18 @@ export class TradingStrategy {
     @Column({
         comment: 'profit_ratio'
     })
-    profit_ratio: number;
+    profit_ratio: string;
+
+    @Column({
+        comment: 'profit_amount'
+    })
+    profit_amount: number;
+
+    @CreateDateColumn({
+        type: 'timestamp',
+        name: 'update_time',
+    })
+    update_time: Date;
 
     @Column({
         comment: 'first_order_id'
@@ -54,12 +70,6 @@ export class TradingStrategy {
         comment: 'is_running'
     })
     is_running: number;
-
-    @CreateDateColumn({
-        type: 'timestamp',
-        name: 'update_time',
-    })
-    update_time: Date;
     /*
     @Column({
         comment: 'updateTime'

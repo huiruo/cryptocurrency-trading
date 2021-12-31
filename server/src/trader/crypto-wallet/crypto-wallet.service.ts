@@ -107,7 +107,7 @@ export class CryptoWalletService {
   }
 
   /*
-  Export API: Query wallet from local Databasce
+  Export API: Query wallet from local database
   */
   async getCryptoWallet():Promise<CryptoWallet>{
     const sql = `select * from crypto_wallet;`
@@ -132,6 +132,27 @@ export class CryptoWalletService {
     const sql = `select * from trading_strategy where asset='${asset}' limit 0,1`
     const tradingStrategy = await this.tradingStrategyRepo.query(sql);
     return tradingStrategy[0];
+  }
+
+  /*
+  Export API: 更新策略:计算盈亏
+  */
+  async updateTradingStrategyProfit(price:any,asset: string){
+    const tradingStrategy:TradingStrategy = await this.findTradingStrategyByAsset(asset)
+    const { cost_price,quantity } = tradingStrategy
+
+    const priceInt= Number(price)
+    const priceDifference:number = parseFloat((priceInt - cost_price).toFixed(8))
+
+    const profit_ratio:string = ((priceDifference / priceInt)*100).toFixed(2)
+
+    const profitAmount:number = parseFloat((priceDifference * quantity).toFixed(8))
+
+    //update
+    console.log("更新",asset,"盈亏")
+    let sql = `update trading_strategy set price = "${priceInt}",profit_ratio = "${profit_ratio}",profit_amount = "${profitAmount}" WHERE asset = "${asset}"`;
+    const result = await this.tradingStrategyRepo.query(sql);
+    return result
   }
 
   /*
@@ -196,11 +217,13 @@ export class CryptoWalletService {
 
       if(tradingStrategy){
         //update
+        console.log("计算出起始订单，并创建/更新策略-update")
         let sql = `update trading_strategy set quantity = "${strategyRow.quantity}",first_order_id = "${first_order_id}", first_order_price = ${first_order_price},
         last_order_id = "${last_order_id}", last_order_price = ${last_order_price} WHERE asset = "${asset}"`;
         result = await this.tradingStrategyRepo.query(sql);
       }else{
         //insert
+        console.log("计算出起始订单，并创建/更新策略-insert")
         result = await this.tradingStrategyRepo.save(strategyRow) 
       }
 

@@ -1,7 +1,7 @@
 import { Controller,Post,Get,Query } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CryptoWalletService } from './crypto-wallet.service';
-
+import { getSymbolPriceUtil } from '../../utils/binanceApiUtil'
 const { binanceConnector }  = require('../../binance-connector/index')
 
 @Controller('account')
@@ -38,14 +38,57 @@ export class CryptoWalletController {
   }
 
   /*
+  Data Api/Server Api: 更新策略:计算盈亏
+  http://localhost:1788/account/binance/updateProfit
+  symbol:'BTCUSDT'
+  */
+  @Get('binance/updateProfit')
+  async updateProfit(@Query() query){
+    const { symbol } = query
+    const binance_api_secret= this.configService.get<string>('BINANCE_API_SECRET')
+    const binance_api_key= this.configService.get<string>('BINANCE_API_KEY')
+    const { code,data,message } = await getSymbolPriceUtil(binance_api_key,binance_api_secret,symbol);
+    if(code === 200){
+      // 匹配USDT结尾,并截取asset start
+      const regUSDT = /USDT$/
+      let asset:string = ''
+      if(regUSDT.test(symbol)){
+        asset = symbol.replace(/USDT/g, "");
+      }
+      //end
+      if(asset){
+        await this.cryptoWalletService.updateTradingStrategyProfit(data.price,asset);
+        return { code: 200, message,data};
+      }else{
+        return { code: 200, message: 'asset error',data:null};
+      }
+    }else{
+      return { code: 0, message, data:null};
+    }
+  }
+
+  /*
   Server api: 获取钱包详情
   http://localhost:1788/account/api/cryptoWallet
   */
   @Get('api/cryptoWallet')
   async cryptoWalletApi(){
     const data = await this.cryptoWalletService.getCryptoWallet();
-
     return { code: 200, message: '查询成功',data};
+  }
+
+  /*
+  Server api: 获取最新价格
+  http://localhost:1788/account/api/symbolPrice
+  symbol:'BTCUSDT'
+  */
+  @Get('api/SymbolPrice')
+  async getSymbolPrice(@Query() query){
+    const { symbol } = query
+    const binance_api_secret= this.configService.get<string>('BINANCE_API_SECRET')
+    const binance_api_key= this.configService.get<string>('BINANCE_API_KEY')
+    const data = await getSymbolPriceUtil(binance_api_key,binance_api_secret,symbol);
+    return { ...data };
   }
 
   /*
