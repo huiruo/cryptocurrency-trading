@@ -46,7 +46,8 @@ export class TradingController {
     http://172.18.1.162:1788/trader/binance/myTrades
     */
     @Get('binance/myTrades')
-    async myTrades(){
+    async myTrades(@Query() query){
+        const { symbol } = query
         const binance_api_secret= this.configService.get<string>('BINANCE_API_SECRET')
         const binance_api_key= this.configService.get<string>('BINANCE_API_KEY')
         const proxy_url= this.configService.get<string>('PROXY_URL')
@@ -64,17 +65,12 @@ export class TradingController {
         注意:
         如果设定 fromId , 获取订单 >= fromId. 否则返回最近订单。
         */
-
-        // /*
         const options = {
             limit:20
         }
-        let symbol:string = 'BTCUSDT'
-        // let symbol:string = 'ETHUSDT'
-        const {data,statusCode:code,statusMessage:message} = await client.myTrades(symbol,options)
+        const { data,statusCode:code,statusMessage:message } = await client.myTrades(symbol,options)
         await this.tradingService.createMyTrades(data);
-        return { code, message,data};
-        // */
+        return { code, message,data };
 
         //mock数据,调试
         /*

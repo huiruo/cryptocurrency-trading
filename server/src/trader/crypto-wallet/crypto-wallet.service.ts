@@ -22,7 +22,7 @@ export class CryptoWalletService {
   Export API: Binance wallet write into Databasce
   api接口：同步钱包数据
   */
-  async updateCryptoWallet(cryptoWallet:cryptoWalletType) {
+  async updateCryptoWallet(cryptoWallet:cryptoWalletType):Promise<any> {
     const { 
       makerCommission,
       takerCommission,buyerCommission,
@@ -50,25 +50,31 @@ export class CryptoWalletService {
     const theWalletInfo = await this.findWalletInfo()
 
     if (theWalletInfo) {
+      // 更新钱包配置
       const result = await this.walletInfoRepo.update({ id: theWalletInfo.id }, theWalletInfo);
-
-      balances.forEach((item:balancesType)=>{
-        const { asset,free,locked } = item
-        if(Number(free) !==0 || (Number(locked) !==0) ){
-          const cryptoWalletRow = {
-            id:uuidv4(),
-            asset,
-            free,
-            locked,
-            updateTime
-          }
-          this.updateCryptoWalletRow(cryptoWalletRow)
-        }
-      })
-
     }else{
       this.walletInfoRepo.save(walletInfoRow)
     }
+
+    // 把为0的过滤掉
+    const validBalances = balances.filter((item)=>{
+      const { free,locked } = item
+      return Number(free) !==0 || (Number(locked) !==0)
+    })
+
+    // 更新钱包
+    validBalances.forEach(async(item:balancesType,index)=>{
+      const { asset,free,locked } = item
+      const cryptoWalletRow = {
+        id:uuidv4(),
+        asset,
+        free,
+        locked,
+        updateTime
+      }
+      this.updateCryptoWalletRow(cryptoWalletRow)
+    })
+
   }
 
   /*
@@ -80,16 +86,30 @@ export class CryptoWalletService {
 
     const assetWallet = await this.findCryptoWalletByAsset(asset)
 
-    if (assetWallet) {
-      //update
-      let sql = `update crypto_wallet set asset = "${asset}",free = "${free}",locked = "${locked}", updateTime = ${updateTime}
-      WHERE id = "${assetWallet.id}"`;
-      const result = await this.cryptoWallet.query(sql);
-      console.log("update----->",cryptoWalletRow.asset,'-',result)
-    }else{
-      //insert
-      const result = await this.cryptoWallet.save(cryptoWalletRow) 
-      console.log("insert----->",result)
+    try {
+        if (assetWallet) {
+          //update
+          let sql = `update crypto_wallet set asset = "${asset}",free = "${free}",locked = "${locked}", updateTime = ${updateTime}
+          WHERE id = "${assetWallet.id}"`;
+          const result = await this.cryptoWallet.query(sql);
+          console.log("update----->",cryptoWalletRow.asset,'-')
+          const success = {
+            code:200,
+            message:'执行成功'
+          }
+          return {...result,...success}
+        }else{
+          //insert
+          const result = await this.cryptoWallet.save(cryptoWalletRow) 
+          console.log("insert----->",asset)
+          const success = {
+            code:200,
+            message:'执行成功'
+          }
+          return {...result,...success}
+        }
+    } catch (error) {
+      return {code:0,message:'执行失败'} 
     }
   }
   /*
@@ -111,8 +131,8 @@ export class CryptoWalletService {
   */
   async getCryptoWallet():Promise<CryptoWallet>{
     const sql = `select * from crypto_wallet;`
-    const cryptoWalletByAsset = await this.cryptoWallet.query(sql);
-    return cryptoWalletByAsset;
+    const cryptoWallet = await this.cryptoWallet.query(sql);
+    return cryptoWallet;
   }
 
   /*
@@ -132,27 +152,6 @@ export class CryptoWalletService {
     const sql = `select * from trading_strategy where asset='${asset}' limit 0,1`
     const tradingStrategy = await this.tradingStrategyRepo.query(sql);
     return tradingStrategy[0];
-  }
-
-  /*
-  Export API: 更新策略:计算盈亏
-  */
-  async updateTradingStrategyProfit(price:any,asset: string){
-    const tradingStrategy:TradingStrategy = await this.findTradingStrategyByAsset(asset)
-    const { cost_price,quantity } = tradingStrategy
-
-    const priceInt= Number(price)
-    const priceDifference:number = parseFloat((priceInt - cost_price).toFixed(8))
-
-    const profit_ratio:string = ((priceDifference / priceInt)*100).toFixed(2)
-
-    const profitAmount:number = parseFloat((priceDifference * quantity).toFixed(8))
-
-    //update
-    console.log("更新",asset,"盈亏")
-    let sql = `update trading_strategy set price = "${priceInt}",profit_ratio = "${profit_ratio}",profit_amount = "${profitAmount}" WHERE asset = "${asset}"`;
-    const result = await this.tradingStrategyRepo.query(sql);
-    return result
   }
 
   /*
@@ -233,6 +232,27 @@ export class CryptoWalletService {
   }
 
   /*
+  Export API: 更新策略:计算盈亏
+  */
+  async updateTradingStrategyProfit(price:any,asset: string){
+    const tradingStrategy:TradingStrategy = await this.findTradingStrategyByAsset(asset)
+    const { cost_price,quantity } = tradingStrategy
+
+    const priceInt= Number(price)
+    const priceDifference:number = parseFloat((priceInt - cost_price).toFixed(8))
+
+    const profit_ratio:string = ((priceDifference / priceInt)*100).toFixed(2)
+
+    const profitAmount:number = parseFloat((priceDifference * quantity).toFixed(8))
+
+    //update
+    console.log("更新",asset,"盈亏")
+    let sql = `update trading_strategy set price = "${priceInt}",profit_ratio = "${profit_ratio}",profit_amount = "${profitAmount}" WHERE asset = "${asset}"`;
+    const result = await this.tradingStrategyRepo.query(sql);
+    return result
+  }
+
+  /*
   Export API: Calculate the hold symbol cost price 
   计算出成本价，并写入策略表
   */
@@ -271,5 +291,15 @@ export class CryptoWalletService {
     }else{
       return null
     }
+  }
+
+  /*
+  Export API: Calculate the hold symbol cost price 
+  获取所有策略
+  */
+  async getStrategies(): Promise<TradingStrategy>{
+      const sql = `select * from trading_strategy`
+      let strategies = await this.tradingStrategyRepo.query(sql);
+      return strategies
   }
 }

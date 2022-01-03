@@ -19,6 +19,8 @@ export class TradingService {
       if (!myTrade) {
         console.log("myTrades insert---->",element)
         return this.myTradesRepo.save(element);
+      }else{
+        console.log("--该订单已存在")
       }
     });
   }
@@ -31,6 +33,7 @@ export class TradingService {
     const myTrade = await this.myTradesRepo.query(sql);
     return myTrade;
   }
+
   /*
   Util method: Query orders from local database
   */
