@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Box } from '@fower/react'
-import {Button} from '../../components/Button/index'
-import {Input} from '../../components/Input/index'
+import { Button } from '../../components/Button/index'
+import { Input } from '../../components/Input/index'
 
 const OrderOperation =()=>{
 

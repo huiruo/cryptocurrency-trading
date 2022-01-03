@@ -8,7 +8,8 @@ import CurrencyList from './right/currencyList'
 
 const Trader =()=>{
 
-  const [ticker,setTicker] = useState<TickerInter>({ 
+  // const [ticker,setTicker] = useState<TickerInter>({ 
+  const [ticker] = useState<TickerInter>({ 
     lastPrice:'',
     lastQty:'', 
     bidPrice:'',
@@ -110,11 +111,11 @@ const Trader =()=>{
     */
   },[])
 
-  console.log("ticker--->1:",ticker)
-  console.log("ticker--->2:",setTicker)
+  // console.log("ticker--->1:",ticker)
+  // console.log("ticker--->2:",setTicker)
   return (
     <>
-      <Box row h="8.4rem" bg='#FAFAFA'>
+      <Box row h="8.4rem" mt='0.4rem' bg='#FAFAFA'>
         <Box w="80%">
           <Box bg="azure" h="16%">
             <TraderHeader ticker={ticker} />

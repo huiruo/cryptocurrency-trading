@@ -10,13 +10,11 @@ const Account =()=>{
     <Box w='100%'>
       <Header />
       <Box w='100%'>
-        <Box px='1.2rem' pt='.rem'>
+        <Box px='1.2rem'>
           <Box mt='.2rem'>
-            <Box>加密钱包:</Box>
             <CryptoWallet />
           </Box>
           <Box mt='.4rem'>
-            <Box h='.2rem' leading='.2rem'>交易对</Box>
             <SpotOrder />
           </Box>
         </Box>

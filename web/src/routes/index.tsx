@@ -1,8 +1,9 @@
 import React from 'react';
 import Home from '../pages/home/index';
-import Detail from '../pages/detail/index';
 import Account from '../pages/account/index';
 import NotFound from '../pages/notFound/index'
+import Strategy from '../pages/strategy/index'
+import Detail from '../pages/detail/index';
 import {
 	Switch,
 	Route,
@@ -12,7 +13,8 @@ import {
 } from 'react-router-dom';
 
 //1.动态路由
-const Routes = withRouter(({ location, history }) => {
+// const Routes = withRouter(({ location, history }) => {
+const Routes = withRouter(() => {
 
 		const routesConfig = [
 			{
@@ -27,6 +29,10 @@ const Routes = withRouter(({ location, history }) => {
 			{
 				path: '/account',
 				component: Account,
+			},
+			{
+				path: '/strategy',
+				component: Strategy,
 			},
 		]
 		/*
@@ -44,7 +50,7 @@ const Routes = withRouter(({ location, history }) => {
 		*/
 		//2.根据条件生成相应的组件
 		const RouteWithSubRoutes = (route:any) => {
-			console.log("2.根据条件生成相应的组件", route)
+			// console.log("2.根据条件生成相应的组件", route)
 			// if (!route.path) return <Route component={NotFound} />
 			return (
 				<Route
@@ -58,7 +64,7 @@ const Routes = withRouter(({ location, history }) => {
 			/>)
 		}
 
-	console.log("1.动态生成路由", location, history)
+	// console.log("1.动态生成路由", location, history)
 	return (
 		<HashRouter>
 			<Switch>

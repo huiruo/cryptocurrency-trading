@@ -24,7 +24,7 @@ interface TickerInter{
 }
 
 const TraderHeader = ({ticker}:{ticker:TickerInter})=>{
-  console.log("props--->",ticker)
+  console.log("TraderHeader:props--->",ticker)
   return (
     <Box>
      App 

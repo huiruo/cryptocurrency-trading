@@ -11,7 +11,7 @@ class DateFormatOption {
   "q+": number;//季度
   "S+": number;//毫秒
 }
-export function formatUnixTime(val:number, fmt="yyyy-MM-dd hh:mm:ss") {
+export function formatUnixTime(val:any, fmt="yyyy-MM-dd hh:mm:ss") {
   const date = new Date(val);
   if (/(y+)/.test(fmt)) {
     fmt = fmt.replace(

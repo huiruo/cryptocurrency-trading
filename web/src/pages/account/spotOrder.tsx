@@ -3,20 +3,21 @@ import { Box } from '@fower/react'
 import { itemType,orderItemType } from '../../utils/types'
 import traderApi from "../../services/traderApi"
 import { formatUnixTime } from '../../utils/index'
+import { Button } from '../../components/Button/index'
 
 const SpotOrder =()=>{
 
   const [currencyList] = useState<itemType[]>([
     {
-      id:12455,
+      id:1,
       symbol:'BTCUSDT'
     },
     {
-      id:1244,
+      id:2,
       symbol:'ETHUSDT'
     },
   ])
-
+  const [symbol,setSymbol] = useState<string>('BTCUSDT')
   const [orderList,setOrderList] = useState<orderItemType[]>([])
 
 
@@ -27,20 +28,57 @@ const SpotOrder =()=>{
   }
 
   const onSymbolItem= async(symbol:string)=>{
+    setSymbol(symbol)
     getSymbolOrder(symbol)
   }
 
   useEffect(()=>{
-    getSymbolOrder(currencyList[1].symbol)
+    let isUnmount:boolean = false;
+
+    const getSymbolOrder= async(symbol:string)=>{
+      const data = { symbol }
+      const res = await traderApi.getMyTrades(data)
+      if(!isUnmount){
+        setOrderList(res.data)
+      }
+    }
+
+    getSymbolOrder(symbol)
+
+    return function cleanup() {
+      isUnmount = true
+    }
   },[])
+
+  const onSync = async()=>{
+    const res = await traderApi.myTradesFromBinance({symbol})
+    if(res.code=== 200){
+      setOrderList(res.data)
+    }else{
+      console.log("同步失败")
+    }
+  }
 
   return (
   <Box>
-    {currencyList.map(item=>{
-      return (
-        <Box key={item.id} onClick={()=>onSymbolItem(item.symbol)} toCenterY h='.24rem' cursor='pointer' bgYellow500--hover>{item.symbol}</Box>
-      )
-    })}
+    <Box>
+      <Box flex mb='0.1rem' style={{justifyContent: 'space-between'}}>
+        <Box h='.2rem' leading='.2rem'>交易订单: { symbol }</Box>
+        <Box>
+          <Button
+            onClick={() => { onSync() }}
+            size="sm"
+          >
+            同步订单
+          </Button>
+        </Box>
+      </Box>
+      {currencyList.map(item=>{
+        return (
+          <Box key={item.id} onClick={()=>onSymbolItem(item.symbol)} toCenterY h='.24rem' cursor='pointer' bgYellow500--hover>{item.symbol}</Box>
+        )
+      })}
+    </Box>
     <Box>
       {/* table start */}
       <Box as='table' w="100%">

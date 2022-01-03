@@ -49,3 +49,19 @@ export interface balancesType{
   locked:string,
   updateTime:number
 }
+
+export interface strategyType{
+  id?:string,
+  asset: string,
+  quantity: string,
+  price: string,
+  cost_price: number,
+  profit_ratio: string,
+  profit_amount: number,
+  update_time: string,
+  first_order_id: string,
+  first_order_price: string,
+  last_order_id: string,
+  last_order_price: string,
+  is_running: number
+}
