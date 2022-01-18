@@ -4,6 +4,8 @@ import Account from '../pages/account/index';
 import NotFound from '../pages/notFound/index'
 import Strategy from '../pages/strategy/index'
 import Detail from '../pages/detail/index';
+import CrytoIncreaseCalculator from '../pages/cryto-increase-calculator/index';
+import StockIncreaseCalculator from '../pages/stock-increase-calculator/index';
 import {
 	Switch,
 	Route,
@@ -31,8 +33,12 @@ const Routes = withRouter(() => {
 				component: Account,
 			},
 			{
-				path: '/strategy',
-				component: Strategy,
+				path: '/crytoCalculator',
+				component: CrytoIncreaseCalculator,
+			},
+			{
+				path: '/stockCalculator',
+				component: StockIncreaseCalculator,
 			},
 		]
 		/*
