@@ -1,12 +1,12 @@
 import React from 'react'
 import { Box } from '@fower/react'
 
-const App =()=>{
+const CrytoIncreaseCalculator =()=>{
   return (
     <Box>
-     App 
+     CrytoIncreaseCalculator 
     </Box>
   );
 }
 
-export default App;
+export default CrytoIncreaseCalculator;

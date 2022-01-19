@@ -33,12 +33,16 @@ const Routes = withRouter(() => {
 				component: Account,
 			},
 			{
-				path: '/crytoCalculator',
-				component: CrytoIncreaseCalculator,
+				path: '/strategy',
+				component: Strategy,
 			},
 			{
 				path: '/stockCalculator',
 				component: StockIncreaseCalculator,
+			},
+			{
+				path: '/crytoCalculator',
+				component: CrytoIncreaseCalculator,
 			},
 		]
 		/*

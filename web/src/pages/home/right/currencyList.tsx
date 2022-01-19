@@ -1,6 +1,6 @@
-import React,{useState} from 'react'
+import React,{ useState } from 'react'
 import { Box } from '@fower/react'
-import {Input} from '../../../components/Input/index'
+import { Input } from '../../../components/Input/index'
 import traderApi from "../../../services/traderApi"
 
 interface itemType {
@@ -8,7 +8,7 @@ interface itemType {
   symbol:string
 }
 const App =()=>{
-  const [searchVal, setSearchVal] = useState('')
+  const [searchVal, setSearchVal] = useState<string>('')
   const [currencyList] = useState<itemType[]>([
     {
       id:12455,
