@@ -48,7 +48,7 @@ const SpotOrder =()=>{
     return function cleanup() {
       isUnmount = true
     }
-  },[])
+  },[]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const onSync = async()=>{
     const res = await traderApi.myTradesFromBinance({symbol})
