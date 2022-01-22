@@ -1,5 +1,3 @@
-
-
 ### 枚举
 https://binance-docs.github.io/apidocs/spot/cn/#api-3
 
