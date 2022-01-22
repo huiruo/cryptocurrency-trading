@@ -2,16 +2,37 @@ import React,{ useEffect, useState } from 'react'
 import { Box } from '@fower/react'
 import { Input } from '../../components/Input/index'
 import TableList from '../../components/table-list/index'
+// import useDebounce from '../../utils/useDebounce'
 
 const range:number[] = [
-  1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11,12,13,14,15,16,17,18,19,20
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+  11,12,13,14,15,16,17,18,19,20,
+  21,22,23,24,25,26,27,28,29,30,
+  31,32,33,34,35,36,37,38,39,40,
+  41,42,43,44,45,46,47,48,49,50,
+  51,52,53,54,55,56,57,58,59,60,
+  61,62,63,64,65,66,67,68,69,70,
+  71,72,73,74,75,76,77,78,79,80,
 ]
 const StockIncreaseCalculator =()=>{
 
   const [inputVal, setInputVal] = useState<string>('100')
   const [calcultorList,setCalcultorList] = useState<any[]>([])
 
-  // 判断输入是股价，还是股票代码
+
+  // const delayQuery = useDebounce((val)=>queryUtil(val),1000)
+
+  // const calc_custom_price = ()=>{
+  // }
+
+  const onInput = (e:any)=>{
+    const val = e.target.value
+
+    console.log('input:',e.target.value)
+    setInputVal(e.target.value)
+    calculatorUtil(val)
+  }
+
   const isPrice =(val:string)=>{
       var value = val.toString();
       if (value.indexOf('.') !== -1) {
@@ -23,18 +44,6 @@ const StockIncreaseCalculator =()=>{
       }
 
       return true;
-  }
-
-  // const calc_custom_price = ()=>{
-
-  // }
-
-  const onInput = (e:any)=>{
-    const val = e.target.value
-
-    console.log('input:',e.target.value)
-    setInputVal(e.target.value)
-    calculatorUtil(val)
   }
 
   const calculatorUtil=(val:any)=>{

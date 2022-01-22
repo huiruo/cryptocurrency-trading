@@ -1,9 +1,9 @@
 import React,{ useEffect, useState } from 'react'
-// import {debounce} from 'lodash'
 import { Box } from '@fower/react'
 import { Input } from '../../components/Input/index'
 import useDebounce from '../../utils/useDebounce'
 // import useThrottle from '../../utils/useThrottle'
+// import {debounce} from 'lodash'
 
 const CrytoIncreaseCalculator =()=>{
 
@@ -13,8 +13,8 @@ const CrytoIncreaseCalculator =()=>{
     console.log('分割线------>','query:',val)
   }
 
-  // const delayQuery = debounce((val)=>queryUtil(val),1000)
   const delayQuery = useDebounce((val)=>queryUtil(val),1000)
+  // const delayQuery = debounce((val)=>queryUtil(val),1000)
   // const delayQuery = useThrottle((val)=>queryUtil(val),1000)
 
   const onInput = (e:any)=>{

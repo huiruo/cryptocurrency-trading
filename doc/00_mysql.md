@@ -1,4 +1,4 @@
-## 钱包
+## 钱包表
 表设计：
 ```json
 "makerCommission": 10,
@@ -96,7 +96,7 @@ CREATE TABLE `trading_strategy`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 24 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
 ```
 
-## btc
+## 订单表
 ```
 {
     "symbol": "ETHUSDT",
