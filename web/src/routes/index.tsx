@@ -14,50 +14,53 @@ import {
 	Redirect
 } from 'react-router-dom';
 
+const routesConfig = [
+	{
+		path: '/',
+		component: Home,
+		exact: true,
+	},
+	{
+		path: '/detail',
+		component: Detail,
+	},
+	{
+		path: '/account',
+		component: Account,
+	},
+	{
+		path: '/strategy',
+		component: Strategy,
+	},
+	{
+		path: '/stockCalculator',
+		component: StockIncreaseCalculator,
+	},
+	{
+		path: '/crytoCalculator',
+		component: CrytoIncreaseCalculator,
+	},
+]
+
+	/*
+	静态路由：
+	const Routes = withRouter(({ location, history }) => {
+		return (
+			<HashRouter>
+				<Switch>
+					<Route exact path="/" component={Index}></Route>
+					<Route path="/detail" component={Detail}></Route>
+				</Switch>
+			</HashRouter>
+		)
+	});
+	*/
+
+
 //1.动态路由
 // const Routes = withRouter(({ location, history }) => {
 const Routes = withRouter(() => {
 
-		const routesConfig = [
-			{
-				path: '/',
-				component: Home,
-				exact: true,
-			},
-			{
-				path: '/detail',
-				component: Detail,
-			},
-			{
-				path: '/account',
-				component: Account,
-			},
-			{
-				path: '/strategy',
-				component: Strategy,
-			},
-			{
-				path: '/stockCalculator',
-				component: StockIncreaseCalculator,
-			},
-			{
-				path: '/crytoCalculator',
-				component: CrytoIncreaseCalculator,
-			},
-		]
-		/*
-		静态路由：
-		const Routes = withRouter(({ location, history }) => {
-			return (
-				<HashRouter>
-					<Switch>
-						<Route exact path="/" component={Index}></Route>
-						<Route path="/detail" component={Detail}></Route>
-					</Switch>
-				</HashRouter>
-			)
-		});
-		*/
 		//2.根据条件生成相应的组件
 		const RouteWithSubRoutes = (route:any) => {
 			// console.log("2.根据条件生成相应的组件", route)
