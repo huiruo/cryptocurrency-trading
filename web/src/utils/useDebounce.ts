@@ -1,38 +1,33 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from 'react'
 
 /*
-const delayQuery = useDebounce((val)=>queryUtil(val),1000)
+use：
+const queryUtil = ()=>{
+  console.log('req:')
+}
+const handleClick = useThrottle((val)=>queryUtil(val),600)
+or:
+const handleClick = useThrottle(()=>queryUtil(),600)
 */
-const useDebounce = (fn:(args:any)=>void, delay:number,dep=[]) => {
+const useThrottle = (fn: (args?: any) => void, delay: number, dep = []) => {
+  const { current } = useRef({ fun: fn, valid: true })
 
-    /*
-    useRef 返回一个可变的ref对象，其current 属性被初始化为传入参数。返回的ref对象在组件的生命周期不变
-    current 值的改变不会引起组件的渲染，相当组件的全局变量
-    ref与render保持一种地址引用，能拿到最新结果
-    */
-    const { current } = useRef({ fun:fn,timer: 0 })
+  useEffect(() => {
+    current.fun = fn
+  }, [fn]) // eslint-disable-line react-hooks/exhaustive-deps
 
-    useEffect(()=>{
-      current.fun = fn
-    },[fn]) // eslint-disable-line react-hooks/exhaustive-deps
+  return useCallback((args?: any) => {
+    if (!current.valid) {
+      return
+    }
 
-    return useCallback((args:any)=>{
+    current.valid = false
 
-      if(current.timer){
-        clearTimeout(current.timer)
-      }
-
-      console.log('args',args)
-
-      current.timer = window.setTimeout(()=>{
-        current.fun(args)
-      },delay)
-
-    },dep) // eslint-disable-line react-hooks/exhaustive-deps
+    window.setTimeout(() => {
+      current.fun(args)
+      current.valid = true
+    }, delay)
+  }, dep) // eslint-disable-line react-hooks/exhaustive-deps
 }
 
-export default useDebounce;
-
-/*
-
-*/
+export default useThrottle
