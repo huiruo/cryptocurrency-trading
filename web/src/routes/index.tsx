@@ -7,85 +7,62 @@ import Detail from '../pages/detail/index';
 import CrytoIncreaseCalculator from '../pages/cryto-increase-calculator/index';
 import StockIncreaseCalculator from '../pages/stock-increase-calculator/index';
 import {
-	Switch,
-	Route,
-	withRouter,
 	HashRouter,
-	Redirect
-} from 'react-router-dom';
+  Routes,
+  Route
+} from "react-router-dom";
 
 const routesConfig = [
 	{
-		path: '/',
-		component: Home,
-		exact: true,
+		path: 'detail',
+		element: <Detail />,
 	},
 	{
-		path: '/detail',
-		component: Detail,
+		path: 'account',
+		element: <Account />,
 	},
 	{
-		path: '/account',
-		component: Account,
+		path: 'strategy',
+		element: <Strategy />,
 	},
 	{
-		path: '/strategy',
-		component: Strategy,
+		path: 'stockCalculator',
+		element: <StockIncreaseCalculator />,
 	},
 	{
-		path: '/stockCalculator',
-		component: StockIncreaseCalculator,
-	},
-	{
-		path: '/crytoCalculator',
-		component: CrytoIncreaseCalculator,
-	},
+		path: 'crytoCalculator',
+		element: <CrytoIncreaseCalculator />,
+	}
 ]
 
-	/*
-	静态路由：
-	const Routes = withRouter(({ location, history }) => {
-		return (
-			<HashRouter>
-				<Switch>
-					<Route exact path="/" component={Index}></Route>
-					<Route path="/detail" component={Detail}></Route>
-				</Switch>
-			</HashRouter>
-		)
-	});
-	*/
+const RoutesContainer = () => {
 
+	const generateRoute = (routes:any)=>{
+		return routes.map((route:any)=>{
+			if (route.children!==undefined && route.children.length) {
+				return ( 
+					<Route key={route.path} path={route.path}>
+						{generateRoute(route.children)}
+						<Route index element={route.element} />
+					</Route>
+				)
+			}
 
-//1.动态路由
-// const Routes = withRouter(({ location, history }) => {
-const Routes = withRouter(() => {
+			return <Route key={route.path} path={route.path} element={route.element} />
+		})
+	}
 
-		//2.根据条件生成相应的组件
-		const RouteWithSubRoutes = (route:any) => {
-			// console.log("2.根据条件生成相应的组件", route)
-			// if (!route.path) return <Route component={NotFound} />
-			return (
-				<Route
-				exact strict
-				path={route.path}
-				render={props => (
-					route.redirect ?
-						<Redirect push to={route.redirect} from={route.path}></Redirect> :
-						<route.component {...props} routes={route.routes} />
-				)}
-			/>)
-		}
-
-	// console.log("1.动态生成路由", location, history)
 	return (
 		<HashRouter>
-			<Switch>
-				{routesConfig.map((route, i) => <RouteWithSubRoutes key={i} {...route} />)}
-				<Route component={NotFound} />
-			</Switch>
+			<Routes>
+				<Route path="/">
+					{ generateRoute(routesConfig) }
+				</Route>
+				<Route index element={<Home />} />
+				<Route path="*" element={<NotFound />} />
+			</Routes>
 		</HashRouter>
 	)
-});
+};
 
-export default Routes;
+export default RoutesContainer;

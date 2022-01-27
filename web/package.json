@@ -18,6 +18,7 @@
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
     "@types/lodash": "^4.14.178",
+    "@types/react-router-dom": "^5.3.3",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@typescript-eslint/parser": "^4.5.0",
     "axios": "^0.24.0",
@@ -69,8 +70,8 @@
     "react-dev-utils": "^11.0.3",
     "react-dom": "^17.0.2",
     "react-refresh": "^0.8.3",
-    "react-router": "^5.2.0",
-    "react-router-dom": "^5.2.0",
+    "react-router": "^6.2.1",
+    "react-router-dom": "^6.2.1",
     "resolve": "1.18.1",
     "resolve-url-loader": "^3.1.2",
     "sass-loader": "^10.0.5",
@@ -163,7 +164,6 @@
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.1",
-    "@types/react": "^17.0.2",
-    "@types/react-router-dom": "^5.3.2"
+    "@types/react": "^17.0.2"
   }
 }
