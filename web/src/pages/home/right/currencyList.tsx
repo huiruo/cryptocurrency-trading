@@ -1,5 +1,4 @@
 import React,{ useState } from 'react'
-import { Box } from '@fower/react'
 import { Input } from '../../../components/Input/index'
 import traderApi from "../../../services/traderApi"
 
@@ -31,19 +30,21 @@ const App =()=>{
   }
 
   return (
-    <Box>
-      <Box>
+    <div>
+      <div>
         <Input onChange={(e) => onSearch(e)} value={searchVal} placeholder="请输入种类"/>
-      </Box>
-      <Box>
-        <Box h='.2rem' leading='.2rem'>交易对</Box>
+      </div>
+      <div>
+        <div style={{height:'2rem',lineHeight:'2rem'}}>交易对</div>
+
         {currencyList.map(item=>{
           return (
-            <Box key={item.id} onClick={()=>onSymbolItem(item.symbol)} toCenterY h='.24rem' cursor='pointer' bgYellow500--hover>{item.symbol}</Box>
+            <div className='toCenterY' style={{height:'2.4rem',cursor: 'pointer'}} key={item.id} onClick={()=>onSymbolItem(item.symbol)}>{item.symbol}</div>
           )
         })}
-      </Box>
-    </Box>
+
+      </div>
+    </div>
   );
 }
 

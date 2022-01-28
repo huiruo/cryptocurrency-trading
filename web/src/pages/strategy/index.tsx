@@ -1,18 +1,17 @@
 import React from 'react'
-import { Box } from '@fower/react'
-import Header from '../../components/Header/index'
+import Header from '../../components/header/index'
 import StrategyTable from './strategyTable'
 
 const Strategy =()=>{
   return (
-    <Box w='100%'>
+    <div className='root-container'>
       <Header />
-      <Box w='100%' mt='.4rem'>
-        <Box px='1.2rem'>
+      <div style={{width:'100%',marginTop: '4rem'}}>
+        <div style={{paddingLeft:'12rem',paddingRight:'12rem'}}>
           <StrategyTable />
-        </Box>
-      </Box>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 }
 

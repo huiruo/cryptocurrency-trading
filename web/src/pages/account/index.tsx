@@ -1,25 +1,24 @@
 import React from 'react'
-import { Box } from '@fower/react'
-import Header from '../../components/Header/index'
+import Header from '../../components/header/index'
 import CryptoWallet from './cryptoWallet'
 import SpotOrder from './spotOrder'
 
 const Account =()=>{
 
   return (
-    <Box w='100%'>
+    <div style={{width:'100%'}}>
       <Header />
-      <Box w='100%'>
-        <Box px='1.2rem'>
-          <Box mt='.2rem'>
+      <div style={{width:'100%'}}>
+        <div style={{paddingLeft:'12rem',paddingRight:'12rem'}}>
+          <div style={{marginTop:'2rem'}}>
             <CryptoWallet />
-          </Box>
-          <Box mt='.4rem'>
+          </div>
+          <div style={{marginTop:'4rem'}}>
             <SpotOrder />
-          </Box>
-        </Box>
-      </Box>
-    </Box>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

@@ -1,11 +1,12 @@
-import React from 'react'
+import React from 'react';
 import Routes from './routes/index'
+import '@/style/common.scss'
 
-const App =()=>{
+function App() {
   return (
-      <>
-        <Routes />
-      </>
+    <>
+      <Routes />
+    </>
   );
 }
 

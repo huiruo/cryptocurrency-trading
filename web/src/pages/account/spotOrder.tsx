@@ -62,8 +62,9 @@ const SpotOrder =()=>{
   return (
   <Box>
     <Box>
-      <Box flex mb='0.1rem' style={{justifyContent: 'space-between'}}>
-        <Box h='.2rem' leading='.2rem'>交易订单: { symbol }</Box>
+
+      <Box className='flex' mb='1rem' style={{justifyContent: 'space-between'}}>
+        <Box h='2rem' leading='2rem'>交易订单: { symbol }</Box>
         <Box>
           <Button
             onClick={() => { onSync() }}
@@ -73,9 +74,10 @@ const SpotOrder =()=>{
           </Button>
         </Box>
       </Box>
+
       {currencyList.map(item=>{
         return (
-          <Box key={item.id} onClick={()=>onSymbolItem(item.symbol)} toCenterY h='.24rem' cursor='pointer' bgYellow500--hover>{item.symbol}</Box>
+          <Box key={item.id} onClick={()=>onSymbolItem(item.symbol)} toCenterY h='2.4rem' cursor='pointer' bgYellow500--hover>{item.symbol}</Box>
         )
       })}
     </Box>
@@ -84,22 +86,6 @@ const SpotOrder =()=>{
       <Box as='table' w="100%">
         <Box as='thead' bg='aliceblue' style={{border:'1px solid #f0f0f0'}}>
           <tr>
-            {/*  
-            <Box as='th'>
-              <div>
-                <Checkbox
-                  value="all"
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      checkAllChange()
-                    } else {
-                      setCheckList([])
-                    }
-                  }}
-                />
-              </div>
-            </Box>
-            */}
             <Box as='th'>序号</Box>
             <Box as='th'>交易对</Box>
             <Box as='th'>订单ID</Box>
