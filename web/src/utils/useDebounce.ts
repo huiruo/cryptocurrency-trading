@@ -18,13 +18,11 @@ const useDebounce = (fn: (args?: any) => void, delay: number, dep = []) => {
 
   return useCallback((args?: any) => {
 
-    console.log('防抖_test')
     if (current.timer) {
       clearTimeout(current.timer)
     }
 
     current.timer = window.setTimeout(() => {
-      console.log('防抖_执行')
       current.fun(args)
     }, delay)
   }, dep) // eslint-disable-line react-hooks/exhaustive-deps
