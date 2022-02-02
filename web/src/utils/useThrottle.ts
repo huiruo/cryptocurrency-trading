@@ -5,30 +5,32 @@ use：
 const queryUtil = ()=>{
   console.log('req:')
 }
-const handleClick = useDebounce((val)=>queryUtil(val),600)
+const handleClick = useThrottle((val)=>queryUtil(val),600)
 or:
-const handleClick = useDebounce(()=>queryUtil(),600)
+const handleClick = useThrottle(()=>queryUtil(),600)
 */
-const useDebounce = (fn: (args?: any) => void, delay: number, dep = []) => {
-  const { current } = useRef({ fun: fn, timer: 0 })
+const useThrottle = (fn: (args?: any) => void, delay: number, dep = []) => {
+  const { current } = useRef({ fun: fn, valid: true })
 
   useEffect(() => {
     current.fun = fn
   }, [fn]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return useCallback((args?: any) => {
-    if (current.timer) {
-      clearTimeout(current.timer)
+    if (!current.valid) {
+      return
     }
 
-    current.timer = window.setTimeout(() => {
+    current.valid = false
+
+    window.setTimeout(() => {
       current.fun(args)
+      current.valid = true
     }, delay)
   }, dep) // eslint-disable-line react-hooks/exhaustive-deps
 }
 
-export default useDebounce
-
+export default useThrottle
 
 /*
 function useThrottle(fn, delay, dep = []) {

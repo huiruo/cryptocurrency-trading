@@ -26,20 +26,15 @@ server/.env
 server/config/env-prod/application-prod.env
 
 # js
-# js
 node_modules/
 generated/
 dist
 
-
 yarn.lock
 yarn-error.log
-
 npm-debug.log
 lerna-debug.log
 
-package-lock.json
-#java
 #java
 HELP.md
 target/
@@ -76,11 +71,9 @@ build/
 ### VS Code ###
 .vscode/
 
-
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-# android
 # android
 *.iml
 .gradle

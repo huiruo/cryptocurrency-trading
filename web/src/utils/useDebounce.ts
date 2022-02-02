@@ -5,29 +5,29 @@ use：
 const queryUtil = ()=>{
   console.log('req:')
 }
-const handleClick = useThrottle((val)=>queryUtil(val),600)
+const handleClick = useDebounce((val)=>queryUtil(val),600)
 or:
-const handleClick = useThrottle(()=>queryUtil(),600)
+const handleClick = useDebounce(()=>queryUtil(),600)
 */
-const useThrottle = (fn: (args?: any) => void, delay: number, dep = []) => {
-  const { current } = useRef({ fun: fn, valid: true })
+const useDebounce = (fn: (args?: any) => void, delay: number, dep = []) => {
+  const { current } = useRef({ fun: fn, timer: 0 })
 
   useEffect(() => {
     current.fun = fn
   }, [fn]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return useCallback((args?: any) => {
-    if (!current.valid) {
-      return
+
+    console.log('防抖_test')
+    if (current.timer) {
+      clearTimeout(current.timer)
     }
 
-    current.valid = false
-
-    window.setTimeout(() => {
+    current.timer = window.setTimeout(() => {
+      console.log('防抖_执行')
       current.fun(args)
-      current.valid = true
     }, delay)
   }, dep) // eslint-disable-line react-hooks/exhaustive-deps
 }
 
-export default useThrottle
+export default useDebounce
