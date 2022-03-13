@@ -66,16 +66,15 @@ double类型，长度需大于等于小数点位数，若相等则整数部分�
 小数位数超出限制将对超出位从后往前依次进行五舍六入
 ```
 ```
-trading_strategy
-  id
-  asset string  种类
-  quantity double  数量
-  cost_price double  成本
-  profit_ratio double 盈利比率 100000.33
-  first_order_id string 策略起始订单
-  last_order_id string 策略起始订单
-  is_running tinyint 是否正在运行
-  update_time bigint  更新时间
+id
+asset string  种类
+quantity double  数量
+cost_price double  成本
+profit_ratio double 盈利比率 100000.33
+first_order_id string 策略起始订单
+last_order_id string 策略结束订单
+is_running tinyint 是否正在运行
+update_time bigint  更新时间
 ```
 ```sql
 CREATE TABLE `trading_strategy`  (
