@@ -99,3 +99,19 @@ app/local.properties
 app/gradle
 app/gradlew
 app/gradlew.bat
+
+#### trade-data-analyse
+trade-data-analyse/.vscode/
+trade-data-analyse/.idea/
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
