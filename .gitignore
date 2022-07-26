@@ -20,10 +20,10 @@
 *.rar
 
 # secret
-secret_document
-server-java/src/main/resources/application-prod.properties
-server/.env
-server/config/env-prod/application-prod.env
+secret-document
+apps/server-java/src/main/resources/application-prod.properties
+apps/server/.env
+apps/server/config/env-prod/application-prod.env
 
 # js
 node_modules/

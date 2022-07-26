@@ -6,25 +6,26 @@ The goal is to explore profitable trading.
 ### Project directory
 ```
 cryptocurrency-trading
-├── app (mobile app:Did not start development)
-├── server (Node service,project main service)
-│   ├── config
-│   ├── doc
-│   ├── src
-│   │   ├──binance-connector (Binance api connector)
-│   │   ├──common
-│   │   ├──mock
-│   │   ├──trader (main Module)
-│   │   ├──app.controller.spec.ts
-│   │   ├──app.controller.ts
-│   │   ├──app.module.ts
-│   │   ├──app.service.ts
-│   │   ├──main.ts
-│   ├── ...
-│   │  
-├── server_java (Java service, involving timing tasks, etc.)
-├── trading_strategy (Trading straregy)
-├── web (Browser application)
+├── app
+|   |
+|   ├──server (Node service,project main service)
+│       ├── config
+│       ├── doc
+│       ├── src
+│       │   ├──binance-connector (Binance api connector)
+│       │   ├──common
+│       │   ├──mock
+│       │   ├──trader (main Module)
+│       │   ├──app.controller.spec.ts
+│       │   ├──app.controller.ts
+│       │   ├──app.module.ts
+│       │   ├──app.service.ts
+│       │   ├──main.ts
+│       ├── ...
+│       │  
+|   ├── server-java (Java service, involving timing tasks, etc.)
+|   ├── web (Browser application)
+├── trading-strategy (Trading straregy)
 ```
 
 ### Secret file
@@ -32,5 +33,5 @@ The necessary configuration parameters for project operation include database ac
 ```
 server/.env
 server/config/env-prod/application-prod.env
-server_java/src/main/resources/application-prod.properties
+server-java/src/main/resources/application-prod.properties
 ```

@@ -1,0 +1,65 @@
+
+.flex-row{
+  display: flex;
+  flex-direction: row;
+}
+
+.flex{
+  display: flex;
+}
+
+.toCenterY{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.root-container{
+  width: 100%;
+  height: 100%;
+  min-width: 85rem;
+  // min-width: 15rem;
+}
+
+.test-bg{
+  background: rgb(37, 54, 37);
+}
+
+.container{
+  width: 152.0rem;
+  min-width: 152rem;
+  margin: 0 auto;
+}
+
+
+.row{
+  display: flex;
+  flex: 1;
+}
+
+.main-content{
+  flex: 2; 
+  background: cadetblue;
+}
+
+.right-content{
+  flex:1; 
+  background: burlywood;
+}
+
+@media (max-width: 768px) {
+  .container{
+    width: 100%;
+    margin: 0 auto;
+  }
+  .row{
+    display: block;
+    flex: 1;
+  }
+  .col-sm-12{
+    width: 100%;
+  }
+  .col-sm-12{
+    float:left
+  }
+}
