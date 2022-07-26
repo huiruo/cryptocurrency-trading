@@ -33,7 +33,7 @@ export class TradingService {
     const myTrade = await this.myTradesRepo.query(sql);
     return myTrade;
   }
-
+  
   /*
   Util method: Query orders from local database
   */

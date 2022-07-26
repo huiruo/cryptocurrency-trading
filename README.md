@@ -34,20 +34,3 @@ server/.env
 server/config/env-prod/application-prod.env
 server_java/src/main/resources/application-prod.properties
 ```
-
-### git commit specification
-```
-feat：new feature
-
-fix：fix bug
-
-docs：documentation
-
-style： format (does not affect the change of code operation)
-
-refactor：refactoring (that is, it is not a new feature, nor is it a code change to modify a bug)
-
-test：add test
-
-chore：Changes in the build process or auxiliary tools
-```

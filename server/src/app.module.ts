@@ -9,9 +9,15 @@ import dbConfig from '../config/db'
 import { getDirFilenames } from './utils/getDirFilenames';
 import { CryptoWalletController } from './trader/crypto-wallet/crypto-wallet.controller';
 import { CryptoWalletModule } from './trader/crypto-wallet/crypto-wallet.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
+      // 静态资源服务器
+      ServeStaticModule.forRoot({
+        rootPath: join(__dirname, '../static'),
+      }),
       ConfigModule.forRoot({
         /*
         isGlobal?: boolean;  // 启用这个会作用于整个大系统(全局module),而非仅你当前注入的module!

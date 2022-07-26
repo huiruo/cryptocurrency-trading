@@ -58,18 +58,15 @@ export class MyTrades {
     @Column({
         comment: 'isBuyer'
     })
-    // isBuyer: boolean;
     isBuyer: number;
 
     @Column({
         comment: 'isMaker'
     })
-    // isMaker: boolean;
     isMaker: number;
 
     @Column({
         comment: 'isBestMatch'
     })
-    // isBestMatch: boolean;
     isBestMatch: number;
 }

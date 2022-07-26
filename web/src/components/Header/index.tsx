@@ -1,23 +1,31 @@
 import React from 'react';
-import { Box } from '@fower/react'
-import { withRouter,NavLink } from "react-router-dom";
+import { NavLink,useLocation } from "react-router-dom";
+import './index.scss'
 
 const Header =()=>{
+  const { pathname } = useLocation()
+
   return (
-    <Box flex minH='.64rem' w='100%' minW="15.20rem" px="0.24rem" bg='#fff' className='nav-box-shadow'>
-      <Box as='ul' flex text='0.15rem' fontWeight='600' listNone>
-        <Box as='li' listNone pr="0.12rem">
-          <NavLink to="/" exact style={{textDecoration: 'none', color: "#707a8a"}} activeClassName="nav-active">首页</NavLink>
-        </Box>
-        <Box as='li' listNone pr="0.12rem">
-          <NavLink to="/strategy" exact style={{textDecoration: 'none', color: "#707a8a"}} activeClassName="nav-active">策略</NavLink>
-        </Box>
-        <Box as='li' listNone pr="0.12rem">
-          <NavLink to="/account" exact style={{textDecoration: 'none', color: "#707a8a"}} activeClassName="nav-active">账户</NavLink>
-        </Box>
-      </Box>
-    </Box>
+    <div className='header-container nav-div-shadow'>
+      <div className='header-content container'>
+        <ul className='ul'>
+
+          <li className='li'>
+            <NavLink to="/" className={pathname==='/'?'nav-active':''}>首页</NavLink>
+          </li>
+
+          <li className='li'>
+            <NavLink to="/strategy" className={pathname==='/strategy'?'nav-active':''}>策略</NavLink>
+          </li>
+
+          <li className='li'>
+            <NavLink to="/account" className={pathname==='/account'?'nav-active':''}>账户</NavLink>
+          </li>
+
+        </ul>
+      </div>
+    </div>
   );
 }
 
-export default withRouter(Header);
+export default Header;

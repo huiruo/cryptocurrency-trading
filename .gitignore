@@ -26,20 +26,15 @@ server/.env
 server/config/env-prod/application-prod.env
 
 # js
-# js
 node_modules/
 generated/
 dist
 
-
 yarn.lock
 yarn-error.log
-
 npm-debug.log
 lerna-debug.log
 
-package-lock.json
-#java
 #java
 HELP.md
 target/
@@ -76,11 +71,9 @@ build/
 ### VS Code ###
 .vscode/
 
-
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-# android
 # android
 *.iml
 .gradle
@@ -106,3 +99,19 @@ app/local.properties
 app/gradle
 app/gradlew
 app/gradlew.bat
+
+#### trade-data-analyse
+trade-data-analyse/.vscode/
+trade-data-analyse/.idea/
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out

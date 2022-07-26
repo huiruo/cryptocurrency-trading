@@ -1,5 +1,5 @@
 
-type TickerInter = {
+export type TickerInter = {
   lastPrice: string;      //最新价格
   lastQty: string;  //最新成交的数量
   bidPrice: string;  //买一价
@@ -19,7 +19,6 @@ type TickerInter = {
   closeTime: number; //integer($int64)
   count: number;  //成交笔数
 }
-export { TickerInter }
 
 export interface itemType {
   id:number,

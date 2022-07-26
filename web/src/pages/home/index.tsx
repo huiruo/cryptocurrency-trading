@@ -1,7 +1,6 @@
 import React,{useEffect} from 'react'
-import Header from '../../components/Header/index'
+import Header from '../../components/header/index'
 // import Footer from '../../components/Footer/index'
-import { Box } from '@fower/react'
 import Trader from './trader'
 // import traderApi from '../../services/traderApi'
 
@@ -26,12 +25,12 @@ const Index=()=>{
   })
   
   return (
-    <Box h='100%' w='100%' minH='8.5rem'>
+    <div className='root-container'>
 			<Header />
-      <Box w="15.20rem" minW="15.20rem" style={{margin: '0 auto'}}>
+      <div className='container'>
         <Trader />
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }
 

@@ -14,8 +14,7 @@ http://localhost:1788/trader/ticker/24hr?symbol=BTC-USDT&platform=okex
 
 ### 2021.12.13(1)
 ```
-1.前天做java后端的退出这个项目，java服务先退出，改用node
-比较打击，郁闷度过半天，自己才是最可靠的,之后进度会慢很多，猥琐半天再次重新出发。
+1.主服务服务由java改用node
 
 2.很难找到稳定梯子，几乎花了一天的时间在找梯子。试了两家广告比较响的都不如意都申请退款了。
 太难了，没梯子这个项目基本停下来。最后找到不是很贵但是目前来看效果还可以的。
@@ -52,19 +51,6 @@ abchen_183
 http://localhost:1788/user/22
 
 4.创建表
-```
-
-测试表链接
-```sql
-CREATE TABLE `mytrades`  (
-  `id` int(1) NOT NULL AUTO_INCREMENT,
-  `account` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `password` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `email` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 24 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
-
-INSERT INTO `myTrades` VALUES (23, '测试1213', '123456', NULL);
 ```
 
 ###### myTrades表

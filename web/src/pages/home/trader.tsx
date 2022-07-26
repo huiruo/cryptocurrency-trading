@@ -1,10 +1,10 @@
 import React,{useEffect,useState} from 'react'
-import { Box } from '@fower/react'
 import OrderOperation from './orderOperation'
 import TraderHeader from './traderHeader'
 import {TickerInter} from '../../utils/types'
 import CurrencyList from './right/currencyList'
 // import traderApi from "../../services/traderApi"
+import './trader.scss'
 
 const Trader =()=>{
 
@@ -114,33 +114,36 @@ const Trader =()=>{
   // console.log("ticker--->1:",ticker)
   // console.log("ticker--->2:",setTicker)
   return (
-    <>
-      <Box row h="8.4rem" mt='0.4rem' bg='#FAFAFA'>
-        <Box w="80%">
-          <Box bg="azure" h="16%">
+      <div className='flex-row trader-container'>
+        <div style={{width:'80%'}}>
+
+          <div style={{height:'16%',background:'grey'}}>
             <TraderHeader ticker={ticker} />
-          </Box>
-          <Box row w="100%" h="84%">
-            <Box w='20%' h='100%'>
-              <Box h='50%'>top</Box>
-              <Box h='50%'>bottom</Box>
-            </Box>
-            <Box w='80%' h='100%' bgBrand200>
-              <Box bg='grey' h='50%'>top</Box>
-              <Box bg='beige' h='50%'>
+          </div>
+
+          <div className='flex-row' style={{width:'100%',height:'84%'}}>
+            <div style={{width:'20%',height:'100%'}}>
+              <div style={{height:'50%'}}>top</div>
+              <div style={{height:'50%'}}>bottom</div>
+            </div>
+            <div style={{width:'80%',height:'100%',background:'green'}}>
+              <div style={{height:'50%'}}>top</div>
+              <div style={{height:'50%'}}>
                 <OrderOperation />
-              </Box>
-            </Box>
-          </Box>
-        </Box>
-        <Box w="20%" minW=".32rem">
-          <Box h='50%' style={{border: 'solid 1px #EEF0F2'}}>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div style={{width:'80%',minWidth: '3.2rem'}}>
+          <div style={{height:'50%',border: 'solid 1px #EEF0F2'}}>
             <CurrencyList />
-          </Box>
-          <Box h='50%'>bottom</Box>
-        </Box>
-      </Box>
-    </>
+          </div>
+          <div style={{height:'50%'}}>bottom</div>
+        </div>
+
+      </div>
   );
 }
 
