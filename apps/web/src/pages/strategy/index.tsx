@@ -1,13 +1,13 @@
 import React from 'react'
-import Header from '../../components/header/index'
+import Header from '../../components/Header/index'
 import StrategyTable from './strategyTable'
 
-const Strategy =()=>{
+const Strategy = () => {
   return (
     <div className='root-container'>
       <Header />
-      <div style={{width:'100%',marginTop: '4rem'}}>
-        <div style={{paddingLeft:'12rem',paddingRight:'12rem'}}>
+      <div style={{ width: '100%', marginTop: '4rem' }}>
+        <div style={{ paddingLeft: '12rem', paddingRight: '12rem' }}>
           <StrategyTable />
         </div>
       </div>

@@ -8,14 +8,20 @@ import CrytoIncreaseCalculator from '../pages/cryto-increase-calculator/index';
 import StockIncreaseCalculator from '../pages/stock-increase-calculator/index';
 import {
 	HashRouter,
-  Routes,
-  Route
+	Routes,
+	Route,
+	BrowserRouter
 } from "react-router-dom";
+import AddSymbol from '@/pages/add-symbol';
 
 const routesConfig = [
 	{
 		path: 'detail',
 		element: <Detail />,
+	},
+	{
+		path: 'addSymbol',
+		element: <AddSymbol />,
 	},
 	{
 		path: 'account',
@@ -37,10 +43,12 @@ const routesConfig = [
 
 const RoutesContainer = () => {
 
-	const generateRoute = (routes:any)=>{
-		return routes.map((route:any)=>{
-			if (route.children!==undefined && route.children.length) {
-				return ( 
+	const generateRoute = (routes: any) => {
+		return routes.map((route: any) => {
+			console.log('router-2:', route);
+
+			if (route.children !== undefined && route.children.length) {
+				return (
 					<Route key={route.path} path={route.path}>
 						{generateRoute(route.children)}
 						<Route index element={route.element} />
@@ -52,16 +60,19 @@ const RoutesContainer = () => {
 		})
 	}
 
+	// console.log('test:', generateRoute(routesConfig));
 	return (
-		<HashRouter>
+		<BrowserRouter>
+			{/* <HashRouter> */}
 			<Routes>
 				<Route path="/">
-					{ generateRoute(routesConfig) }
+					{generateRoute(routesConfig)}
 				</Route>
 				<Route index element={<Home />} />
 				<Route path="*" element={<NotFound />} />
 			</Routes>
-		</HashRouter>
+			{/* </HashRouter> */}
+		</BrowserRouter>
 	)
 };
 

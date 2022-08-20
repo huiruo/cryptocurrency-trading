@@ -80,6 +80,12 @@ const traderApi = {
 	myTradesFromBinance(data:any){
 		const url:string = `${traderApiUrl}/trader/binance/myTrades`;
 		return http.get<resType>(data,url);
+	},
+
+	// 添加请求code
+	addSimplifySymbol(data:any){
+		const url:string = `${traderApiUrl}/data/center/addCode`;
+		return http.post<resType>(data,url);
 	}
 }
 

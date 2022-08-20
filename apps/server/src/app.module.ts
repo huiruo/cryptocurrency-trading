@@ -11,6 +11,7 @@ import { CryptoWalletController } from './trader/crypto-wallet/crypto-wallet.con
 import { CryptoWalletModule } from './trader/crypto-wallet/crypto-wallet.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { DataCenterModule } from './data-center/data-center/data-center.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { join } from 'path';
       CryptoWalletModule,
       UserModule,
       TypeOrmModule.forRoot(dbConfig),
+      DataCenterModule,
     ],
     controllers: [AppController, CryptoWalletController],
     providers: [AppService],

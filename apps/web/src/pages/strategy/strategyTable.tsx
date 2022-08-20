@@ -1,23 +1,23 @@
-import React,{ useEffect,useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Box } from '@fower/react'
-import traderApi from "../../services/traderApi"
+import traderApi from '@/services/traderApi';
 import { strategyType } from '../../utils/types'
 import { formatUnixTime } from '../../utils/index'
 import { Button } from '../../components/Button/index'
 
-const StrategyTable =()=>{
+const StrategyTable = () => {
 
-  const [strategies,setStrategies] = useState<strategyType[]>([])
+  const [strategies, setStrategies] = useState<strategyType[]>([])
 
-  useEffect(()=>{
-    let isUnmount:boolean = false;
+  useEffect(() => {
+    let isUnmount: boolean = false;
 
-    const getStrategies= async()=>{
+    const getStrategies = async () => {
       const res = await traderApi.getStrategiesApi()
-      if(!isUnmount){
-        if(res.code===200){
+      if (!isUnmount) {
+        if (res.code === 200) {
           setStrategies(res.data)
-        }else{
+        } else {
           console.log('获取详情失败')
         }
       }
@@ -28,52 +28,52 @@ const StrategyTable =()=>{
     return function cleanup() {
       isUnmount = true
     }
-  },[])
+  }, [])
 
-  const getStrategies= async()=>{
+  const getStrategies = async () => {
     const res = await traderApi.getStrategiesApi()
     setStrategies(res.data)
   }
 
-  const onUpdate = async(asset:string)=>{
-    const data ={
-      symbol:asset
+  const onUpdate = async (asset: string) => {
+    const data = {
+      symbol: asset
     }
     const res = await traderApi.calculateCostpriceApi(data)
-    console.log("onUpdate--->",res)
+    console.log("onUpdate--->", res)
     getStrategies()
   }
 
-  const onUpdateProfit  = async(asset:string)=>{
-    const data ={
-      symbol:asset
+  const onUpdateProfit = async (asset: string) => {
+    const data = {
+      symbol: asset
     }
     const res = await traderApi.updateProfitApi(data)
-    console.log("onUpdateProfit--->",res)
+    console.log("onUpdateProfit--->", res)
     getStrategies()
   }
 
-  const onSync = async()=>{
-    console.log('onSync',) 
+  const onSync = async () => {
+    console.log('onSync',)
     // const testSymbol:string = 'BTCUSDT'
-    const testSymbol:string = 'ETHUSDT'
+    const testSymbol: string = 'ETHUSDT'
 
     const data = {
       symbol: testSymbol
     }
     const res = await traderApi.updateTradingStrategy(data)
-    console.log("onUpdateProfit--->",res)
+    console.log("onUpdateProfit--->", res)
 
-    setTimeout(()=>{
+    setTimeout(() => {
       console.log("更新表单-----")
       getStrategies()
-    },800)
+    }, 800)
 
   }
 
   return (
     <Box>
-      <Box flex mb='0.1rem' style={{justifyContent: 'space-between'}}>
+      <Box flex mb='0.1rem' style={{ justifyContent: 'space-between' }}>
         <Box>运行策略</Box>
         <Box>
           <Button
@@ -85,7 +85,7 @@ const StrategyTable =()=>{
         </Box>
       </Box>
       <Box as='table' w="100%">
-        <Box as='thead' bg='aliceblue' style={{border:'1px solid #f0f0f0'}}>
+        <Box as='thead' bg='aliceblue' style={{ border: '1px solid #f0f0f0' }}>
           <tr>
             <Box as='th'>交易对</Box>
             <Box as='th'>数量</Box>
@@ -100,7 +100,7 @@ const StrategyTable =()=>{
           </tr>
         </Box>
         <tbody>
-          {strategies.map((item:strategyType) => {
+          {strategies.map((item: strategyType) => {
             return (
               <Box as='tr' key={item.id} border-1 borderSolid borderOrange500>
                 <Box as='td'>{item.asset}</Box>
@@ -118,13 +118,13 @@ const StrategyTable =()=>{
                     size="sm"
                     mr='0.1rem'
                   >
-                    计算成本 
+                    计算成本
                   </Button>
                   <Button
                     onClick={() => { onUpdateProfit(item.asset) }}
                     size="sm"
                   >
-                    更新盈亏 
+                    更新盈亏
                   </Button>
                 </Box>
               </Box>
