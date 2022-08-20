@@ -50,6 +50,23 @@
   background: burlywood;
 }
 
+.symbol-container {
+  display: flex;
+
+  .add-symbol {
+    width: 50%;
+    // background-color: aqua;
+  }
+
+  .symbol-list {
+    width: 50%;
+
+    .symbol-item {
+      margin: 10px;
+    }
+  }
+}
+
 @media (max-width: 768px) {
   .container {
     width: 100%;

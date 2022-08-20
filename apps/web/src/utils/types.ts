@@ -49,6 +49,14 @@ export interface balancesType{
   updateTime:number
 }
 
+export interface SymbolListType{
+  id?:string,
+  symbol:string,
+  baseAsset:string,
+  quoteAsset:string,
+  code:string,
+}
+
 export interface strategyType{
   id?:string,
   asset: string,

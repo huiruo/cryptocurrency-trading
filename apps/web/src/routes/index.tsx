@@ -45,8 +45,6 @@ const RoutesContainer = () => {
 
 	const generateRoute = (routes: any) => {
 		return routes.map((route: any) => {
-			console.log('router-2:', route);
-
 			if (route.children !== undefined && route.children.length) {
 				return (
 					<Route key={route.path} path={route.path}>

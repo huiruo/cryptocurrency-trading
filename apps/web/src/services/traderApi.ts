@@ -86,6 +86,11 @@ const traderApi = {
 	addSimplifySymbol(data:any){
 		const url:string = `${traderApiUrl}/data/center/addCode`;
 		return http.post<resType>(data,url);
+	},
+
+	getSymbolList(){
+		const url:string = `${traderApiUrl}/data/center/symbolList`;
+		return http.get<resType>({},url);
 	}
 }
 

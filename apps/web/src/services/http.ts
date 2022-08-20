@@ -185,8 +185,6 @@ class HttpRequest {
     }
 
     post<T>(options:customRequest,url:string): Promise<T>{
-      console.log('post:',url);
-      
       const config = Object.assign(
         {},
         {
