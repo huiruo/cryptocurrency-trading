@@ -1,58 +1,64 @@
-import { Controller,Body,Post,Get,Query } from '@nestjs/common';
+import { Controller, Body, Post, Get, Query } from '@nestjs/common';
 import { TradingService } from './trading.service';
 import { ConfigService } from '@nestjs/config';
 import { HttpsProxyAgent } from 'hpagent';
 import got from 'got';
-import { myTradesRes } from '../../mock/myTradesRes'
-const { binanceConnector }  = require('../../binance-connector/index')
+import { myTradesRes } from '../../mock/myTradesRes';
+import { binanceConnector } from '../../binance-connector/index';
 
 @Controller('trader')
 export class TradingController {
-    
-    constructor(
-        private readonly tradingService:TradingService,
-        private configService: ConfigService,
-    ){
-    }
+  constructor(
+    private readonly tradingService: TradingService,
+    private configService: ConfigService,
+  ) {}
 
-
-    /*
+  /*
     Test api: 获取当前 symbol 价格，权重太高，不建议使用
     http://localhost:1788/trader/ticker/24hr?symbol=BTC-USDT&platform=okex
     */
-    @Get('binance/24hr')
-    async ticker(){
-       const ticker24URL = 'https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT'
-       const agent ={
-            https: new HttpsProxyAgent({
-                keepAlive: true,
-                keepAliveMsecs: 10000,
-                maxSockets: 256,
-                maxFreeSockets: 256,
-                proxy: 'http://127.0.0.1:7890'
-            })
-        }
-        const isProxy = false
-        const data = await got.get(ticker24URL,{
-            agent: isProxy?agent:null
-        }).json();
-        return data
-    }
+  @Get('binance/24hr')
+  async ticker() {
+    const ticker24URL =
+      'https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT';
+    const agent = {
+      https: new HttpsProxyAgent({
+        keepAlive: true,
+        keepAliveMsecs: 10000,
+        maxSockets: 256,
+        maxFreeSockets: 256,
+        proxy: 'http://127.0.0.1:7890',
+      }),
+    };
+    const isProxy = false;
+    const data = await got
+      .get(ticker24URL, {
+        agent: isProxy ? agent : null,
+      })
+      .json();
+    return data;
+  }
 
-    /*
+  /*
     Data Api:从币安更新订单,并写入本地数据库
     所属：现货账户和交易接口----账户成交历史
     http://localhost:1788/trader/binance/myTrades
     http://172.18.1.162:1788/trader/binance/myTrades
     */
-    @Get('binance/myTrades')
-    async myTrades(@Query() query){
-        const { symbol } = query
-        const binance_api_secret= this.configService.get<string>('BINANCE_API_SECRET')
-        const binance_api_key= this.configService.get<string>('BINANCE_API_KEY')
-        const proxy_url= this.configService.get<string>('PROXY_URL')
-        const client = new binanceConnector(binance_api_key, binance_api_secret,proxy_url,{})
-        /*
+  @Get('binance/myTrades')
+  async myTrades(@Query() query) {
+    const { symbol } = query;
+    const binance_api_secret =
+      this.configService.get<string>('BINANCE_API_SECRET');
+    const binance_api_key = this.configService.get<string>('BINANCE_API_KEY');
+    const proxy_url = this.configService.get<string>('PROXY_URL');
+    const client = new binanceConnector(
+      binance_api_key,
+      binance_api_secret,
+      proxy_url,
+      {},
+    );
+    /*
         名称	类型	是否必需	描述
         symbol	STRING	YES	
         orderId	LONG	NO	必须要和参数symbol一起使用.
@@ -65,62 +71,72 @@ export class TradingController {
         注意:
         如果设定 fromId , 获取订单 >= fromId. 否则返回最近订单。
         */
-        const options = {
-            limit:20
-        }
-        const { data,statusCode:code,statusMessage:message } = await client.myTrades(symbol,options)
-        await this.tradingService.createMyTrades(data);
-        return { code, message,data };
+    const options = {
+      limit: 20,
+    };
+    const {
+      data,
+      statusCode: code,
+      statusMessage: message,
+    } = await client.myTrades(symbol, options);
+    await this.tradingService.createMyTrades(data);
+    return { code, message, data };
 
-        //mock数据,调试
-        /*
+    //mock数据,调试
+    /*
         const {data,code,message} = myTradesRes
         await this.tradingService.createMyTrades(data);
         return { code, message,data};
         */
-    }
+  }
 
-    /*
+  /*
     Server api: 拿本地订单数据，暂时未作分页
     http://localhost:1788/trader/api/myTrades
     symbol:'ETHUSDT'
     */
-    @Get('api/myTrades')
-    async myTradesApi(@Query() query){
-        const { symbol } = query
-        if(symbol){
-            const data = await this.tradingService.getMyTrades(symbol);
-            return { code:200, message:'ok',data}; 
-        }else{
-            return { code:500, message:'请求参数错误',data:null}; 
-        }
+  @Get('api/myTrades')
+  async myTradesApi(@Query() query) {
+    const { symbol } = query;
+    if (symbol) {
+      const data = await this.tradingService.getMyTrades(symbol);
+      return { code: 200, message: 'ok', data };
+    } else {
+      return { code: 500, message: '请求参数错误', data: null };
     }
+  }
 
-    /*
+  /*
     Test api
     所属：现货账户和交易接口----测试下单 (TRADE)
     http://localhost:1788/trader/ticker/newOrderTest
     */
-    @Post('binance/newOrderTest')
-    async newOrderTest(payload={}){
-        const binance_api_secret= this.configService.get<string>('BINANCE_API_SECRET')
-        const binance_api_key= this.configService.get<string>('BINANCE_API_KEY')
-        const proxy_url= this.configService.get<string>('PROXY_URL')
-        const client = new binanceConnector(binance_api_key, binance_api_secret,proxy_url,{})
+  @Post('binance/newOrderTest')
+  async newOrderTest(payload = {}) {
+    const binance_api_secret =
+      this.configService.get<string>('BINANCE_API_SECRET');
+    const binance_api_key = this.configService.get<string>('BINANCE_API_KEY');
+    const proxy_url = this.configService.get<string>('PROXY_URL');
+    const client = new binanceConnector(
+      binance_api_key,
+      binance_api_secret,
+      proxy_url,
+      {},
+    );
 
-        let symbol = 'ETHUSDT'
-        let side = 'SELL'
-        let type = 'MARKET'
-        const options = {
-            // timeInForce:'GTC',
-            // limit:20,
-            timestamp:Date.now(),
-            // price:4300,
-            quantity:0.01,
-        }
+    const symbol = 'ETHUSDT';
+    const side = 'SELL';
+    const type = 'MARKET';
+    const options = {
+      // timeInForce:'GTC',
+      // limit:20,
+      timestamp: Date.now(),
+      // price:4300,
+      quantity: 0.01,
+    };
 
-       const data = await client.newOrderTest(symbol,side,type,options)
-       /*
+    const data = await client.newOrderTest(symbol, side, type, options);
+    /*
        {
         "symbol": "BTCUSDT", // 交易对
         "orderId": 28, // 系统的订单ID
@@ -145,6 +161,6 @@ export class TradingController {
         ]
       }
       */
-      return { code: 200, message: '查询成功',data};
-    }
+    return { code: 200, message: '查询成功', data };
+  }
 }

@@ -1,39 +1,43 @@
-import { Controller,Post,Get,Query } from '@nestjs/common';
+import { Controller, Post, Get, Query } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CryptoWalletService } from './crypto-wallet.service';
-import { getSymbolPriceUtil } from '../../utils/binanceApiUtil'
-const { binanceConnector }  = require('../../binance-connector/index')
+import { getSymbolPriceUtil } from '../../utils/binanceApiUtil';
+import { binanceConnector } from '../../binance-connector/index';
 
 @Controller('account')
 export class CryptoWalletController {
-      
   constructor(
-    private readonly cryptoWalletService:CryptoWalletService,
+    private readonly cryptoWalletService: CryptoWalletService,
     private configService: ConfigService,
-){
-}
+  ) {}
 
   /*
   Data Api: 更新钱包
   http://localhost:1788/account/binance/cryptoWallet
   */
   @Get('binance/cryptoWallet')
-  async cryptoWallet(){
-      const binance_api_secret= this.configService.get<string>('BINANCE_API_SECRET')
-      const binance_api_key= this.configService.get<string>('BINANCE_API_KEY')
-      const proxy_url= this.configService.get<string>('PROXY_URL')
+  async cryptoWallet() {
+    const binance_api_secret =
+      this.configService.get<string>('BINANCE_API_SECRET');
+    const binance_api_key = this.configService.get<string>('BINANCE_API_KEY');
+    const proxy_url = this.configService.get<string>('PROXY_URL');
 
-      const client = new binanceConnector(binance_api_key, binance_api_secret,proxy_url,{})
+    const client = new binanceConnector(
+      binance_api_key,
+      binance_api_secret,
+      proxy_url,
+      {},
+    );
 
-      const { statusCode,data,statusMessage } = await client.account()
+    const { statusCode, data, statusMessage } = await client.account();
 
-      if(statusCode===200){
-        // 这里没解决异步
-        const wallet = await this.cryptoWalletService.updateCryptoWallet(data);
-        return { code: 200, message: statusMessage,data:wallet};
-      }else{
-        return { code: 0, message: statusMessage,data:null};
-      }
+    if (statusCode === 200) {
+      // 这里没解决异步
+      const wallet = await this.cryptoWalletService.updateCryptoWallet(data);
+      return { code: 200, message: statusMessage, data: wallet };
+    } else {
+      return { code: 0, message: statusMessage, data: null };
+    }
   }
 
   /*
@@ -41,9 +45,9 @@ export class CryptoWalletController {
   http://localhost:1788/account/api/cryptoWallet
   */
   @Get('api/cryptoWallet')
-  async cryptoWalletApi(){
+  async cryptoWalletApi() {
     const data = await this.cryptoWalletService.getCryptoWallet();
-    return { code: 200, message: '查询成功',data};
+    return { code: 200, message: '查询成功', data };
   }
 
   /*
@@ -52,11 +56,16 @@ export class CryptoWalletController {
   symbol:'BTCUSDT'
   */
   @Get('api/SymbolPrice')
-  async getSymbolPrice(@Query() query){
-    const { symbol } = query
-    const binance_api_secret= this.configService.get<string>('BINANCE_API_SECRET')
-    const binance_api_key= this.configService.get<string>('BINANCE_API_KEY')
-    const data = await getSymbolPriceUtil(binance_api_key,binance_api_secret,symbol);
+  async getSymbolPrice(@Query() query) {
+    const { symbol } = query;
+    const binance_api_secret =
+      this.configService.get<string>('BINANCE_API_SECRET');
+    const binance_api_key = this.configService.get<string>('BINANCE_API_KEY');
+    const data = await getSymbolPriceUtil(
+      binance_api_key,
+      binance_api_secret,
+      symbol,
+    );
     return { ...data };
   }
 
@@ -70,28 +79,31 @@ export class CryptoWalletController {
   asset:'BTC'
   */
   @Get('api/calculateCostPrice')
-  async calculateCostprice(@Query() query){
-    const { symbol } = query
+  async calculateCostprice(@Query() query) {
+    const { symbol } = query;
 
     // 匹配USDT结尾,并截取asset start
-    const regUSDT = /USDT$/
-    let asset:string = ''
-    let symbolForQuery:string = ''
+    const regUSDT = /USDT$/;
+    let asset = '';
+    let symbolForQuery = '';
 
-    if(regUSDT.test(symbol)){
-      asset = symbol.replace(/USDT/g, "");
-      symbolForQuery = symbol
-    }else{
-      asset = symbol
-      symbolForQuery = symbol + 'USDT'
+    if (regUSDT.test(symbol)) {
+      asset = symbol.replace(/USDT/g, '');
+      symbolForQuery = symbol;
+    } else {
+      asset = symbol;
+      symbolForQuery = symbol + 'USDT';
     }
     //end
 
-    if(asset){
-      const data = await this.cryptoWalletService.CALC_holdCostprice(symbolForQuery,asset);
-      return { code: 200, message: '查询成功',data};
-    }else{
-      return { code: 200, message: 'asset error',data:null};
+    if (asset) {
+      const data = await this.cryptoWalletService.CALC_holdCostprice(
+        symbolForQuery,
+        asset,
+      );
+      return { code: 200, message: '查询成功', data };
+    } else {
+      return { code: 200, message: 'asset error', data: null };
     }
   }
 
@@ -104,28 +116,29 @@ export class CryptoWalletController {
   asset:'BTC'
   */
   @Get('api/updateStrategy')
-  async updateTradingStrategy(@Query() query){
-    console.log("updateStrategy_query:",query.symbol)
-    const { symbol } = query
+  async updateTradingStrategy(@Query() query) {
+    console.log('updateStrategy_query:', query.symbol);
+    const { symbol } = query;
 
     // 匹配USDT结尾,并截取asset start
-    const regUSDT = /USDT$/
-    let asset:string = ''
-    if(regUSDT.test(symbol)){
-      asset = symbol.replace(/USDT/g, "");
+    const regUSDT = /USDT$/;
+    let asset = '';
+    if (regUSDT.test(symbol)) {
+      asset = symbol.replace(/USDT/g, '');
     }
     //end
 
-    if(asset){
+    if (asset) {
+      const data = await this.cryptoWalletService.updateTradingStrategy(
+        symbol,
+        asset,
+      );
 
-      const data = await this.cryptoWalletService.updateTradingStrategy(symbol,asset);
-
-      return { code: 200, message: '更新成功',data};
-    }else{
-
-      return { code: 200, message: 'asset error',data:null};
+      return { code: 200, message: '更新成功', data };
+    } else {
+      return { code: 200, message: 'asset error', data: null };
     }
-  } 
+  }
 
   /*
   Data Api/Server Api: 更新策略:计算盈亏
@@ -133,34 +146,42 @@ export class CryptoWalletController {
   symbol:'BTCUSDT'
   */
   @Get('binance/updateProfit')
-  async updateProfit(@Query() query){
-    const { symbol } = query
+  async updateProfit(@Query() query) {
+    const { symbol } = query;
     // 匹配USDT结尾,并截取asset start
-    const regUSDT = /USDT$/
-    let asset:string = ''
-    let symbolForQuery:string = ''
+    const regUSDT = /USDT$/;
+    let asset = '';
+    let symbolForQuery = '';
 
-    if(regUSDT.test(symbol)){
-      asset = symbol.replace(/USDT/g, "");
-      symbolForQuery = symbol
-    }else{
-      asset = symbol
-      symbolForQuery = symbol + 'USDT'
+    if (regUSDT.test(symbol)) {
+      asset = symbol.replace(/USDT/g, '');
+      symbolForQuery = symbol;
+    } else {
+      asset = symbol;
+      symbolForQuery = symbol + 'USDT';
     }
     //end
 
-    const binance_api_secret= this.configService.get<string>('BINANCE_API_SECRET')
-    const binance_api_key= this.configService.get<string>('BINANCE_API_KEY')
-    const { code,data,message } = await getSymbolPriceUtil(binance_api_key,binance_api_secret,symbolForQuery);
-    if(code === 200){
-      if(asset){
-        await this.cryptoWalletService.updateTradingStrategyProfit(data.price,asset);
-        return { code: 200, message,data};
-      }else{
-        return { code: 200, message: 'asset error',data:null};
+    const binance_api_secret =
+      this.configService.get<string>('BINANCE_API_SECRET');
+    const binance_api_key = this.configService.get<string>('BINANCE_API_KEY');
+    const { code, data, message } = await getSymbolPriceUtil(
+      binance_api_key,
+      binance_api_secret,
+      symbolForQuery,
+    );
+    if (code === 200) {
+      if (asset) {
+        await this.cryptoWalletService.updateTradingStrategyProfit(
+          data.price,
+          asset,
+        );
+        return { code: 200, message, data };
+      } else {
+        return { code: 200, message: 'asset error', data: null };
       }
-    }else{
-      return { code: 0, message, data:null};
+    } else {
+      return { code: 0, message, data: null };
     }
   }
 
@@ -169,9 +190,8 @@ export class CryptoWalletController {
   http://localhost:1788/account/api/getStrategies
   */
   @Get('api/getStrategies')
-  async getStrategies(){
-      const data = await this.cryptoWalletService.getStrategies();
-      return { code: 200, message: '查询成功',data};
+  async getStrategies() {
+    const data = await this.cryptoWalletService.getStrategies();
+    return { code: 200, message: '查询成功', data };
   }
-
 }
