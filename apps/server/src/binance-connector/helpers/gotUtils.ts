@@ -92,10 +92,26 @@ export class gotUtils {
       console.log('agent:', agent);
       console.log('proxyUrl:', proxyUrl);
       console.log('reqUrl:', reqUrl);
+      console.log('reqUrl-data:', paramOptions);
 
       const res: any = await got.post(reqUrl, {
         headers,
         agent,
+        // body: JSON.stringify({ code: 'polkadot', addlink: 1, webp: 1 }),
+        // body: JSON.stringify({ code: 'bitcoin', addlink: 1, webp: 1 }),
+        /*
+        body: JSON.stringify({
+          msgtype: 'text',
+          text: {
+            content: 'boter: a test',
+          },
+          at: {
+            atMobiles: ['15692426057'],
+            isAtAll: false,
+          },
+        }),
+        */
+        body: JSON.stringify(paramOptions),
       });
       return {
         error: null,

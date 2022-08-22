@@ -22,8 +22,9 @@ export class DataCenterController {
     return data;
   }
 
-  @Post('symbolList')
+  @Post('syncSymbol')
   async syncSymbolInfo(@Body() symbol: any): Promise<Result> {
+    console.log('syncSymbol--->test');
     const data = await this.DataCenterService.syncSymbolInfo(symbol);
     return data;
   }

@@ -35,8 +35,8 @@ const stringifyKeyValuePair = ([key, value]) => {
   return `${key}=${encodeURIComponent(valueString)}`;
 };
 
-export const createRequest = async (config) => {
-  const { baseURL, apiKey, method, url, proxyUrl = '' } = config;
+export const createRequest = async (config: any) => {
+  const { baseURL, apiKey, method, url, proxyUrl = '', options = {} } = config;
   const reqUrl = baseURL + url;
   const headers = {
     'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ export const createRequest = async (config) => {
     const data = await gotUtils.get(reqUrl, headers, proxyUrl_test);
     return data;
   } else if (method === 'POST') {
-    const data = await gotUtils.post(reqUrl, headers, proxyUrl_test, {});
+    const data = await gotUtils.post(reqUrl, headers, proxyUrl_test, options);
     return data;
   }
 };
