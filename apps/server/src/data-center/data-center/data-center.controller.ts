@@ -8,7 +8,7 @@ export class DataCenterController {
   constructor(
     private readonly DataCenterService: DataCenterService,
     private configService: ConfigService,
-  ) {}
+  ) { }
 
   @Post('addCode')
   async createCode(@Body() symbol: any): Promise<Result> {
@@ -24,7 +24,11 @@ export class DataCenterController {
 
   @Post('syncSymbol')
   async syncSymbolInfo(@Body() symbol: any): Promise<Result> {
-    console.log('syncSymbol--->test');
+    /*
+    {"code":"polkadot100","addlink":1,"webp":1}
+    {"code":"bitcoin"}
+    {"code":"polkadot100"}
+    */
     const data = await this.DataCenterService.syncSymbolInfo(symbol);
     return data;
   }

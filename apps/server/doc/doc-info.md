@@ -1,5 +1,3 @@
-
-
 ```javaScript
 {
      "msgtype": "markdown",
@@ -30,7 +28,7 @@
 }
 ```
 
-## 
+## reference resources
 ```
 link:
 https://www.feixiaohaozh.info/currencies/bitcoin/
@@ -114,4 +112,20 @@ https://dncapi.gomynft.com/api/coin/web-coininfo
 ```json
 {"code":"bitcoin","addlink":1,"webp":1}
 {"code":"polkadot100","addlink":1,"webp":1}
+```
+
+## api
+```
+http://localhost:1788/data/center/addCode
+    {
+    "symbol":"BTCUSDT",
+    "baseAsset":"BTC",
+    "quoteAsset":"USDT",
+    "code":"bitcoin",
+    "addlink":1,
+    "webp":1
+    }
+
+
+http://localhost:1788/data/center/syncSymbol
 ```

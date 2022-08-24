@@ -9,7 +9,7 @@ const isNull = (param) => {
 
 export class gotUtils {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  constructor() {}
+  constructor() { }
 
   /**
    * application/x-www-form-urlencoded
@@ -27,14 +27,14 @@ export class gotUtils {
   ) {
     const agent = proxyUrl
       ? {
-          https: new HttpsProxyAgent({
-            keepAlive: true,
-            keepAliveMsecs: 10000,
-            maxSockets: 256,
-            maxFreeSockets: 256,
-            proxy: proxyUrl,
-          }),
-        }
+        https: new HttpsProxyAgent({
+          keepAlive: true,
+          keepAliveMsecs: 10000,
+          maxSockets: 256,
+          maxFreeSockets: 256,
+          proxy: proxyUrl,
+        }),
+      }
       : null;
     try {
       console.log('agent:', agent);
@@ -79,20 +79,22 @@ export class gotUtils {
     try {
       const agent = proxyUrl
         ? {
-            https: new HttpsProxyAgent({
-              keepAlive: true,
-              keepAliveMsecs: 10000,
-              maxSockets: 256,
-              maxFreeSockets: 256,
-              proxy: proxyUrl,
-            }),
-          }
+          https: new HttpsProxyAgent({
+            keepAlive: true,
+            keepAliveMsecs: 10000,
+            maxSockets: 256,
+            maxFreeSockets: 256,
+            proxy: proxyUrl,
+          }),
+        }
         : null;
 
+      /*
       console.log('agent:', agent);
       console.log('proxyUrl:', proxyUrl);
       console.log('reqUrl:', reqUrl);
       console.log('reqUrl-data:', paramOptions);
+      */
 
       const res: any = await got.post(reqUrl, {
         headers,
@@ -133,14 +135,14 @@ export class gotUtils {
   static async get(reqUrl: string, headers?, proxyUrl?: string) {
     const agent = proxyUrl
       ? {
-          https: new HttpsProxyAgent({
-            keepAlive: true,
-            keepAliveMsecs: 10000,
-            maxSockets: 256,
-            maxFreeSockets: 256,
-            proxy: proxyUrl,
-          }),
-        }
+        https: new HttpsProxyAgent({
+          keepAlive: true,
+          keepAliveMsecs: 10000,
+          maxSockets: 256,
+          maxFreeSockets: 256,
+          proxy: proxyUrl,
+        }),
+      }
       : null;
 
     console.log('agent:', agent);

@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('simplify_symbol')
-export class SimplifySymbol {
+@Entity('coin_code')
+export class CoinCode {
   /**
    * 主键
    */
