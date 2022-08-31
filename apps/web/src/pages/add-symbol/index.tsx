@@ -11,14 +11,11 @@ import SymbolList from './symbol-list';
 function AddSymbol() {
   const [code, setCode] = useState('')
   const [symbol, setSymbol] = useState('')
-  const [baseAsset, setbaseAsset] = useState('')
 
   const onAdd = async () => {
     /*
     {
     "symbol":"BTCUSDT",
-    "baseAsset":"BTC",
-    "quoteAsset":"USDT",
     "code":"bitcoin",
     "addlink":1,
     "webp":1
@@ -26,12 +23,13 @@ function AddSymbol() {
     */
     const data = {
       symbol,
-      baseAsset,
       code
     }
     const res = await traderApi.addSimplifySymbol(data)
     if (res.code === 200) {
       console.log('success');
+      setSymbol('')
+      setCode('')
     } else {
       console.log("同步失败")
     }
@@ -43,11 +41,7 @@ function AddSymbol() {
       <div className='container symbol-container' style={{ paddingTop: '20px' }} >
         <div className='add-symbol'>
           <div className='custom-input'>
-            <Input onChange={(e) => { setSymbol(e.target.value) }} value={symbol} placeholder="Please enter symbol code" />
-          </div>
-
-          <div className='custom-input'>
-            <Input onChange={(e) => { setbaseAsset(e.target.value) }} value={baseAsset} placeholder="Please enter base asset" />
+            <Input onChange={(e) => { setSymbol(e.target.value) }} value={symbol} placeholder="Please enter symbol" />
           </div>
 
           <div className='custom-input'>

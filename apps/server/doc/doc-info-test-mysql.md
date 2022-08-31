@@ -1,13 +1,13 @@
 
+1E10的意思是：科学计数法的另外一种表示方法，表示1×10¹⁰=1×10^10=10，000，000，000
+
 ```sql
 CREATE TABLE `coin_code`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `symbol` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `baseAsset` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `quoteAsset` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 667 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;
 ```
@@ -19,25 +19,25 @@ CREATE TABLE `coin`  (
   `code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `symbol` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `name_zh` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `rank` bigint(0) NOT NULL COMMENT '排名',
-  `price` double(32, 8) NULL DEFAULT NULL COMMENT '当前价格',
-  `holders` bigint(0) NOT NULL COMMENT 'holders',
-  `maxsupply` bigint(0) NOT NULL COMMENT 'maxsupply',
-  `is_infinity_supply` tinyint(0) NULL DEFAULT NULL COMMENT '是否无限增发',
+  `rank` int(11) NOT NULL COMMENT '排名',
+  `price` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '当前价格',
+  `holders` bigint(100) NOT NULL COMMENT 'holders',
+  `maxsupply` bigint(100) NOT NULL COMMENT 'maxsupply',
+  `is_infinity_supply` tinyint(50) NULL DEFAULT NULL COMMENT '是否无限增发',
   `circulationRate` float NOT NULL COMMENT '流通率',
-  `supply` bigint(0) NOT NULL COMMENT '流通总量',
-  `marketcap` bigint(0) NOT NULL COMMENT '总市值',
-  `marketcap_total_rnb` bigint(0) NOT NULL COMMENT '总市值',
+  `supply` bigint(100) NOT NULL COMMENT '流通总量',
+  `marketcap` bigint(100) NOT NULL COMMENT '总市值',
+  `marketcap_total_rnb` bigint(100) NOT NULL COMMENT '总市值',
   `marketcappercent` float NOT NULL COMMENT '流通占全球市值',
-  `supportfutures` int(0) NOT NULL COMMENT '是否合约',
-  `supportetf` int(0) NOT NULL,
-  `supportspots` int(0) NOT NULL,
-  `haslongshort` int(0) NOT NULL,
-  `icoprice` double(32, 8) NULL DEFAULT NULL COMMENT 'ico价格',
-  `openprice` double(32, 8) NULL DEFAULT NULL COMMENT '开盘价格',
+  `supportfutures` int(50) NOT NULL COMMENT '是否合约',
+  `supportetf` int(50) NOT NULL,
+  `supportspots` int(50) NOT NULL,
+  `haslongshort` int(50) NOT NULL,
+  `icoprice` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'ico价格',
+  `openprice` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '开盘价格',
   `openprice_percent` double(32, 8) NULL DEFAULT NULL COMMENT '投资回报',
-  `his_highest_usd` double(32, 8) NULL DEFAULT NULL COMMENT '最高价格',
-  `his_lowest_usd` double(32, 8) NULL DEFAULT NULL COMMENT '历史最低',
+  `his_highest_usd` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '最高价格',
+  `his_lowest_usd` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '历史最低',
   `his_highprice_time` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '高点',
   `his_lowprice_time` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '低点',
   `prooftype` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
@@ -47,49 +47,50 @@ CREATE TABLE `coin`  (
   `publicchain` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `miningstate` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `blockreward` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `firstblocktime` bigint(0) NOT NULL,
+  `firstblocktime` bigint(100) NOT NULL,
   `blockspleed` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `halvetime` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `halvereward` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `online_time` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `exchange_listcount` int(0) NOT NULL,
+  `exchange_listcount` int(50) NOT NULL,
   `logo_small` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `updatetime` bigint(0) NOT NULL,
+  `updatetime` bigint(100) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 667 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;
 ```
 
 
 ```sql
-CREATE TABLE `day_kline`  (
+CREATE TABLE `coin_kline`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `symbol` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `holders` bigint(0) NOT NULL COMMENT 'holders',
-  `totalSupply` bigint(0) NOT NULL COMMENT '流通总量',
+  `holders` bigint(100) NOT NULL COMMENT 'holders',
+  `totalSupply` bigint(100) NOT NULL COMMENT '流通总量',
   `marketcappercent` float NOT NULL COMMENT '流通占全球市值',
   `circulationRate` float NOT NULL COMMENT '流通率',
   `turn_over` float NOT NULL COMMENT '换手率',
   `ratio` float NOT NULL COMMENT '量比',
-  `high_week` double(32, 8) NULL DEFAULT NULL COMMENT '周高',
-  `low_week` double(32, 8) NULL DEFAULT NULL COMMENT '周低',
-  `open` double(32, 8) NULL DEFAULT NULL COMMENT 'open',
-  `price` double(32, 8) NULL DEFAULT NULL COMMENT '当前价格',
-  `high` double(32, 8) NULL DEFAULT NULL,
-  `low` double(32, 8) NULL DEFAULT NULL,
-  `amount_day` bigint(0) NOT NULL COMMENT '24小时量',
-  `vol_24` bigint(0) NOT NULL COMMENT '24H成交额',
-  `vol` bigint(0) NOT NULL COMMENT '24H成交额',
+
+  `high_week` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '周高',
+  `low_week` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '周低',
+  `open` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'open',
+  `price` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '当前价格',
+  `high` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `low` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `amount_day` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '24小时量',
+  `vol_24` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '24H成交额',
+  `vol` varchar(255) NOT NULL COMMENT '24H成交额',
+  `change` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '波动',
+
   `vol_percent` float NOT NULL COMMENT '额比率',
-  `ticker_num` int(0) NOT NULL,
-  `change` double(32, 8) NULL DEFAULT NULL COMMENT '波动',
+  `ticker_num` int(50) NOT NULL,
   `change_percent` float NOT NULL COMMENT '波动率',
-  `updatetime` bigint(0) NOT NULL,
+  `updatetime` bigint(100) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 667 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Compact;
-}
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 ```
 
 ```sql
@@ -98,26 +99,27 @@ CREATE TABLE `coin_addition`  (
   `code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `symbol` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `siteurl` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `coindesc` mediumtext NOT NULL,
+  `coindesc` LONGTEXT NOT NULL,
   `codelink` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `logo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `telegramlink` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `facebook` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `twitter` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `explorer` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `explorer` mediumtext NOT NULL,
   `redditlink` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `biyong` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `white_paper` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `difftime` int(0) NOT NULL,
-  `supportoptions` int(0) NOT NULL,
-  `is_refresh` int(0) NOT NULL,
-  `not_public` bigint(0) NOT NULL ,
+  `difftime` int(50) NOT NULL,
+  `supportoptions` int(50) NOT NULL,
+  `is_refresh` int(50) NOT NULL,
+  `not_public` bigint(100) NOT NULL ,
   `btccorrelation` float NOT NULL COMMENT 'btc相关性',
-  `updatetime` bigint(0) NOT NULL,
+  `updatetime` bigint(100) NOT NULL,
 
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 667 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Compact;
-}
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+
+  `coindesc` mediumtext NOT NULL,
 ```
 
 ```sql
@@ -129,20 +131,15 @@ CREATE TABLE `coin_dev_member`  (
   `headimg` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `twitterlink` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `linkinLink` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `isfounder` int(0) NOT NULL,
-  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `isfounder` int(50) NOT NULL,
+  `description` mediumtext NOT NULL,
 
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 667 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 ```
 
 ## 2.次要字段数据
 // Initial Coin Offering缩写)，首次币发行，源自股票市场的首次公开发行(IPO)概念，是区块链项目首次发行代币，募集比特币、以太坊等通用数字货币的行为。
-
-```
-
-```
-
 去掉的字段:
 ```
 "weibo": "",

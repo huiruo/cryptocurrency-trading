@@ -2,10 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { get, isEmpty } from 'lodash';
-import { CoinCode } from './data-center.entity';
-import { Coin } from './coin.entity';
 import { Result } from 'src/common/result.interface';
 import { createRequest } from 'src/binance-connector/helpers/utils';
+
+import { CoinCode } from './data-center.entity';
+import { Coin } from './coin.entity';
 import { CoinAddition } from './coin.addition.entity';
 import { DayKline } from './day.kline.entity';
 import { CoinDevMember } from './coin.member.entity';
@@ -28,31 +29,31 @@ export class DataCenterService {
     private readonly coninDevMemberRepo: Repository<CoinDevMember>,
   ) { }
 
-  async addSymbol(data: any): Promise<Result> {
+  async addCode(data: any): Promise<Result> {
     const { symbol } = data;
     const symbolData = await this.getSymbol(symbol);
     if (isEmpty(symbolData)) {
-      const req = await this.coinCodeRepo.save(data);
-      return { code: 200, message: 'ok', data: req };
+      const res = await this.coinCodeRepo.save(data);
+      return { code: 200, message: 'ok', data: res };
     } else {
       return { code: 500, message: 'Duplicate data', data: null };
     }
   }
 
-  async symbolList(): Promise<Result> {
-    const req = await this.coinCodeRepo.find();
-    return { code: 200, message: 'ok', data: req };
+  async getCodelist(): Promise<Result> {
+    const res = await this.coinCodeRepo.find();
+    return { code: 200, message: 'ok', data: res };
   }
 
   async getSymbol(symbol: string) {
-    const sql = `select * from simplify_symbol where symbol='${symbol}'`;
+    const sql = `select * from coin_code where symbol='${symbol}'`;
     const symbolData = await this.coinCodeRepo.query(sql);
 
     return get(symbolData, '[0]', {});
   }
 
-  async syncSymbolInfo(symbol: any): Promise<Result> {
-    const coinCode = get(symbol, 'code', '')
+  async syncSymbolInfo(params: any): Promise<Result> {
+    const coinCode = get(params, 'code', '')
     if (!coinCode) {
       return { code: 500, message: '参数错误', data: null };
     }
@@ -75,7 +76,7 @@ export class DataCenterService {
       }
 
       const res = get(gotData, 'data.data', {})
-      const { rateRemark, value: allot_value, name: allot_name } = get(res, 'coinallot.[0]', {})
+      const { rateRemark = '', value: allot_value = '', name: allot_name = '' } = get(res, 'coinallot.[0]', {})
       const {
         code,
         symbol,
@@ -247,8 +248,6 @@ export class DataCenterService {
       const coinData = await this.findCoin(coinCode)
       if (isEmpty(coinData)) {
         console.log('新增-->');
-        /* insert coin */
-        const saveRes = await this.coninRepo.save(coin);
 
         /* insert dev members */
         const members: CoinDevMember[] = get(res, 'members', []).map(item => {
@@ -257,14 +256,17 @@ export class DataCenterService {
             ...item
           }
         })
-        await this.coninDevMemberRepo.insert(members);
+        this.coninDevMemberRepo.insert(members);
 
         /* insert coin addition */
-        await this.coinAdditionRepo.insert(coinAddition);
-        console.log('coinAddition', coinAddition);
+        this.coinAdditionRepo.insert(coinAddition);
 
         /* insert day kline */
-        await this.dayKlineRepo.insert(dayKline);
+        this.dayKlineRepo.insert(dayKline);
+
+        /* insert coin */
+        // console.log('coin', coin);
+        const saveRes = await this.coninRepo.save(coin);
 
         return { code: 200, message: '新增成功', data: saveRes };
       } else {

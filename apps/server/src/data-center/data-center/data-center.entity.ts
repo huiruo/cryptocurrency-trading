@@ -16,16 +16,6 @@ export class CoinCode {
   symbol: string;
 
   @Column({
-    comment: 'baseAsset',
-  })
-  baseAsset: string;
-
-  @Column({
-    comment: 'quoteAsset',
-  })
-  quoteAsset: string;
-
-  @Column({
     comment: 'code',
   })
   code: string;

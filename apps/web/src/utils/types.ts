@@ -21,11 +21,11 @@ export type TickerInter = {
 }
 
 export interface itemType {
-  id:number,
-  symbol:string
+  id: number,
+  symbol: string
 }
 
-export interface orderItemType{
+export interface orderItemType {
   symbol: string,
   id: number,
   orderId: number,
@@ -41,24 +41,24 @@ export interface orderItemType{
   isBestMatch: boolean
 }
 
-export interface balancesType{
-  id?:string,
-  asset:string,
-  free:string,
-  locked:string,
-  updateTime:number
+export interface balancesType {
+  id?: string,
+  asset: string,
+  free: string,
+  locked: string,
+  updateTime: number
 }
 
-export interface SymbolListType{
-  id?:string,
-  symbol:string,
-  baseAsset:string,
-  quoteAsset:string,
-  code:string,
+export interface SymbolListType {
+  id?: string,
+  symbol: string,
+  // baseAsset:string,
+  // quoteAsset:string,
+  code: string,
 }
 
-export interface strategyType{
-  id?:string,
+export interface strategyType {
+  id?: string,
   asset: string,
   quantity: string,
   price: string,

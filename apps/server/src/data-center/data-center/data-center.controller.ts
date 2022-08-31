@@ -11,14 +11,14 @@ export class DataCenterController {
   ) { }
 
   @Post('addCode')
-  async createCode(@Body() symbol: any): Promise<Result> {
-    const data = await this.DataCenterService.addSymbol(symbol);
+  async addCode(@Body() symbol: any): Promise<Result> {
+    const data = await this.DataCenterService.addCode(symbol);
     return data;
   }
 
-  @Get('symbolList')
-  async symbolList(): Promise<Result> {
-    const data = await this.DataCenterService.symbolList();
+  @Get('codelist')
+  async getCodelist(): Promise<Result> {
+    const data = await this.DataCenterService.getCodelist();
     return data;
   }
 

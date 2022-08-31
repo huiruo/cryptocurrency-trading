@@ -27,15 +27,26 @@ function SymbolList(props: SymbolListProps) {
     }
   }
 
-  const onSyncSymbolInfo = (item: SymbolListType) => {
+  const onSyncSymbolInfo = async (item: SymbolListType) => {
     console.log('onSyncSymbolInfo', item);
+    const req = {
+      code: item.code
+    }
+    const res = await traderApi.syncSymbolInfo(req)
+    const { data, code } = res
+    if (code === 200) {
+      console.log('sync success', res);
+    } else {
+      console.log("同步失败")
+    }
   }
 
   return (
     <div className='symbol-list'>
-      {symbolList.map(item => {
+      {symbolList.map((item, index) => {
         return <div key={item.symbol} className='symbol-item'>
-          <span>
+          <span style={{ marginRight: '10px' }}>{index + 1}.</span>
+          <span style={{ marginRight: '10px' }}>
             {item.symbol}
           </span>
           <span>
