@@ -58,9 +58,11 @@ export class DataCenterService {
       return { code: 500, message: '参数错误', data: null };
     }
 
+    const baseURL = 'http://example.com'
+
     const config = {
       options: { code: coinCode, addlink: 1, webp: 1 },
-      baseURL: 'https://dncapi.gomynft.com/api/coin/web-coininfo',
+      baseURL,
       url: '',
       apiKey: '',
       method: 'POST',
