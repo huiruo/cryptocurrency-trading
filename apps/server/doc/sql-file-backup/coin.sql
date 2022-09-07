@@ -26,7 +26,7 @@ CREATE TABLE `coin`  (
   `code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `symbol` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `name_zh` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `rank` bigint(0) NOT NULL COMMENT '排名',
+  `ranking` bigint(0) NOT NULL COMMENT '排名',
   `price` double(32, 8) NULL DEFAULT NULL COMMENT '当前价格',
   `holders` bigint(0) NOT NULL COMMENT 'holders',
   `maxsupply` bigint(0) NOT NULL COMMENT 'maxsupply',

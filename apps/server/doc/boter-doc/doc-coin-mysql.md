@@ -19,7 +19,7 @@ CREATE TABLE `coin`  (
   `code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `symbol` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `name_zh` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `rank` int(11) NOT NULL COMMENT '排名',
+  `ranked` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `price` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '当前价格',
   `holders` bigint(100) NOT NULL COMMENT 'holders',
   `maxsupply` bigint(100) NOT NULL COMMENT 'maxsupply',
@@ -55,6 +55,23 @@ CREATE TABLE `coin`  (
   `exchange_listcount` int(50) NOT NULL,
   `logo_small` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `updatetime` bigint(100) NOT NULL,
+  -- ** coin_kline start
+  `totalSupply` bigint(100) NOT NULL COMMENT '流通总量',
+  `turn_over` float NOT NULL COMMENT '换手率',
+  `ratio` float NOT NULL COMMENT '量比',
+  `high_week` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '周高',
+  `low_week` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '周低',
+  `open` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'open',
+  `high` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `low` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `amount_day` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '24小时量',
+  `vol_24` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '24H成交额',
+  `vol` varchar(255) NOT NULL COMMENT '24H成交额',
+  `change` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '波动',
+  `vol_percent` float NOT NULL COMMENT '额比率',
+  `ticker_num` int(50) NOT NULL,
+  `change_percent` float NOT NULL COMMENT '波动率',
+  -- ** coin_kline end
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
@@ -67,28 +84,27 @@ CREATE TABLE `coin_kline`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `symbol` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `holders` bigint(100) NOT NULL COMMENT 'holders',
-  `totalSupply` bigint(100) NOT NULL COMMENT '流通总量',
+  `updatetime` bigint(100) NOT NULL,
+  `price` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '当前价格',
   `marketcappercent` float NOT NULL COMMENT '流通占全球市值',
   `circulationRate` float NOT NULL COMMENT '流通率',
+  `holders` bigint(100) NOT NULL COMMENT 'holders',
+
+  `totalSupply` bigint(100) NOT NULL COMMENT '流通总量',
   `turn_over` float NOT NULL COMMENT '换手率',
   `ratio` float NOT NULL COMMENT '量比',
-
   `high_week` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '周高',
   `low_week` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '周低',
   `open` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'open',
-  `price` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '当前价格',
   `high` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `low` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `amount_day` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '24小时量',
   `vol_24` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '24H成交额',
   `vol` varchar(255) NOT NULL COMMENT '24H成交额',
   `change` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '波动',
-
   `vol_percent` float NOT NULL COMMENT '额比率',
   `ticker_num` int(50) NOT NULL,
   `change_percent` float NOT NULL COMMENT '波动率',
-  `updatetime` bigint(100) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 ```
