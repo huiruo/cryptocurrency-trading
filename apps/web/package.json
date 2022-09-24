@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@babel/core": "^7.16.0",
-    "@fower/react": "^1.55.0",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.3",
     "@svgr/webpack": "^5.5.0",
     "@testing-library/jest-dom": "^5.14.1",
@@ -77,7 +76,9 @@
     "webpack": "^5.64.4",
     "webpack-dev-server": "^4.6.0",
     "webpack-manifest-plugin": "^4.0.2",
-    "workbox-webpack-plugin": "^6.4.1"
+    "workbox-webpack-plugin": "^6.4.1",
+    "@fower/react": "^1.72.0",
+    "rc-table": "^7.27.2"
   },
   "eslintConfig": {
     "extends": [

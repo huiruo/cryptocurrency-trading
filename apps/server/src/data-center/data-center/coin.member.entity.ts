@@ -37,9 +37,7 @@ export class CoinDevMember {
   })
   linkinLink: string;
 
-  @Column({
-    comment: 'description',
-  })
+  @Column('mediumtext', { comment: 'description' })
   description: string;
 
   @Column({

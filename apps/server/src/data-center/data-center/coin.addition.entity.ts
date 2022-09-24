@@ -8,7 +8,7 @@ export class CoinAddition {
   id: number;
 
   @Column({
-    comment: 'code',
+    comment: 'test',
   })
   code: string;
 
@@ -18,17 +18,26 @@ export class CoinAddition {
   symbol: string;
 
   @Column({
+    comment: 'updatetime',
+  })
+  updatetime: number;
+
+
+  @Column({
+    comment: 'algorithm',
+  })
+  algorithm: string;
+
+  @Column({
     comment: 'siteurl',
   })
   siteurl: string;
 
-  @Column({
-    comment: 'coindesc',
-  })
+  @Column('longtext', { comment: '币种介绍', nullable: true })
   coindesc: string;
 
   @Column({
-    comment: 'codelink',
+    comment: 'testlink',
   })
   codelink: string;
 
@@ -52,9 +61,7 @@ export class CoinAddition {
   })
   twitter: string;
 
-  @Column({
-    comment: 'explorer',
-  })
+  @Column('mediumtext', { comment: 'explorer' })
   explorer: string;
 
   @Column({
@@ -96,9 +103,4 @@ export class CoinAddition {
     comment: 'btccorrelation',
   })
   btccorrelation: number;
-
-  @Column({
-    comment: 'updatetime',
-  })
-  updatetime: number;
 }

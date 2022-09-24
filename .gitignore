@@ -24,6 +24,7 @@ secret-document
 apps/server-java/src/main/resources/application-prod.properties
 apps/server/.env
 apps/server/config/env-prod/application-prod.env
+apps/server/config/env-dev/application-dev.env
 
 # js
 node_modules/

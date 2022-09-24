@@ -93,8 +93,13 @@ const traderApi = {
 		return http.get<resType>({}, url);
 	},
 
-	syncSymbolInfo(data: any) {
-		const url: string = `${traderApiUrl}/data/center/syncSymbol`;
+	syncCoinInfoApi(data: any) {
+		const url: string = `${traderApiUrl}/data/center/syncCoinInfo`;
+		return http.post<resType>(data, url);
+	},
+
+	getCoinApi(data: any) {
+		const url: string = `${traderApiUrl}/data/center/getCoin`;
 		return http.post<resType>(data, url);
 	},
 }

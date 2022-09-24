@@ -12,16 +12,14 @@ import {
 	Route,
 	BrowserRouter
 } from "react-router-dom";
-import AddSymbol from '@/pages/add-symbol';
+import { AddCode } from '@/pages/coin-data/add-code';
+import { CoinInfo } from '@/pages/coin-data/coinInfo';
+import { CoinList } from '@/pages/coin-data/coinList';
 
 const routesConfig = [
 	{
 		path: 'detail',
 		element: <Detail />,
-	},
-	{
-		path: 'addSymbol',
-		element: <AddSymbol />,
 	},
 	{
 		path: 'account',
@@ -38,7 +36,19 @@ const routesConfig = [
 	{
 		path: 'crytoCalculator',
 		element: <CrytoIncreaseCalculator />,
-	}
+	},
+	{
+		path: 'coin/addCode',
+		element: <AddCode />,
+	},
+	{
+		path: 'coin/list',
+		element: <CoinList />,
+	},
+	{
+		path: 'coin/info',
+		element: <CoinInfo />,
+	},
 ]
 
 const RoutesContainer = () => {
@@ -58,7 +68,6 @@ const RoutesContainer = () => {
 		})
 	}
 
-	// console.log('test:', generateRoute(routesConfig));
 	return (
 		<BrowserRouter>
 			{/* <HashRouter> */}

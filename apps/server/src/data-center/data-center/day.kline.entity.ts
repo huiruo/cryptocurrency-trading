@@ -17,15 +17,11 @@ export class DayKline {
   })
   symbol: string;
 
-  @Column({
-    comment: 'holders',
-  })
-  holders: number;
 
   @Column({
-    comment: 'totalSupply',
+    comment: 'price',
   })
-  totalSupply: number;
+  price: string;
 
   @Column({
     comment: 'marketcappercent',
@@ -36,6 +32,21 @@ export class DayKline {
     comment: 'circulationRate',
   })
   circulationRate: number;
+
+
+  @Column('bigint', { comment: '持仓地址' })
+  holders: number;
+
+  @Column({
+    comment: 'updatetime',
+  })
+  updatetime: number;
+
+
+
+
+  @Column('bigint', { comment: 'maxsupply' })
+  totalSupply: number;
 
   @Column({
     comment: 'turn_over',
@@ -50,51 +61,38 @@ export class DayKline {
   @Column({
     comment: 'high_week',
   })
-  high_week: number;
+  high_week: string;
 
   @Column({
     comment: 'low_week',
   })
-  low_week: number;
+  low_week: string;
 
   @Column({
     comment: 'open',
   })
-  open: number;
-
-  @Column({
-    comment: 'price',
-  })
-  price: number;
+  open: string;
 
   @Column({
     comment: 'high',
   })
-  high: number;
+  high: string;
 
   @Column({
     comment: 'low',
   })
-  low: number;
+  low: string;
 
-  @Column({
-    comment: 'amount_day',
-  })
-  amount_day: number;
+  @Column({ comment: 'amount_day', })
+  amount_day: string;
 
-  @Column({
-    comment: 'vol_24',
-  })
-  vol_24: number;
+  @Column({ comment: 'vol_24', })
+  vol_24: string;
 
-  @Column({
-    comment: 'vol',
-  })
-  vol: number;
+  @Column({ comment: '成交量', })
+  vol: string;
 
-  @Column({
-    comment: 'vol_percent',
-  })
+  @Column({ comment: 'vol_percent', })
   vol_percent: number;
 
   @Column({
@@ -105,15 +103,10 @@ export class DayKline {
   @Column({
     comment: 'change',
   })
-  change: number;
+  change: string;
 
   @Column({
     comment: 'change_percent',
   })
-  change_percent: number;
-
-  @Column({
-    comment: 'updatetime',
-  })
-  updatetime: number;
+  change_percent: string;
 }

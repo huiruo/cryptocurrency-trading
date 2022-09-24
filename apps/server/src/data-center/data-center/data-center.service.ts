@@ -45,6 +45,13 @@ export class DataCenterService {
     return { code: 200, message: 'ok', data: res };
   }
 
+  async getCoin(currentPage, pageSize): Promise<Result> {
+    const sql = `select * from coin order by ranked asc limit ${(currentPage - 1) * pageSize
+      },${pageSize}`;
+
+    return await this.coninRepo.query(sql);
+  }
+
   async getSymbol(symbol: string) {
     const sql = `select * from coin_code where symbol='${symbol}'`;
     const symbolData = await this.coinCodeRepo.query(sql);
@@ -52,13 +59,13 @@ export class DataCenterService {
     return get(symbolData, '[0]', {});
   }
 
-  async syncSymbolInfo(params: any): Promise<Result> {
-    const coinCode = get(params, 'code', '')
-    if (!coinCode) {
-      return { code: 500, message: '参数错误', data: null };
-    }
+  async syncCoinInfo(coinCode: string): Promise<Result> {
+    // const coinCode = get(params, 'code', '')
+    // if (!coinCode) {
+    //   return { code: 500, message: '参数错误', data: null };
+    // }
 
-    const baseURL = 'http://example.com'
+    const baseURL = ''
 
     const config = {
       options: { code: coinCode, addlink: 1, webp: 1 },
@@ -71,6 +78,8 @@ export class DataCenterService {
 
     const gotData: any = await createRequest(config);
     const { statusCode } = gotData
+    console.log('gotData:', gotData);
+
     if (statusCode === 200) {
 
       if (get(gotData, 'data.code', '') !== 200) {
@@ -130,6 +139,7 @@ export class DataCenterService {
         twitter,
         explorer,
         redditlink,
+        algorithm,
         biyong,
         white_paper,
         difftime,
@@ -162,8 +172,8 @@ export class DataCenterService {
         code,
         symbol,
         name_zh,
-        rank,
-        price,
+        ranked: rank,
+        price: price.toString(),
         holders,
         maxsupply,
         is_infinity_supply,
@@ -176,11 +186,11 @@ export class DataCenterService {
         supportetf,
         supportspots,
         haslongshort,
-        icoprice,
-        openprice,
+        icoprice: icoprice.toString(),
+        openprice: openprice.toString(),
         openprice_percent,
-        his_highest_usd,
-        his_lowest_usd,
+        his_highest_usd: his_highest_usd.toString(),
+        his_lowest_usd: his_lowest_usd.toString(),
         his_highprice_time,
         his_lowprice_time,
         prooftype,
@@ -198,6 +208,23 @@ export class DataCenterService {
         exchange_listcount,
         logo_small,
         updatetime,
+        /* kline data start*/
+        totalSupply,
+        turn_over,
+        ratio,
+        high_week: high_week.toString(),
+        low_week: low_week.toString(),
+        open: open.toString(),
+        high: high.toString(),
+        low: low.toString(),
+        amount_day: amount_day.toString(),
+        vol_24: vol_btc.toString(),
+        vol: vol.toString(),
+        vol_percent,
+        ticker_num,
+        change: change.toString(),
+        change_percent: change_percent.toString(),
+        /* kline data end*/
       }
 
       const coinAddition = {
@@ -212,6 +239,7 @@ export class DataCenterService {
         twitter,
         explorer,
         redditlink,
+        algorithm: algorithm || '',
         biyong,
         white_paper,
         difftime,
@@ -225,26 +253,27 @@ export class DataCenterService {
       const dayKline = {
         code,
         symbol,
-        holders,
+        updatetime,
+        price: price.toString(),
         marketcappercent,
         circulationRate,
-        price,
+        holders,
+        // only for kline
         totalSupply,
         turn_over,
         ratio,
-        high_week,
-        low_week,
-        open,
-        high,
-        low,
-        amount_day,
-        vol_24: vol_btc,
-        vol,
+        high_week: high_week.toString(),
+        low_week: low_week.toString(),
+        open: open.toString(),
+        high: high.toString(),
+        low: low.toString(),
+        amount_day: amount_day.toString(),
+        vol_24: vol_btc.toString(),
+        vol: vol.toString(),
         vol_percent,
         ticker_num,
-        change,
-        change_percent,
-        updatetime,
+        change: change.toString(),
+        change_percent: change_percent.toString(),
       }
 
       const coinData = await this.findCoin(coinCode)

@@ -3,6 +3,11 @@ import { ConfigService } from '@nestjs/config';
 import { Result } from 'src/common/result.interface';
 import { DataCenterService } from './data-center.service';
 
+export interface Page {
+  currentPage: number
+  pageSize: number
+}
+
 @Controller('data/center')
 export class DataCenterController {
   constructor(
@@ -22,14 +27,28 @@ export class DataCenterController {
     return data;
   }
 
-  @Post('syncSymbol')
-  async syncSymbolInfo(@Body() symbol: any): Promise<Result> {
+  @Post('syncCoinInfo')
+  async syncCoinInfo(@Body() args: any): Promise<Result> {
     /*
     {"code":"polkadot100","addlink":1,"webp":1}
     {"code":"bitcoin"}
     {"code":"polkadot100"}
     */
-    const data = await this.DataCenterService.syncSymbolInfo(symbol);
+    console.log('code', args);
+
+    const coinBaseURL = this.configService.get<string>('coinBaseURL')
+    console.log('coinBaseURL:', coinBaseURL);
+
+
+    return
+    const data = await this.DataCenterService.syncCoinInfo(args.code);
+    console.log('data', data);
+    return data;
+  }
+
+  @Post('getCoin')
+  async getCoin(@Body() page: Page): Promise<Result> {
+    const data = await this.DataCenterService.getCoin(page.currentPage, page.pageSize);
     return data;
   }
 }

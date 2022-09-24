@@ -8,7 +8,7 @@ import SymbolList from './symbol-list';
 /**
  * add symbol form server
  */
-function AddSymbol() {
+export function AddCode() {
   const [code, setCode] = useState('')
   const [symbol, setSymbol] = useState('')
 
@@ -61,5 +61,3 @@ function AddSymbol() {
     </div>
   )
 }
-
-export default AddSymbol;
