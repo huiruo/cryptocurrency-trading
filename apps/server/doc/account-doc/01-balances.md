@@ -10,8 +10,8 @@ CREATE TABLE `balances`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 ```
 
-## sync form binance
-http://localhost:1788/data/center/syncAccountInfo
+## sync balances form binance
+http://localhost:1788/data/center/syncBalances
 
-## query list
-http://localhost:1788/data/center/accountInfo
+## query balances
+http://localhost:1788/data/center/balances

@@ -82,6 +82,9 @@ export class DataCenterService {
       return { code: 500, message: 'URL dont exist', data: null };
     }
 
+    /*
+    {"code":"polkadot100","addlink":1,"webp":1}
+    */
     const config = {
       options: { code: coinCode, addlink: 1, webp: 1 },
       baseURL: coinBaseURL,
@@ -344,12 +347,12 @@ export class DataCenterService {
     }
   }
 
-  async getAccountInfo() {
+  async getBalances() {
     const res = await this.balancesRepo.find();
     return { code: 200, message: 'ok', data: res };
   }
 
-  async syncAccountInfo() {
+  async syncBalances() {
     try {
       const res = await this.client.getAccountInfo()
       const balances = get(res, 'balances', []).filter(item => Number(item.free) !== 0)

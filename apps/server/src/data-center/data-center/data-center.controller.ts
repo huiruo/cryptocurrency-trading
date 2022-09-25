@@ -31,15 +31,7 @@ export class DataCenterController {
 
   @Post('syncCoinInfo')
   async syncCoinInfo(@Body() args: any): Promise<Result> {
-    /*
-    {"code":"polkadot100","addlink":1,"webp":1}
-    {"code":"bitcoin"}
-    {"code":"polkadot100"}
-    */
-    console.log('code', args);
-    const data = await this.DataCenterService.syncCoinInfo(args.code);
-    console.log('data', data);
-    return data;
+    return await this.DataCenterService.syncCoinInfo(args.code);
   }
 
   @Post('getCoin')
@@ -49,15 +41,15 @@ export class DataCenterController {
   }
 
 
-  // =========== trader test ===========
+  // =========== Balances test ===========
   @Get('syncBalances')
   async syncAccountInfo(): Promise<Result> {
-    return await this.DataCenterService.syncAccountInfo()
+    return await this.DataCenterService.syncBalances()
   }
 
   @Get('balances')
   async getAccountInfo(@Body() page: Page): Promise<Result> {
-    return await this.DataCenterService.getAccountInfo()
+    return await this.DataCenterService.getBalances()
   }
-
+  // =========== Balances test ===========
 }
