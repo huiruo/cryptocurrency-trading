@@ -103,9 +103,14 @@ const traderApi = {
 		return http.post<resType>(data, url);
 	},
 
-	getAccountInfoApi() {
-		const url: string = `${traderApiUrl}/data/center/accountInfo`;
-		return http.post<resType>({}, url);
+	syncBalancesApi() {
+		const url: string = `${traderApiUrl}/data/center/syncBalances`;
+		return http.get<resType>({}, url);
+	},
+
+	balancesApi() {
+		const url: string = `${traderApiUrl}/data/center/balances`;
+		return http.get<resType>({}, url);
 	},
 }
 

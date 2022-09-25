@@ -15,7 +15,7 @@ import {
 import { AddCode } from '@/pages/coin-data/add-code';
 import { CoinInfo } from '@/pages/coin-data/coinInfo';
 import { CoinList } from '@/pages/coin-data/coinList';
-import { TradeAccount } from '@/pages/trade/account';
+import { Balances } from '@/pages/trade/balances';
 
 const routesConfig = [
 	{
@@ -50,11 +50,12 @@ const routesConfig = [
 		path: 'coin/info',
 		element: <CoinInfo />,
 	},
-	// == trade == 
+	// == trade start== 
 	{
-		path: 'trade/account',
-		element: <TradeAccount />,
+		path: 'trade/balances',
+		element: <Balances />,
 	},
+	// == trade end== 
 ]
 
 const RoutesContainer = () => {

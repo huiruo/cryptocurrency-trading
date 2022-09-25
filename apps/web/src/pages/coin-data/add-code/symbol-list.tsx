@@ -6,7 +6,7 @@ import { Button } from '@/components/Button';
 interface SymbolListProps { }
 
 /**
- * 注释
+ * CODE ANNOTATION
  */
 function SymbolList(props: SymbolListProps) {
 

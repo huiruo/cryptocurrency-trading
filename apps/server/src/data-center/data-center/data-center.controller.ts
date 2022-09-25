@@ -50,8 +50,13 @@ export class DataCenterController {
 
 
   // =========== trader test ===========
-  @Post('accountInfo')
-  async checkApiValid(@Body() page: Page): Promise<any> {
+  @Get('syncBalances')
+  async syncAccountInfo(): Promise<Result> {
+    return await this.DataCenterService.syncAccountInfo()
+  }
+
+  @Get('balances')
+  async getAccountInfo(@Body() page: Page): Promise<Result> {
     return await this.DataCenterService.getAccountInfo()
   }
 

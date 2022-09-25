@@ -5,7 +5,7 @@ interface Props {
 }
 
 /**
- * 注释
+ * CODE ANNOTATION
  */
 export function CoinInfo() {
 

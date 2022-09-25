@@ -11,7 +11,7 @@ interface Props {
 }
 
 /**
- * 注释
+ * CODE ANNOTATION
  */
 export function CoinList() {
 
@@ -54,7 +54,7 @@ export function CoinList() {
     {
       id: 'updatetime', title: 'updatetime', dataIndex: '', key: 'updatetime', width: 100,
       render(item: any) {
-        return <span>{formatUnixTime(item.updatetime)}</span>
+        return <span>{formatUnixTime(item.updatetime * 1000)}</span>
       },
     },
     {
@@ -119,4 +119,3 @@ export function CoinList() {
     </Box>
   </div>;
 }
-

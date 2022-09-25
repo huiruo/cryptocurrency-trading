@@ -12,6 +12,7 @@ import { CoinAddition } from './coin.addition.entity';
 import { DayKline } from './day.kline.entity';
 import { CoinDevMember } from './coin.member.entity';
 import { BaseServiceBiance } from 'src/utils/base-service-biance';
+import { Balances } from './balances.entity';
 
 @Injectable()
 export class DataCenterService {
@@ -23,6 +24,7 @@ export class DataCenterService {
 
     @InjectRepository(CoinCode)
     private readonly coinCodeRepo: Repository<CoinCode>,
+
     @InjectRepository(Coin)
     private readonly coninRepo: Repository<Coin>,
 
@@ -34,6 +36,9 @@ export class DataCenterService {
 
     @InjectRepository(CoinDevMember)
     private readonly coninDevMemberRepo: Repository<CoinDevMember>,
+
+    @InjectRepository(Balances)
+    private readonly balancesRepo: Repository<Balances>,
   ) {
 
     this.initBinanceApi()
@@ -41,7 +46,6 @@ export class DataCenterService {
 
   async addCode(data: any): Promise<Result> {
     const { symbol } = data;
-    console.log('symbol', symbol);
 
     const symbolData = await this.getSymbol(symbol);
     if (isEmpty(symbolData)) {
@@ -57,7 +61,7 @@ export class DataCenterService {
     return { code: 200, message: 'ok', data: res };
   }
 
-  async getCoin(currentPage, pageSize): Promise<Result> {
+  async getCoin(currentPage: number, pageSize: number): Promise<Result> {
     const sql = `select * from coin order by ranked asc limit ${(currentPage - 1) * pageSize
       },${pageSize}`;
 
@@ -88,8 +92,8 @@ export class DataCenterService {
     };
 
     const gotData: any = await createRequest(config);
+
     const { statusCode } = gotData
-    console.log('gotData:', gotData);
 
     if (statusCode === 200) {
 
@@ -341,7 +345,23 @@ export class DataCenterService {
   }
 
   async getAccountInfo() {
-    const res = await this.client.getAccountInfo()
-    return res
+    const res = await this.balancesRepo.find();
+    return { code: 200, message: 'ok', data: res };
+  }
+
+  async syncAccountInfo() {
+    try {
+      const res = await this.client.getAccountInfo()
+      const balances = get(res, 'balances', []).filter(item => Number(item.free) !== 0)
+
+      const sql = `TRUNCATE TABLE balances`;
+      const TRUNCATE_TABLE = await this.coninRepo.query(sql);
+
+      //{asset: 'ETH', free: '0.00003934', locked: '0.00000000'}
+      const saveBalances = await this.balancesRepo.save(balances);
+      return { code: 200, message: 'ok', data: balances };
+    } catch (error) {
+      return { code: 500, message: 'sync balances error', data: null };
+    }
   }
 }

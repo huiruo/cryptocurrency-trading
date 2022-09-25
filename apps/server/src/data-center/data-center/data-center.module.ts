@@ -7,9 +7,10 @@ import { DataCenterService } from './data-center.service';
 import { CoinAddition } from './coin.addition.entity';
 import { DayKline } from './day.kline.entity';
 import { CoinDevMember } from './coin.member.entity';
+import { Balances } from './balances.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([CoinCode, Coin, CoinAddition, DayKline, CoinDevMember])],
+  imports: [TypeOrmModule.forFeature([CoinCode, Coin, CoinAddition, DayKline, CoinDevMember, Balances])],
   controllers: [DataCenterController],
   providers: [DataCenterService],
 })

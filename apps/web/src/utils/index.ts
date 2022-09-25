@@ -12,7 +12,17 @@ class DateFormatOption {
   "S+": number;//毫秒
 }
 export function formatUnixTime(val: any, fmt = 'yyyy-MM-dd hh:mm:ss') {
-  const date = new Date(val * 1000);
+
+  const date = new Date(val);
+  /*
+  let date = null
+  if (isUnixTime) {
+    date = new Date(val);
+  } else {
+    date = val
+  }
+  */
+
   if (/(y+)/.test(fmt)) {
     fmt = fmt.replace(
       RegExp.$1,
