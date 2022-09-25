@@ -23,15 +23,36 @@ cryptocurrency-trading
 │       │   ├──main.ts
 │       ├── ...
 │       │  
-|   ├── server-java (Java service, involving timing tasks, etc.)
 |   ├── web (Browser application)
 ├── trading-strategy (Trading straregy)
 ```
 
-### Secret file
-The necessary configuration parameters for project operation include database account configuration, platform API Key and platform Secret Key.
+## config
+In the apps\server\config\env-dev directory,rename application-dev.env_example to application-dev.env,and set your 
+Binance Api.
 ```
-server/.env
-server/config/env-prod/application-prod.env
-server-java/src/main/resources/application-prod.properties
+binanceApiKey=test
+binanceSecretKey=test
+coinBaseURL=https://example.com
+```
+In the apps\server\ directory,rename .env_example to .env,and set your mysql.
+```
+host_dev=localhost
+port_dev=3306
+username_dev=xxxx
+password_dev=xxxxx
+database_dev=trader
+```
+
+## Run
+In the apps\server:
+```
+yarn
+yarn start:dev
+```
+
+In apps\web\README.md:
+```
+yarn
+yarn start
 ```
