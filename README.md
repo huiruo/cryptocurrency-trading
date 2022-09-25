@@ -45,13 +45,13 @@ database_dev=trader
 ```
 
 ## Run
-In the apps\server:
+In the apps\server directory:
 ```
 yarn
 yarn start:dev
 ```
 
-In apps\web\README.md:
+In the apps\web directory:
 ```
 yarn
 yarn start
