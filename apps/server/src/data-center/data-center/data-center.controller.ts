@@ -48,8 +48,14 @@ export class DataCenterController {
   }
 
   @Get('balances')
-  async getAccountInfo(@Body() page: Page): Promise<Result> {
+  async getAccountInfo(): Promise<Result> {
     return await this.DataCenterService.getBalances()
   }
   // =========== Balances test ===========
+
+  @Get('futuresTest')
+  async futuresTest(): Promise<Result> {
+
+    return await this.DataCenterService.futuresTest()
+  }
 }

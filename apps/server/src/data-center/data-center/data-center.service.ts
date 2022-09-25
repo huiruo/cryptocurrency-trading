@@ -367,4 +367,32 @@ export class DataCenterService {
       return { code: 500, message: 'sync balances error', data: null };
     }
   }
+
+  async futuresTest() {
+
+    // futuresAccountInfo
+    /*
+    [{
+        "asset": "USDT",
+        "walletBalance": "762.40744601",
+        "unrealizedProfit": "-37.09661096",
+        "marginBalance": "725.31083505",
+        "maintMargin": "5.95196795",
+        "initialMargin": "743.99599451",
+        "positionInitialMargin": "743.99599451",
+        "openOrderInitialMargin": "0.00000000",
+        "maxWithdrawAmount": "0.82715543",
+        "crossWalletBalance": "0.82715543",
+        "crossUnPnl": "0.00000000",
+        "availableBalance": "0.82715543",
+        "marginAvailable": true,
+        "updateTime": 1664121600397
+    },]
+    */
+    // const info = await this.client.futuresAccountInfo()
+
+    // 
+    const info = await this.client.futuresOpenOrders()
+    return { code: 200, message: 'ok', data: info };
+  }
 }
