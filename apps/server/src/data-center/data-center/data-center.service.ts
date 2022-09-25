@@ -4,16 +4,23 @@ import { Repository } from 'typeorm';
 import { get, isEmpty } from 'lodash';
 import { Result } from 'src/common/result.interface';
 import { createRequest } from 'src/binance-connector/helpers/utils';
+import { ConfigService } from '@nestjs/config';
 
 import { CoinCode } from './data-center.entity';
 import { Coin } from './coin.entity';
 import { CoinAddition } from './coin.addition.entity';
 import { DayKline } from './day.kline.entity';
 import { CoinDevMember } from './coin.member.entity';
+import { BaseServiceBiance } from 'src/utils/base-service-biance';
 
 @Injectable()
 export class DataCenterService {
+
+  private client: BaseServiceBiance
   constructor(
+
+    private configService: ConfigService,
+
     @InjectRepository(CoinCode)
     private readonly coinCodeRepo: Repository<CoinCode>,
     @InjectRepository(Coin)
@@ -27,10 +34,15 @@ export class DataCenterService {
 
     @InjectRepository(CoinDevMember)
     private readonly coninDevMemberRepo: Repository<CoinDevMember>,
-  ) { }
+  ) {
+
+    this.initBinanceApi()
+  }
 
   async addCode(data: any): Promise<Result> {
     const { symbol } = data;
+    console.log('symbol', symbol);
+
     const symbolData = await this.getSymbol(symbol);
     if (isEmpty(symbolData)) {
       const res = await this.coinCodeRepo.save(data);
@@ -60,16 +72,15 @@ export class DataCenterService {
   }
 
   async syncCoinInfo(coinCode: string): Promise<Result> {
-    // const coinCode = get(params, 'code', '')
-    // if (!coinCode) {
-    //   return { code: 500, message: '参数错误', data: null };
-    // }
 
-    const baseURL = ''
+    const coinBaseURL = this.configService.get<string>('coinBaseURL')
+    if (!coinBaseURL) {
+      return { code: 500, message: 'URL dont exist', data: null };
+    }
 
     const config = {
       options: { code: coinCode, addlink: 1, webp: 1 },
-      baseURL,
+      baseURL: coinBaseURL,
       url: '',
       apiKey: '',
       method: 'POST',
@@ -278,7 +289,7 @@ export class DataCenterService {
 
       const coinData = await this.findCoin(coinCode)
       if (isEmpty(coinData)) {
-        console.log('新增-->');
+        console.log('add-->');
 
         /* insert dev members */
         const members: CoinDevMember[] = get(res, 'members', []).map(item => {
@@ -299,15 +310,15 @@ export class DataCenterService {
         // console.log('coin', coin);
         const saveRes = await this.coninRepo.save(coin);
 
-        return { code: 200, message: '新增成功', data: saveRes };
+        return { code: 200, message: 'added successfully', data: saveRes };
       } else {
-        console.log('更新-->');
+        console.log('update-->');
         const updateRes = await this.coninRepo.update({ code: coinCode }, coin);
 
-        return { code: 200, message: '更新成功', data: coin };
+        return { code: 200, message: 'update completed', data: coin };
       }
     } else {
-      return { code: 500, message: '请求api错误', data: null };
+      return { code: 500, message: 'request api error', data: null };
     }
   }
 
@@ -318,4 +329,19 @@ export class DataCenterService {
     return res;
   }
 
+  async initBinanceApi() {
+    const apiKey = this.configService.get<string>('binanceApiKey')
+    const secretKey = this.configService.get<string>('binanceSecretKey')
+    if (apiKey && secretKey) {
+      const baseServiceBinance = new BaseServiceBiance(apiKey, secretKey)
+      this.client = baseServiceBinance
+    } else {
+      console.log('api key do not exist');
+    }
+  }
+
+  async getAccountInfo() {
+    const res = await this.client.getAccountInfo()
+    return res
+  }
 }

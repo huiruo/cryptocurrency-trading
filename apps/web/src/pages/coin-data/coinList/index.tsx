@@ -64,8 +64,8 @@ export function CoinList() {
       render(item: any) {
         return (
           <>
-            <Button onClick={() => onSyncCoinInfo(item)} mr4>同步资源</Button>
-            <Button onClick={() => onDetail(item)}>详情</Button>
+            <Button onClick={() => onSyncCoinInfo(item)} mr4>Sync</Button>
+            <Button onClick={() => onDetail(item)}>Detail</Button>
           </>
         )
       },
@@ -83,9 +83,8 @@ export function CoinList() {
     setCoinData(res)
     if (res.code === 200) {
       console.log('success', res);
-      // setCoinData(res)
     } else {
-      console.log("同步失败")
+      console.log("Sync failed")
     }
   }
 

@@ -4,19 +4,19 @@ import { traderApiUrl } from "./config";
 interface resType {
 	data: any,
 	code?: number,
-	msg?: string
+	message?: string
 }
 
 interface Ticker24hrType {
 	data: any,
 	code?: number,
-	msg?: string
+	message?: string
 }
 
 interface onLoginType {
 	data: any,
 	code?: number,
-	msg?: string
+	message?: string
 }
 const traderApi = {
 	/*
@@ -101,6 +101,11 @@ const traderApi = {
 	getCoinApi(data: any) {
 		const url: string = `${traderApiUrl}/data/center/getCoin`;
 		return http.post<resType>(data, url);
+	},
+
+	getAccountInfoApi() {
+		const url: string = `${traderApiUrl}/data/center/accountInfo`;
+		return http.post<resType>({}, url);
 	},
 }
 

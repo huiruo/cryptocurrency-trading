@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+// import { ConfigService } from '@nestjs/config';
 import { Result } from 'src/common/result.interface';
 import { DataCenterService } from './data-center.service';
 
@@ -12,11 +12,13 @@ export interface Page {
 export class DataCenterController {
   constructor(
     private readonly DataCenterService: DataCenterService,
-    private configService: ConfigService,
+    // private configService: ConfigService,
   ) { }
 
   @Post('addCode')
   async addCode(@Body() symbol: any): Promise<Result> {
+    console.log('addCode', symbol);
+
     const data = await this.DataCenterService.addCode(symbol);
     return data;
   }
@@ -35,12 +37,6 @@ export class DataCenterController {
     {"code":"polkadot100"}
     */
     console.log('code', args);
-
-    const coinBaseURL = this.configService.get<string>('coinBaseURL')
-    console.log('coinBaseURL:', coinBaseURL);
-
-
-    return
     const data = await this.DataCenterService.syncCoinInfo(args.code);
     console.log('data', data);
     return data;
@@ -51,4 +47,12 @@ export class DataCenterController {
     const data = await this.DataCenterService.getCoin(page.currentPage, page.pageSize);
     return data;
   }
+
+
+  // =========== trader test ===========
+  @Post('accountInfo')
+  async checkApiValid(@Body() page: Page): Promise<any> {
+    return await this.DataCenterService.getAccountInfo()
+  }
+
 }

@@ -31,7 +31,7 @@ export function AddCode() {
       setSymbol('')
       setCode('')
     } else {
-      console.log("同步失败")
+      console.log(res.message)
     }
   }
 

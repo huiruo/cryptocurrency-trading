@@ -89,12 +89,12 @@ export class gotUtils {
         }
         : null;
 
-      // /*
+      /*
       console.log('agent:', agent);
       console.log('proxyUrl:', proxyUrl);
       console.log('reqUrl:', reqUrl);
       console.log('reqUrl-data:', paramOptions);
-      // */
+      */
 
       const res: any = await got.post(reqUrl, {
         headers,

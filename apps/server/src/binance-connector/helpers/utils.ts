@@ -40,7 +40,7 @@ export const createRequest = async (config: any) => {
   const reqUrl = baseURL + url;
   const headers = {
     'Content-Type': 'application/json',
-    // 'X-MBX-APIKEY': apiKey,
+    'X-MBX-APIKEY': apiKey,
   };
 
   // let proxyUrl_test = 'http://127.0.0.1:7890'
