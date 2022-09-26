@@ -57,8 +57,8 @@ export const createRequest = async (config: any) => {
 
 export const flowRight =
   (...functions) =>
-    (input) =>
-      functions.reduceRight((input, fn) => fn(input), input);
+  (input) =>
+    functions.reduceRight((input, fn) => fn(input), input);
 
 export const defaultLogger = new Console({
   stdout: process.stdout,

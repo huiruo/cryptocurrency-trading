@@ -103,8 +103,10 @@ module.exports = function (proxy, allowedHost) {
     // proxy,
     proxy: {
       "/traderUrl": {
-        // target: "http://172.18.1.162:1788",
-        target: "http://192.168.1.107:1788",
+        // home
+        // target: "http://192.168.1.107:1788",
+        // company
+        target: "http://192.168.20.211:1788",
         // man
         // target:"http://192.168.0.106:1788",
         changeOrigin: true,

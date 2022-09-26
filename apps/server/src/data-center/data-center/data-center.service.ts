@@ -16,10 +16,8 @@ import { Balances } from './balances.entity';
 
 @Injectable()
 export class DataCenterService {
-
-  private client: BaseServiceBiance
+  private client: BaseServiceBiance;
   constructor(
-
     private configService: ConfigService,
 
     @InjectRepository(CoinCode)
@@ -40,8 +38,7 @@ export class DataCenterService {
     @InjectRepository(Balances)
     private readonly balancesRepo: Repository<Balances>,
   ) {
-
-    this.initBinanceApi()
+    this.initBinanceApi();
   }
 
   async addCode(data: any): Promise<Result> {
@@ -62,8 +59,9 @@ export class DataCenterService {
   }
 
   async getCoin(currentPage: number, pageSize: number): Promise<Result> {
-    const sql = `select * from coin order by ranked asc limit ${(currentPage - 1) * pageSize
-      },${pageSize}`;
+    const sql = `select * from coin order by ranked asc limit ${
+      (currentPage - 1) * pageSize
+    },${pageSize}`;
 
     return await this.coninRepo.query(sql);
   }
@@ -76,8 +74,7 @@ export class DataCenterService {
   }
 
   async syncCoinInfo(coinCode: string): Promise<Result> {
-
-    const coinBaseURL = this.configService.get<string>('coinBaseURL')
+    const coinBaseURL = this.configService.get<string>('coinBaseURL');
     if (!coinBaseURL) {
       return { code: 500, message: 'URL dont exist', data: null };
     }
@@ -96,16 +93,19 @@ export class DataCenterService {
 
     const gotData: any = await createRequest(config);
 
-    const { statusCode } = gotData
+    const { statusCode } = gotData;
 
     if (statusCode === 200) {
-
       if (get(gotData, 'data.code', '') !== 200) {
         return { code: 500, message: get(gotData, 'data.msg', ''), data: null };
       }
 
-      const res = get(gotData, 'data.data', {})
-      const { rateRemark = '', value: allot_value = '', name: allot_name = '' } = get(res, 'coinallot.[0]', {})
+      const res = get(gotData, 'data.data', {});
+      const {
+        rateRemark = '',
+        value: allot_value = '',
+        name: allot_name = '',
+      } = get(res, 'coinallot.[0]', {});
       const {
         code,
         symbol,
@@ -184,7 +184,7 @@ export class DataCenterService {
         change,
         change_percent,
         /* day_kline end */
-      } = res
+      } = res;
 
       const coin = {
         code,
@@ -243,7 +243,7 @@ export class DataCenterService {
         change: change.toString(),
         change_percent: change_percent.toString(),
         /* kline data end*/
-      }
+      };
 
       const coinAddition = {
         code,
@@ -266,7 +266,7 @@ export class DataCenterService {
         not_public,
         btccorrelation,
         updatetime,
-      }
+      };
 
       const dayKline = {
         code,
@@ -292,19 +292,19 @@ export class DataCenterService {
         ticker_num,
         change: change.toString(),
         change_percent: change_percent.toString(),
-      }
+      };
 
-      const coinData = await this.findCoin(coinCode)
+      const coinData = await this.findCoin(coinCode);
       if (isEmpty(coinData)) {
         console.log('add-->');
 
         /* insert dev members */
-        const members: CoinDevMember[] = get(res, 'members', []).map(item => {
+        const members: CoinDevMember[] = get(res, 'members', []).map((item) => {
           return {
             code,
-            ...item
-          }
-        })
+            ...item,
+          };
+        });
         this.coninDevMemberRepo.insert(members);
 
         /* insert coin addition */
@@ -337,11 +337,11 @@ export class DataCenterService {
   }
 
   async initBinanceApi() {
-    const apiKey = this.configService.get<string>('binanceApiKey')
-    const secretKey = this.configService.get<string>('binanceSecretKey')
+    const apiKey = this.configService.get<string>('binanceApiKey');
+    const secretKey = this.configService.get<string>('binanceSecretKey');
     if (apiKey && secretKey) {
-      const baseServiceBinance = new BaseServiceBiance(apiKey, secretKey)
-      this.client = baseServiceBinance
+      const baseServiceBinance = new BaseServiceBiance(apiKey, secretKey);
+      this.client = baseServiceBinance;
     } else {
       console.log('api key do not exist');
     }
@@ -354,8 +354,10 @@ export class DataCenterService {
 
   async syncBalances() {
     try {
-      const res = await this.client.getAccountInfo()
-      const balances = get(res, 'balances', []).filter(item => Number(item.free) !== 0)
+      const res = await this.client.getAccountInfo();
+      const balances = get(res, 'balances', []).filter(
+        (item) => Number(item.free) !== 0,
+      );
 
       const sql = `TRUNCATE TABLE balances`;
       const TRUNCATE_TABLE = await this.coninRepo.query(sql);
@@ -369,7 +371,6 @@ export class DataCenterService {
   }
 
   async futuresTest() {
-
     // futuresAccountInfo
     /*
     [{
@@ -391,8 +392,8 @@ export class DataCenterService {
     */
     // const info = await this.client.futuresAccountInfo()
 
-    // 
-    const info = await this.client.futuresOpenOrders()
+    //
+    const info = await this.client.futuresOpenOrders();
     return { code: 200, message: 'ok', data: info };
   }
 }
