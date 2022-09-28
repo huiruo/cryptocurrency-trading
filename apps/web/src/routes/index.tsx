@@ -15,6 +15,7 @@ import { AddCode } from '@/pages/coin-data/add-code';
 import { CoinInfo } from '@/pages/coin-data/coinInfo';
 import { CoinList } from '@/pages/coin-data/coinList';
 import { Balances } from '@/pages/trade/balances';
+import { FutureOrders } from '@/pages/trade/future-orders';
 
 const routesConfig = [
 	{
@@ -53,6 +54,10 @@ const routesConfig = [
 	{
 		path: 'trade/balances',
 		element: <Balances />,
+	},
+	{
+		path: 'trade/futureOrder',
+		element: <FutureOrders />,
 	},
 	// == trade end== 
 ]

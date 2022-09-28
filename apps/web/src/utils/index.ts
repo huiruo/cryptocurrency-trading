@@ -12,7 +12,6 @@ class DateFormatOption {
   "S+": number;//毫秒
 }
 export function formatUnixTime(val: any, fmt = 'yyyy-MM-dd hh:mm:ss') {
-
   const date = new Date(val);
   /*
   let date = null

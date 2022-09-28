@@ -53,9 +53,21 @@ export class DataCenterController {
   }
   // =========== Balances test ===========
 
-  @Get('futuresTest')
-  async futuresTest(): Promise<Result> {
+  @Get('syncFutureOrder')
+  async futuresAllOrders(): Promise<Result> {
 
-    return await this.DataCenterService.futuresTest()
+    return await this.DataCenterService.futuresAllOrders()
+  }
+
+  @Post('futureOrders')
+  async getFuturesOrders(@Body() page: Page): Promise<Result> {
+
+    return await this.DataCenterService.getFutureOrders(page.currentPage, page.pageSize)
+  }
+
+  @Get('futuresBatchOrders')
+  async futuresBatchOrders(): Promise<Result> {
+
+    return await this.DataCenterService.futuresBatchOrders()
   }
 }

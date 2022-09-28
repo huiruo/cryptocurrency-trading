@@ -13,6 +13,8 @@ import { DayKline } from './day.kline.entity';
 import { CoinDevMember } from './coin.member.entity';
 import { BaseServiceBiance } from 'src/utils/base-service-biance';
 import { Balances } from './balances.entity';
+import { FuturesOrder } from './futures-order.entity';
+import { QueryFuturesOrderResult } from 'binance-api-node';
 
 @Injectable()
 export class DataCenterService {
@@ -37,6 +39,9 @@ export class DataCenterService {
 
     @InjectRepository(Balances)
     private readonly balancesRepo: Repository<Balances>,
+
+    @InjectRepository(FuturesOrder)
+    private readonly futuresOrderRepo: Repository<FuturesOrder>,
   ) {
     this.initBinanceApi();
   }
@@ -59,9 +64,8 @@ export class DataCenterService {
   }
 
   async getCoin(currentPage: number, pageSize: number): Promise<Result> {
-    const sql = `select * from coin order by ranked asc limit ${
-      (currentPage - 1) * pageSize
-    },${pageSize}`;
+    const sql = `select * from coin order by ranked asc limit ${(currentPage - 1) * pageSize
+      },${pageSize}`;
 
     return await this.coninRepo.query(sql);
   }
@@ -370,7 +374,25 @@ export class DataCenterService {
     }
   }
 
-  async futuresTest() {
+  async savefutureOrderUtil(order: FuturesOrder) {
+    await this.futuresOrderRepo.save(order);
+  }
+
+  async getFutureOrders(currentPage: number, pageSize: number) {
+    const sql = `select * from futures_order order by updateTime desc limit ${(currentPage - 1) * pageSize
+      },${pageSize}`;
+
+    const res = await this.futuresOrderRepo.query(sql);
+    return { code: 200, message: 'ok', data: res };
+  }
+
+  async findFutureOrderUtil(orderId: number): Promise<FuturesOrder> {
+    const sql = `select symbol,orderId from futures_order where orderId='${orderId}'`;
+    const futureOrder = await this.futuresOrderRepo.query(sql);
+    return get(futureOrder, '[0]', {});
+  }
+
+  async futuresAllOrders() {
     // futuresAccountInfo
     /*
     [{
@@ -392,8 +414,27 @@ export class DataCenterService {
     */
     // const info = await this.client.futuresAccountInfo()
 
-    //
-    const info = await this.client.futuresOpenOrders();
+    const info = await this.client.futuresAllOrders();
+    if (Array.isArray(info)) {
+      info.forEach(async item => {
+        const { orderId } = item
+        const existFutureOrder = await this.findFutureOrderUtil(orderId)
+        if (isEmpty(existFutureOrder)) {
+          console.log('== not exist FutureOrder,insert...', item);
+          await this.savefutureOrderUtil(item)
+        } else {
+          console.log('== exist FutureOrder,skip... ==');
+        }
+
+      })
+    }
+
+    return { code: 200, message: 'ok', data: info };
+  }
+
+  async futuresBatchOrders() {
+    const info = await this.client.futuresBatchOrders();
+
     return { code: 200, message: 'ok', data: info };
   }
 }

@@ -112,6 +112,16 @@ const traderApi = {
 		const url: string = `${traderApiUrl}/data/center/balances`;
 		return http.get<resType>({}, url);
 	},
+
+	syncFutureOrderApi() {
+		const url: string = `${traderApiUrl}/data/center/syncFutureOrder`;
+		return http.get<resType>({}, url);
+	},
+
+	futureOrdersApi(data: any) {
+		const url: string = `${traderApiUrl}/data/center/futureOrders`;
+		return http.post<resType>(data, url);
+	},
 }
 
 export default traderApi;

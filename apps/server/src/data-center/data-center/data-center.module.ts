@@ -8,9 +8,19 @@ import { CoinAddition } from './coin.addition.entity';
 import { DayKline } from './day.kline.entity';
 import { CoinDevMember } from './coin.member.entity';
 import { Balances } from './balances.entity';
+import { FuturesOrder } from './futures-order.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([CoinCode, Coin, CoinAddition, DayKline, CoinDevMember, Balances])],
+  imports: [TypeOrmModule.forFeature(
+    [
+      CoinCode,
+      Coin,
+      CoinAddition,
+      DayKline,
+      CoinDevMember,
+      Balances,
+      FuturesOrder
+    ])],
   controllers: [DataCenterController],
   providers: [DataCenterService],
 })

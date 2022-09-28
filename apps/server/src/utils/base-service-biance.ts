@@ -32,7 +32,7 @@ export class BaseServiceBiance {
     }
   }
 
-  async futuresOpenOrders() {
+  async futuresAllOrders() {
     try {
       /*
       return await this.client.futuresOpenOrders({
@@ -47,9 +47,17 @@ export class BaseServiceBiance {
       */
       return await this.client.futuresAllOrders({
         symbol: 'BTCUSDT',
+        // recvWindow: 1000 * 10,
+        recvWindow: 59999,
+        // limit: 10,
+        // orderId: 2850048922,
+        // startTime: 1663084800000,
+        // endTime: 1664294399999,
       });
     } catch (error) {
-      throw new Error('apiKey and secretKey are invalid');
+      console.log('error', error);
+
+      throw new Error('futuresAllOrders error');
     }
   }
 
@@ -57,7 +65,8 @@ export class BaseServiceBiance {
     try {
       return await this.client.futuresBatchOrders({ batchOrders: [] });
     } catch (error) {
-      throw new Error('apiKey and secretKey are invalid');
+      console.log('error:', error);
+      throw new Error('futuresBatchOrders error');
     }
   }
 
