@@ -24,6 +24,45 @@ export class BaseServiceBiance {
     }
   }
 
+  /*
+  Get trades for the current authenticated account and symbol.
+  */
+  async myTrades(options: any) {
+    try {
+      return await this.client.myTrades(
+        options
+      );
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  /*
+  Get all open orders on a symbol.
+  */
+  async openOrders(options: any) {
+    try {
+      return await this.client.openOrders(
+        options
+      );
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  /*
+  Get all account orders on a symbol; active, canceled, or filled.
+  */
+  async allOrders(options: any) {
+    try {
+      return await this.client.allOrders(
+        options
+      );
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
   async futuresAccountInfo() {
     try {
       return await this.client.futuresAccountInfo({ recvWindow: 1000 * 10 });
@@ -47,12 +86,7 @@ export class BaseServiceBiance {
       */
       return await this.client.futuresAllOrders({
         symbol: 'BTCUSDT',
-        // recvWindow: 1000 * 10,
         recvWindow: 59999,
-        // limit: 10,
-        // orderId: 2850048922,
-        // startTime: 1663084800000,
-        // endTime: 1664294399999,
       });
     } catch (error) {
       console.log('error', error);

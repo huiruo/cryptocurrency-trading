@@ -15,6 +15,7 @@ import { BaseServiceBiance } from 'src/utils/base-service-biance';
 import { Balances } from './balances.entity';
 import { FuturesOrder } from './futures-order.entity';
 import { QueryFuturesOrderResult } from 'binance-api-node';
+import { SpotOrder } from './spot-order.entity';
 
 @Injectable()
 export class DataCenterService {
@@ -42,8 +43,22 @@ export class DataCenterService {
 
     @InjectRepository(FuturesOrder)
     private readonly futuresOrderRepo: Repository<FuturesOrder>,
+
+    @InjectRepository(SpotOrder)
+    private readonly SpotOrderRepo: Repository<SpotOrder>,
   ) {
     this.initBinanceApi();
+  }
+
+  async initBinanceApi() {
+    const apiKey = this.configService.get<string>('binanceApiKey');
+    const secretKey = this.configService.get<string>('binanceSecretKey');
+    if (apiKey && secretKey) {
+      const baseServiceBinance = new BaseServiceBiance(apiKey, secretKey);
+      this.client = baseServiceBinance;
+    } else {
+      console.log('Api key do not exist');
+    }
   }
 
   async addCode(data: any): Promise<Result> {
@@ -340,20 +355,14 @@ export class DataCenterService {
     return res;
   }
 
-  async initBinanceApi() {
-    const apiKey = this.configService.get<string>('binanceApiKey');
-    const secretKey = this.configService.get<string>('binanceSecretKey');
-    if (apiKey && secretKey) {
-      const baseServiceBinance = new BaseServiceBiance(apiKey, secretKey);
-      this.client = baseServiceBinance;
-    } else {
-      console.log('api key do not exist');
-    }
-  }
-
+  // =========== Balances start ===========
   async getBalances() {
     const res = await this.balancesRepo.find();
     return { code: 200, message: 'ok', data: res };
+  }
+
+  private async saveBalancesUtil(order: FuturesOrder) {
+    await this.balancesRepo.save(order);
   }
 
   async syncBalances() {
@@ -364,18 +373,31 @@ export class DataCenterService {
       );
 
       const sql = `TRUNCATE TABLE balances`;
-      const TRUNCATE_TABLE = await this.coninRepo.query(sql);
+      await this.coninRepo.query(sql);
 
       //{asset: 'ETH', free: '0.00003934', locked: '0.00000000'}
-      const saveBalances = await this.balancesRepo.save(balances);
+      balances.forEach(async (item) => {
+        // mock userId
+        item.userId = 1
+        this.saveBalancesUtil(item)
+      })
+
       return { code: 200, message: 'ok', data: balances };
     } catch (error) {
       return { code: 500, message: 'sync balances error', data: null };
     }
   }
+  // =========== Balances end ===========
 
-  async savefutureOrderUtil(order: FuturesOrder) {
+  // =========== future start ===========
+  private async savefutureOrderUtil(order: FuturesOrder) {
     await this.futuresOrderRepo.save(order);
+  }
+
+  private async findFutureOrderUtil(orderId: number): Promise<FuturesOrder> {
+    const sql = `select symbol,orderId from futures_order where orderId='${orderId}'`;
+    const futureOrder = await this.futuresOrderRepo.query(sql);
+    return get(futureOrder, '[0]', {});
   }
 
   async getFutureOrders(currentPage: number, pageSize: number) {
@@ -386,48 +408,46 @@ export class DataCenterService {
     return { code: 200, message: 'ok', data: res };
   }
 
-  async findFutureOrderUtil(orderId: number): Promise<FuturesOrder> {
-    const sql = `select symbol,orderId from futures_order where orderId='${orderId}'`;
-    const futureOrder = await this.futuresOrderRepo.query(sql);
-    return get(futureOrder, '[0]', {});
-  }
-
   async futuresAllOrders() {
-    // futuresAccountInfo
-    /*
-    [{
-        "asset": "USDT",
-        "walletBalance": "762.40744601",
-        "unrealizedProfit": "-37.09661096",
-        "marginBalance": "725.31083505",
-        "maintMargin": "5.95196795",
-        "initialMargin": "743.99599451",
-        "positionInitialMargin": "743.99599451",
-        "openOrderInitialMargin": "0.00000000",
-        "maxWithdrawAmount": "0.82715543",
-        "crossWalletBalance": "0.82715543",
-        "crossUnPnl": "0.00000000",
-        "availableBalance": "0.82715543",
-        "marginAvailable": true,
-        "updateTime": 1664121600397
-    },]
-    */
-    // const info = await this.client.futuresAccountInfo()
-
     const info = await this.client.futuresAllOrders();
     if (Array.isArray(info)) {
       info.forEach(async item => {
         const { orderId } = item
+        // mock userId
+        item.userId = 1
         const existFutureOrder = await this.findFutureOrderUtil(orderId)
         if (isEmpty(existFutureOrder)) {
-          console.log('== not exist FutureOrder,insert...', item);
+          console.log('== not exist FutureOrder,insert...');
           await this.savefutureOrderUtil(item)
         } else {
           console.log('== exist FutureOrder,skip... ==');
         }
-
       })
     }
+
+    return { code: 200, message: 'ok', data: info };
+  }
+
+  /*
+  [{
+      "asset": "USDT",
+      "walletBalance": "762.40744601",
+      "unrealizedProfit": "-37.09661096",
+      "marginBalance": "725.31083505",
+      "maintMargin": "5.95196795",
+      "initialMargin": "743.99599451",
+      "positionInitialMargin": "743.99599451",
+      "openOrderInitialMargin": "0.00000000",
+      "maxWithdrawAmount": "0.82715543",
+      "crossWalletBalance": "0.82715543",
+      "crossUnPnl": "0.00000000",
+      "availableBalance": "0.82715543",
+      "marginAvailable": true,
+      "updateTime": 1664121600397
+  },]
+  */
+  async futuresAccountInfo() {
+    const info = await this.client.futuresAccountInfo()
 
     return { code: 200, message: 'ok', data: info };
   }
@@ -437,4 +457,63 @@ export class DataCenterService {
 
     return { code: 200, message: 'ok', data: info };
   }
+  // =========== future end =========== 
+
+  // =========== spot start ===========
+  private async savaSpotOrderUtil(spotOrder: SpotOrder) {
+    await this.SpotOrderRepo.save(spotOrder);
+  }
+
+  private async findSpotOrderUtil(orderId: number): Promise<FuturesOrder> {
+    const sql = `select symbol,orderId from spot_order where orderId='${orderId}'`;
+    const futureOrder = await this.SpotOrderRepo.query(sql);
+    return get(futureOrder, '[0]', {});
+  }
+
+  async getSpotOrder() {
+    const info: any = await this.client.myTrades(
+      {
+        symbol: 'BTCUSDT',
+        // endTime: 1664467199999,
+        // startTime: 1662566400000,
+      }
+    );
+    console.log('=== spot order ====', info.length);
+
+    info.forEach(async (item) => {
+      const { orderId } = item as any
+      // mock userId
+      item.userId = 1
+      const existSpotOrder = await this.findSpotOrderUtil(orderId)
+      if (isEmpty(existSpotOrder)) {
+        console.log('== not exist spotOrder,insert...');
+        this.savaSpotOrderUtil(item)
+      } else {
+        console.log('== exist spotOrder,skip... ==');
+      }
+    })
+
+    return { code: 200, message: 'ok', data: null };
+  }
+
+  async getSpotAllOrders() {
+    const info = await this.client.allOrders(
+      {
+        symbol: 'BTCUSDT',
+        // endTime: 1664467199999,
+        // startTime: 1662566400000,
+      }
+    );
+
+    return { code: 200, message: 'ok', data: info };
+  }
+
+  async getSpotOpenOrders() {
+    const info = await this.client.openOrders(
+      { symbol: 'BTCUSDT', }
+    );
+
+    return { code: 200, message: 'ok', data: info };
+  }
+  // =========== spot end ===========
 }

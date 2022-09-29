@@ -9,6 +9,7 @@ import { DayKline } from './day.kline.entity';
 import { CoinDevMember } from './coin.member.entity';
 import { Balances } from './balances.entity';
 import { FuturesOrder } from './futures-order.entity';
+import { SpotOrder } from './spot-order.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature(
@@ -19,7 +20,8 @@ import { FuturesOrder } from './futures-order.entity';
       DayKline,
       CoinDevMember,
       Balances,
-      FuturesOrder
+      FuturesOrder,
+      SpotOrder
     ])],
   controllers: [DataCenterController],
   providers: [DataCenterService],

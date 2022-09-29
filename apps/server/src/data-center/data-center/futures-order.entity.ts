@@ -2,6 +2,8 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 @Entity('futures_order')
 export class FuturesOrder {
   @PrimaryGeneratedColumn({ comment: 'ID', }) id?: number;
+  @Column({ comment: 'userId', }) userId: number;
+  @Column({ comment: 'strategyId', }) strategyId?: string;
   @Column({ comment: 'orderId', }) orderId: number;
   @Column({ comment: 'symbol', }) symbol: string;
   @Column({ comment: 'status', }) status: string;
@@ -25,5 +27,8 @@ export class FuturesOrder {
   @Column({ comment: 'priceProtect', }) priceProtect: boolean;
   @Column({ comment: 'origType', }) origType: string;
   @Column({ comment: 'time', }) time: number;
-  @Column('bigint', { comment: 'updateTime', }) updateTime: number;
+  // @Column('bigint', { comment: 'updateTime', }) updateTime: number;
+  @Column('bigint', { comment: 'updateTime', }) updateTime?: number;
+  @Column('bigint', { comment: 'updatedAt', }) updatedAt?: number;
+  @Column('bigint', { comment: 'createdAt', }) createdAt?: number;
 }

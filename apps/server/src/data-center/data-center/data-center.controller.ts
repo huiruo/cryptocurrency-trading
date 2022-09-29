@@ -41,7 +41,7 @@ export class DataCenterController {
   }
 
 
-  // =========== Balances test ===========
+  // =========== Balances start ===========
   @Get('syncBalances')
   async syncAccountInfo(): Promise<Result> {
     return await this.DataCenterService.syncBalances()
@@ -51,8 +51,9 @@ export class DataCenterController {
   async getAccountInfo(): Promise<Result> {
     return await this.DataCenterService.getBalances()
   }
-  // =========== Balances test ===========
+  // =========== Balances end ===========
 
+  // =========== future start ===========
   @Get('syncFutureOrder')
   async futuresAllOrders(): Promise<Result> {
 
@@ -70,4 +71,25 @@ export class DataCenterController {
 
     return await this.DataCenterService.futuresBatchOrders()
   }
+  // =========== future end ===========
+
+  // =========== spot start ===========
+  @Get('spotOrder')
+  async getSpotOrder(): Promise<Result> {
+
+    return await this.DataCenterService.getSpotOrder()
+  }
+
+  @Get('spotOpenOrders')
+  async getSpotOpenOrders(): Promise<Result> {
+
+    return await this.DataCenterService.getSpotOpenOrders()
+  }
+
+  @Get('spotAllOrders')
+  async getSpotAllOrders(): Promise<Result> {
+
+    return await this.DataCenterService.getSpotAllOrders()
+  }
+  // =========== spot end ===========
 }
