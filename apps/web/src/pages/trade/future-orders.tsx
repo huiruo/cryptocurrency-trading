@@ -3,6 +3,9 @@ import traderApi from '@/services/traderApi';
 import { Table } from '@/components/Table/Table';
 import { Button } from '@/components/Button';
 import { formatUnixTime } from '@/utils';
+import { useDocumentTitle } from '@/utils/useDocumentTitle';
+import Header from '@/components/Header';
+import { Box } from '@fower/react';
 
 /**
  * CODE ANNOTATION
@@ -11,6 +14,8 @@ export function FutureOrders() {
 
   const [currentPage, setCurrentPage] = useState(1)
   const [futureOrders, setFutureOrders] = useState<any>([])
+
+  useDocumentTitle("future order");
 
   const getFutureOrders = async (currentPage: number, pageSize?: number) => {
     const data = {
@@ -57,6 +62,12 @@ export function FutureOrders() {
         return <span>{formatUnixTime(Number(item.updateTime))}</span>
       },
     },
+    {
+      id: 'createdAt', title: 'createdAt', dataIndex: '', key: 'createdAt', width: 100,
+      render(item: any) {
+        return <span>{formatUnixTime(item.createdAt)}</span>
+      },
+    },
     { id: 'clientOrderId', title: 'clientOrderId', dataIndex: 'clientOrderId', key: 'clientOrderId', width: 100 },
     { id: 'executedQty', title: 'executedQty', dataIndex: 'executedQty', key: 'executedQty', width: 100 },
     { id: 'timeInForce', title: 'timeInForce', dataIndex: 'timeInForce', key: 'timeInForce', width: 100 },
@@ -85,12 +96,23 @@ export function FutureOrders() {
   ]
 
 
-  return <div>
-    <div>
-      <Button onClick={() => onSyncFutureOrder()} mr4>Sync future orders</Button>
-    </div>
-    <div>
-      <Table columns={columns} data={futureOrders} />
-    </div>
-  </div>;
+  return (
+    <>
+      <Header />
+
+      <Box pb='50px' mt='20px'>
+        <Box toCenterX mb='20px'>
+          <Box w='90%'>
+            <Button onClick={() => onSyncFutureOrder()} mr4>Sync future orders</Button>
+          </Box>
+        </Box>
+
+        <Box toCenterX>
+          <Box className='table-box-container'>
+            <Table columns={columns} data={futureOrders} className='table-box' />
+          </Box>
+        </Box>
+      </Box>
+    </>
+  );
 }

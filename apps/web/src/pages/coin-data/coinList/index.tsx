@@ -5,6 +5,8 @@ import { Button } from '@/components/Button';
 import { Box } from '@fower/react';
 import { Input } from '@/components/Input';
 import { Table } from '@/components/Table/Table';
+import Header from '@/components/Header';
+import { useDocumentTitle } from '@/utils/useDocumentTitle';
 
 interface Props {
   test: React.ReactNode
@@ -18,6 +20,8 @@ export function CoinList() {
   const [coinData, setCoinData] = useState<any>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [searchSymbol, setSearchSymbol] = useState<string>('')
+
+  useDocumentTitle("coin list");
 
   const onDetail = async (item: any) => {
     console.log('onDetail', item);
@@ -61,6 +65,7 @@ export function CoinList() {
       title: 'Operations',
       dataIndex: '',
       key: 'd',
+      width: 200,
       render(item: any) {
         return (
           <>
@@ -99,23 +104,36 @@ export function CoinList() {
     getCoin(1)
   }, [])
 
-  return <div>
+  return (
+    <>
+      <Header />
 
-    <Box flex pt8 pb8>
-      <Box flex w='400px'>
-        <Input
-          placeholder="Seach coin"
-          value={searchSymbol}
-          onChange={(e) => setSearchSymbol(e.target.value)}
-        />
-        <Button ml2 onClick={onSearch}>Search</Button>
+      <Box pb='50px' mt='20px'>
+        <Box toCenterX mb='20px'>
+          <Box w='90%'>
+            <Box flex w='400px'>
+              <Input
+                placeholder="Seach coin"
+                value={searchSymbol}
+                onChange={(e) => setSearchSymbol(e.target.value)}
+              />
+              <Button ml2 onClick={onSearch}>Search</Button>
+            </Box>
+          </Box>
+        </Box>
+
+        <Box toCenterX>
+          <Box className='table-box-container'>
+            <Table columns={columns} data={coinData} className='table-box' />
+          </Box>
+        </Box>
+
+        <Box toCenterX mt='20px' mb='20px'>
+          <Box w='90%'>
+            <Button onClick={onPrePage}>上一页</Button>  当前页：{currentPage} <Button onClick={onNextPage}>下一页</Button>
+          </Box>
+        </Box>
       </Box>
-    </Box>
-    <div>
-      <Table columns={columns} data={coinData} />
-    </div>
-    <Box pt8 pb8>
-      <Button onClick={onPrePage}>上一页</Button>  当前页：{currentPage} <Button onClick={onNextPage}>下一页</Button>
-    </Box>
-  </div>;
+    </>
+  );
 }

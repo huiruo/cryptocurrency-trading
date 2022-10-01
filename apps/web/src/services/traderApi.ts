@@ -122,6 +122,16 @@ const traderApi = {
 		const url: string = `${traderApiUrl}/data/center/futureOrders`;
 		return http.post<resType>(data, url);
 	},
+
+	syncSpotOrderApi() {
+		const url: string = `${traderApiUrl}/data/center/syncSpotOrder`;
+		return http.get<resType>({}, url);
+	},
+
+	spotOrdersApi(data: any) {
+		const url: string = `${traderApiUrl}/data/center/spotOrders`;
+		return http.post<resType>(data, url);
+	},
 }
 
 export default traderApi;

@@ -4,6 +4,7 @@ import { Input } from '@/components/Input';
 import { Button } from '@/components/Button';
 import traderApi from '@/services/traderApi';
 import SymbolList from './symbol-list';
+import { useDocumentTitle } from '@/utils/useDocumentTitle';
 
 /**
  * add symbol form server
@@ -11,6 +12,8 @@ import SymbolList from './symbol-list';
 export function AddCode() {
   const [code, setCode] = useState('')
   const [symbol, setSymbol] = useState('')
+
+  useDocumentTitle("add code");
 
   const onAdd = async () => {
     /*

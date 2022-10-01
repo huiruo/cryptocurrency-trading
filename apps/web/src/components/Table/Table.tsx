@@ -5,9 +5,10 @@ interface Props {
   rowKey?: string
   columns: any[]
   data: any
+  className?: string
 }
 
-export const Table = ({ columns, data, rowKey = 'id' }: Props) => {
+export const Table = ({ columns, data, rowKey = 'id', className: classNames }: Props) => {
   return (
     <RcTable
       columns={columns}
@@ -45,6 +46,7 @@ export const Table = ({ columns, data, rowKey = 'id' }: Props) => {
           ),
         },
       }}
+      className={classNames}
     />
   )
 }

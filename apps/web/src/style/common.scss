@@ -86,3 +86,14 @@
     float: left
   }
 }
+
+.table-box-container {
+  width: 90%;
+  border: 1px solid rgba(0, 0, 0, .06);
+  padding: 20px 20px 30px;
+}
+
+.table-box {
+  width: 100%;
+  overflow: auto;
+}

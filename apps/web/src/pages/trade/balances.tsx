@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import traderApi from '@/services/traderApi';
 import { Table } from '@/components/Table/Table';
+import { useDocumentTitle } from "@/utils/useDocumentTitle"
 import { Button } from '@/components/Button';
 import { formatUnixTime } from '@/utils';
+import Header from '@/components/Header';
+import { Box } from '@fower/react';
 
 /**
  * CODE ANNOTATION
@@ -10,6 +13,8 @@ import { formatUnixTime } from '@/utils';
 export function Balances() {
 
   const [balances, setBalances] = useState<any>([])
+
+  useDocumentTitle("balances order");
 
   const getBalances = async () => {
     const res = await traderApi.balancesApi()
@@ -37,9 +42,15 @@ export function Balances() {
     { id: 'free', title: 'free', dataIndex: 'free', key: 'free', width: 100 },
     { id: 'locked', title: 'locked', dataIndex: 'locked', key: 'locked', width: 100 },
     {
-      id: 'updateTime', title: 'updateTime', dataIndex: '', key: 'updateTime', width: 100,
+      id: 'updatedAt', title: 'updatedAt', dataIndex: '', key: 'updatedAt', width: 100,
       render(item: any) {
-        return <span>{formatUnixTime(item.updateTime)}</span>
+        return <span>{formatUnixTime(item.updatedAt)}</span>
+      },
+    },
+    {
+      id: 'createdAt', title: 'createdAt', dataIndex: '', key: 'createdAt', width: 50,
+      render(item: any) {
+        return <span>{formatUnixTime(item.createdAt)}</span>
       },
     },
   ]
@@ -48,12 +59,23 @@ export function Balances() {
     getBalances()
   }, [])
 
-  return <div>
-    <div>
-      <Button onClick={() => onSyncBalances()} mr4>Sync balances</Button>
-    </div>
-    <div>
-      <Table columns={columns} data={balances} />
-    </div>
-  </div>;
+  return (
+    <>
+      <Header />
+
+      <Box pb='50px' mt='20px'>
+        <Box toCenterX mb='20px'>
+          <Box w='90%'>
+            <Button onClick={() => onSyncBalances()} mr4>Sync balances</Button>
+          </Box>
+        </Box>
+
+        <Box toCenterX>
+          <Box className='table-box-container'>
+            <Table columns={columns} data={balances} className='table-box' />
+          </Box>
+        </Box>
+      </Box>
+    </>
+  );
 }

@@ -1,13 +1,12 @@
 import React from 'react';
-
-interface Props {
-  test: React.ReactNode
-}
+import { useDocumentTitle } from '@/utils/useDocumentTitle';
 
 /**
  * CODE ANNOTATION
  */
 export function CoinInfo() {
+
+  useDocumentTitle("coin info");
 
   return <div>CoinInfo</div>;
 }
