@@ -470,7 +470,15 @@ export class DataCenterService {
     return get(futureOrder, '[0]', {});
   }
 
-  async getSpotOrder() {
+  async getSpotOrder(currentPage: number, pageSize: number) {
+    const sql = `select * from spot_order order by time desc limit ${(currentPage - 1) * pageSize
+      },${pageSize}`;
+
+    const res = await this.SpotOrderRepo.query(sql);
+    return { code: 200, message: 'ok', data: res };
+  }
+
+  async syncSpotOrder() {
     const info: any = await this.client.myTrades(
       {
         symbol: 'BTCUSDT',

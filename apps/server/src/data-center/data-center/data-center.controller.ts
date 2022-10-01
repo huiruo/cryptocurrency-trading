@@ -74,10 +74,16 @@ export class DataCenterController {
   // =========== future end ===========
 
   // =========== spot start ===========
-  @Get('spotOrder')
-  async getSpotOrder(): Promise<Result> {
+  @Post('spotOrders')
+  async getSpotOrder(@Body() page: Page): Promise<Result> {
 
-    return await this.DataCenterService.getSpotOrder()
+    return await this.DataCenterService.getSpotOrder(page.currentPage, page.pageSize)
+  }
+
+  @Get('syncSpotOrder')
+  async syncSpotOrder(): Promise<Result> {
+
+    return await this.DataCenterService.syncSpotOrder()
   }
 
   @Get('spotOpenOrders')
