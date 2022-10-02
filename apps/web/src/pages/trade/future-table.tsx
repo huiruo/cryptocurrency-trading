@@ -1,53 +1,46 @@
-import React, { useEffect, useState } from 'react';
-import traderApi from '@/services/traderApi';
-import { Table } from '@/components/Table/Table';
-import { Button } from '@/components/Button';
-import { formatUnixTime } from '@/utils';
-import { useDocumentTitle } from '@/utils/useDocumentTitle';
-import Header from '@/components/Header';
+import React, { useState } from 'react';
 import { Box } from '@fower/react';
-import { FutureTable } from './future-table';
+import { Table } from '@/components/Table/Table';
+import { formatUnixTime } from '@/utils';
+import { Checkbox } from '@/components/checkbox';
+
+interface Props {
+  data: any
+}
 
 /**
- * CODE ANNOTATION
+ * Code annotation
  */
-export function FutureOrders() {
+export function FutureTable(props: Props) {
+  const { data } = props
+  const [selectRows, setSelectRows] = useState<number[]>([])
 
-  const [currentPage, setCurrentPage] = useState(1)
-  const [futureOrders, setFutureOrders] = useState<any>([])
+  const onSelectChange = (index: number, checked: boolean, keySet?: any) => {
+    const arrIndex = selectRows.findIndex(i => {
+      return i === index;
+    });
 
-  useDocumentTitle("future order");
-
-  const getFutureOrders = async (currentPage: number, pageSize?: number) => {
-    const data = {
-      currentPage: currentPage || 1,
-      pageSize: pageSize || 10
-    }
-    const res = await traderApi.futureOrdersApi(data)
-    if (res.code === 200) {
-
-      setFutureOrders(res.data)
+    if (checked) {
+      selectRows.splice(arrIndex, 1)
     } else {
-      console.log("get future orders error")
+      selectRows.push(index)
     }
+    setSelectRows([...selectRows])
   }
-
-  const onSyncFutureOrder = async () => {
-    const res = await traderApi.syncFutureOrderApi()
-    if (res.code === 200) {
-      console.log('success');
-
-      // setFutureOrders(res.data)
-    } else {
-      console.log("get future orders error")
-    }
-  }
-
-  useEffect(() => {
-    getFutureOrders(1)
-  }, [])
 
   const columns = [
+    {
+      title: 'Select',
+      dataIndex: '',
+      key: '',
+      width: 200,
+      render(_item: any, _e: any, index: number) {
+        const checked = selectRows.includes(index)
+        return (
+          <Checkbox checked={checked} onChange={() => onSelectChange(index, checked)} />
+        )
+      },
+    },
     { id: 'orderId', title: 'orderId', dataIndex: 'orderId', key: 'orderId', width: 100 },
     { id: 'symbol', title: 'symbol', dataIndex: 'symbol', key: 'symbol', width: 100 },
     { id: 'status', title: 'status', dataIndex: 'status', key: 'status', width: 100 },
@@ -96,20 +89,13 @@ export function FutureOrders() {
     { id: 'origType', title: 'origType', dataIndex: 'origType', key: 'origType', width: 100 },
   ]
 
+  console.log('se；', selectRows);
 
   return (
-    <>
-      <Header />
-
-      <Box pb='50px' mt='20px'>
-        <Box toCenterX mb='20px'>
-          <Box w='90%'>
-            <Button onClick={() => onSyncFutureOrder()} mr4>Sync future orders</Button>
-          </Box>
-        </Box>
-
-        <FutureTable data={futureOrders} />
+    <Box toCenterX>
+      <Box className='table-box-container'>
+        <Table columns={columns} data={data} className='table-box' />
       </Box>
-    </>
+    </Box>
   );
 }

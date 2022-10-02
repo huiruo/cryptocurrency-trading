@@ -11,11 +11,11 @@ const Header = () => {
         <ul className='ul'>
 
           <li className='li'>
-            <NavLink to="/" className={pathname === '/' ? 'nav-active' : ''}>首页</NavLink>
+            <NavLink to="/" className={pathname === '/' ? 'nav-active' : ''}>Home</NavLink>
           </li>
 
           <li className='li'>
-            <NavLink to="/strategy" className={pathname === '/strategy' ? 'nav-active' : ''}>策略</NavLink>
+            <NavLink to="/strategy" className={pathname === '/strategy' ? 'nav-active' : ''}>Strategy</NavLink>
           </li>
 
           <li className='li'>
@@ -27,7 +27,7 @@ const Header = () => {
           </li>
 
           <li className='li'>
-            <NavLink to="/trade/future/order" className={pathname === '/trade/future/order' ? 'nav-active' : ''}>future</NavLink>
+            <NavLink to="/trade/future/order" className={pathname === '/trade/future/order' ? 'nav-active' : ''}>Future</NavLink>
           </li>
 
           <li className='li'>

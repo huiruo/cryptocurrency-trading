@@ -12,10 +12,7 @@ class DateFormatOption {
   "S+": number;//毫秒
 }
 export function formatUnixTime(val: any, fmt = 'yyyy-MM-dd hh:mm:ss') {
-  console.log('val', val);
-
   const date = new Date(val);
-  console.log('date', date);
 
   /*
   let date = null
