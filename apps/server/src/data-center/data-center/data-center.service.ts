@@ -363,7 +363,7 @@ export class DataCenterService {
   }
 
   // =========== Balances start ===========
-  async getBalances() {
+  async getBalances(): Promise<Result> {
     const res = await this.balancesRepo.find();
     return { code: 200, message: 'ok', data: res };
   }
@@ -372,7 +372,7 @@ export class DataCenterService {
     await this.balancesRepo.save(order);
   }
 
-  async syncBalances() {
+  async syncBalances(): Promise<Result> {
     try {
       const res = await this.client.getAccountInfo();
       const balances = get(res, 'balances', []).filter(
@@ -407,7 +407,7 @@ export class DataCenterService {
     return get(futureOrder, '[0]', {});
   }
 
-  async getFutureOrders(currentPage: number, pageSize: number) {
+  async getFutureOrders(currentPage: number, pageSize: number): Promise<Result> {
     const sql = `select * from futures_order order by updateTime desc limit ${(currentPage - 1) * pageSize
       },${pageSize}`;
 
@@ -415,7 +415,7 @@ export class DataCenterService {
     return { code: 200, message: 'ok', data: res };
   }
 
-  async futuresAllOrders() {
+  async futuresAllOrders(): Promise<Result> {
     const info = await this.client.futuresAllOrders();
     if (Array.isArray(info)) {
       info.forEach(async item => {
@@ -453,13 +453,13 @@ export class DataCenterService {
       "updateTime": 1664121600397
   },]
   */
-  async futuresAccountInfo() {
+  async futuresAccountInfo(): Promise<Result> {
     const info = await this.client.futuresAccountInfo()
 
     return { code: 200, message: 'ok', data: info };
   }
 
-  async futuresBatchOrders() {
+  async futuresBatchOrders(): Promise<Result> {
     const info = await this.client.futuresBatchOrders();
 
     return { code: 200, message: 'ok', data: info };
@@ -477,7 +477,7 @@ export class DataCenterService {
     return get(futureOrder, '[0]', {});
   }
 
-  async getSpotOrder(currentPage: number, pageSize: number) {
+  async getSpotOrder(currentPage: number, pageSize: number): Promise<Result> {
     const sql = `select * from spot_order order by time desc limit ${(currentPage - 1) * pageSize
       },${pageSize}`;
 
@@ -485,7 +485,7 @@ export class DataCenterService {
     return { code: 200, message: 'ok', data: res };
   }
 
-  async syncSpotOrder() {
+  async syncSpotOrder(): Promise<Result> {
     const info: any = await this.client.myTrades(
       {
         symbol: 'BTCUSDT',
@@ -511,7 +511,7 @@ export class DataCenterService {
     return { code: 200, message: 'ok', data: null };
   }
 
-  async getSpotAllOrders() {
+  async getSpotAllOrders(): Promise<Result> {
     const info = await this.client.allOrders(
       {
         symbol: 'BTCUSDT',
@@ -523,7 +523,7 @@ export class DataCenterService {
     return { code: 200, message: 'ok', data: info };
   }
 
-  async getSpotOpenOrders() {
+  async getSpotOpenOrders(): Promise<Result> {
     const info = await this.client.openOrders(
       { symbol: 'BTCUSDT', }
     );
@@ -547,7 +547,7 @@ export class DataCenterService {
     await this.strategiesOrderRepo.save(strategiesOrder);
   }
 
-  async getStrategiesOrder(currentPage: number, pageSize: number) {
+  async getStrategiesOrder(currentPage: number, pageSize: number): Promise<Result> {
     const sql = `select * from strategies_order order by createdAt desc limit ${(currentPage - 1) * pageSize
       },${pageSize}`;
 
@@ -555,7 +555,7 @@ export class DataCenterService {
     return { code: 200, message: 'ok', data: res };
   }
 
-  async mergeStrategy(currentPage: number, pageSize: number) {
+  async mergeStrategy(currentPage: number, pageSize: number): Promise<Result> {
     const sql = `select * from spot_order order by time desc limit ${(currentPage - 1) * pageSize
       },${pageSize}`;
 
@@ -563,7 +563,7 @@ export class DataCenterService {
     return { code: 200, message: 'ok', data: res };
   }
 
-  async createStrategiesOrder(spotOrder: SpotOrder) {
+  async createStrategiesOrder(spotOrder: SpotOrder): Promise<Result> {
     const { orderId, userId } = spotOrder
 
     const strategyOrderId = await this.findStrategyOrderIdUtil(orderId)
@@ -577,10 +577,12 @@ export class DataCenterService {
         strategyId,
         symbol: spotOrder.symbol,
         price: '',
-        quantity: spotOrder.quoteQty,
-        profit_ratio: '',
-        cost_price: spotOrder.price,
-        profit_amount: 0,
+        qty: spotOrder.qty,
+        quoteQty: spotOrder.quoteQty,
+        profit: 0,
+        profitRate: '',
+        entryPrice: spotOrder.price,
+        sellingPrice: '',
         is_running: true,
       }
 
@@ -595,6 +597,36 @@ export class DataCenterService {
     }
 
     return { code: 200, message: 'ok', data: null };
+  }
+
+  async getSpotPrice(symbol: string): Promise<any> {
+    /*
+      { BTCUSDT: '19376.16000000' }
+    */
+    return await this.client.spotPrice(symbol)
+  }
+
+  async syncStrategyPrice(strategiesOrder: StrategiesOrder): Promise<Result> {
+    const { symbol, entryPrice, quoteQty, qty, strategyId } = strategiesOrder
+    const spotPrice = await this.getSpotPrice(symbol)
+    const price = get(spotPrice, `${symbol}`, '')
+
+    if (!price) {
+      return { code: 500, message: 'error', data: null };
+    }
+    const currentPrice = Number(price)
+    const costPriceInt = Number(entryPrice)
+    const qtyInt = Number(qty)
+    const quoteQtyInt = Number(quoteQty)
+
+    // 浮动盈亏: profit =（当天结算价－开仓价格）×持仓量×合约单位－手续费
+    const profit = (currentPrice - costPriceInt) * qtyInt
+    const profitRate = parseFloat(((profit / quoteQtyInt) * 100).toFixed(2)) + '%'
+
+    let sql = `update strategies_order set price = "${price}",profitRate = "${profitRate}",profit = "${profit}" WHERE strategyId = "${strategyId}"`;
+    const result = await this.strategyOrderIdRepo.query(sql);
+
+    return { code: 200, message: 'ok', data: result };
   }
   // =========== Strategies Order end ===========
 }

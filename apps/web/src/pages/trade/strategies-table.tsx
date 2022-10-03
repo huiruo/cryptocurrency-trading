@@ -18,7 +18,7 @@ export function StrategiesTable(props: Props) {
   const { data } = props
   const [selectRows, setSelectRows] = useState<number[]>([])
 
-  const onCreatStrategy = async () => {
+  const onSyncPrice = async () => {
     if (!selectRows.length) {
       alert('select empty')
 
@@ -33,10 +33,15 @@ export function StrategiesTable(props: Props) {
 
     const index = get(selectRows, '[0]', 0)
     const selectRow = get(data, `${[index]}`, 0)
+    if (!selectRow.is_running) {
+      alert('This strategyis closed and cannot be updated')
+
+      return
+    }
     const params = {
       ...selectRow
     }
-    const res = await traderApi.creatStrategiesApi(params)
+    const res = await traderApi.syncStrategyPriceApi(params)
     if (res.code === 200) {
 
       console.log('create success');
@@ -79,26 +84,28 @@ export function StrategiesTable(props: Props) {
       },
     },
     { id: 'symbol', title: 'symbol', dataIndex: 'symbol', key: 'symbol', width: 100 },
-    { id: 'strategyId', title: 'strategyId', dataIndex: 'strategyId', key: 'strategyId', width: 100 },
     {
       id: 'updatedAt', title: 'updatedAt', dataIndex: '', key: 'updatedAt', width: 100,
       render(item: any) {
         return <span>{formatUnixTime(item.updatedAt)}</span>
       },
     },
-    { id: 'userId', title: 'userId', dataIndex: 'userId', key: 'userId', width: 100 },
     { id: 'price', title: 'price', dataIndex: 'price', key: 'price', width: 100 },
-    { id: 'quantity', title: 'quantity', dataIndex: 'quantity', key: 'quantity', width: 100 },
-    { id: 'profit_ratio', title: 'profit_ratio', dataIndex: 'profit_ratio', key: 'profit_ratio', width: 100 },
-    { id: 'cost_price', title: 'cost_price', dataIndex: 'cost_price', key: 'cost_price', width: 100 },
-    { id: 'profit_amount', title: 'profit_amount', dataIndex: 'profit_amount', key: 'profit_amount', width: 100 },
+    { id: 'profit', title: 'profit', dataIndex: 'profit', key: 'profit', width: 100 },
+    { id: 'profitRate', title: 'profitRate', dataIndex: 'profitRate', key: 'profitRate', width: 100 },
+    { id: 'entryPrice', title: 'entryPrice', dataIndex: 'entryPrice', key: 'entryPrice', width: 100 },
+    { id: 'sellingPrice', title: 'sellingPrice', dataIndex: 'sellingPrice', key: 'sellingPrice', width: 100 },
+    { id: 'qty', title: 'qty', dataIndex: 'qty', key: 'qty', width: 100 },
+    { id: 'quoteQty', title: 'quoteQty', dataIndex: 'quoteQty', key: 'quoteQty', width: 100 },
     { id: 'is_running', title: 'is_running', dataIndex: 'is_running', key: 'is_running', width: 100 },
-    {
-      id: 'createdAt', title: 'createdAt', dataIndex: '', key: 'createdAt', width: 100,
-      render(item: any) {
-        return <span>{formatUnixTime(item.createdAt)}</span>
-      },
-    },
+    { id: 'strategyId', title: 'strategyId', dataIndex: 'strategyId', key: 'strategyId', width: 100 },
+    { id: 'userId', title: 'userId', dataIndex: 'userId', key: 'userId', width: 100 },
+    // {
+    //   id: 'createdAt', title: 'createdAt', dataIndex: '', key: 'createdAt', width: 100,
+    //   render(item: any) {
+    //     return <span>{formatUnixTime(item.createdAt)}</span>
+    //   },
+    // },
   ]
 
   return (
@@ -106,8 +113,10 @@ export function StrategiesTable(props: Props) {
       <Box className='table-box-container'>
         <Table columns={columns} data={data} className='table-box' />
 
-        <Button onClick={() => onCreatStrategy()} mr4>Creat strategy</Button>
-        <Button onClick={() => onMergeStrategy()} mr4>Merge strategy</Button>
+        <Box mt-10>
+          <Button onClick={() => onSyncPrice()} mr4>Sync price</Button>
+          <Button onClick={() => onMergeStrategy()} mr4>Merge strategy</Button>
+        </Box>
       </Box>
     </Box>
   );

@@ -19,15 +19,15 @@ const Header = () => {
           </li>
 
           <li className='li'>
-            <NavLink to="/trade/balances" className={pathname === '/trade/balances' ? 'nav-active' : ''}>Balances</NavLink>
-          </li>
-
-          <li className='li'>
             <NavLink to="/trade/spot/order" className={pathname === '/trade/spot/order' ? 'nav-active' : ''}>Spot</NavLink>
           </li>
 
           <li className='li'>
             <NavLink to="/trade/future/order" className={pathname === '/trade/future/order' ? 'nav-active' : ''}>Future</NavLink>
+          </li>
+
+          <li className='li'>
+            <NavLink to="/trade/balances" className={pathname === '/trade/balances' ? 'nav-active' : ''}>Balances</NavLink>
           </li>
 
           <li className='li'>

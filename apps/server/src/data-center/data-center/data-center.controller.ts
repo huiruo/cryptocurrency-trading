@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 // import { ConfigService } from '@nestjs/config';
 import { Result } from 'src/common/result.interface';
+import { SymbolType } from 'src/common/types';
 import { DataCenterService } from './data-center.service';
 import { SpotOrder } from './spot-order.entity';
 import { StrategiesOrder } from './strategies-order.entity';
@@ -109,8 +110,6 @@ export class DataCenterController {
   @Post('strategiesOrder')
   async getStrategiesOrder(@Body() page: Page): Promise<Result> {
 
-    console.log('getStrategiesOrder', page);
-
     return await this.DataCenterService.getStrategiesOrder(page.currentPage, page.pageSize)
   }
 
@@ -118,6 +117,16 @@ export class DataCenterController {
   async mergeStrategy(@Body() page: Page): Promise<Result> {
 
     return await this.DataCenterService.mergeStrategy(page.currentPage, page.pageSize)
+  }
+
+  @Post('symbolPrice')
+  async getSymbolPrice(@Body() params: SymbolType): Promise<any> {
+    return await this.DataCenterService.getSpotPrice(params.symbol)
+  }
+
+  @Post('strategyPrice')
+  async syncStrategyPrice(@Body() params: StrategiesOrder): Promise<any> {
+    return await this.DataCenterService.syncStrategyPrice(params)
   }
   // =========== Strategies Order end ===========
 }

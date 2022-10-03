@@ -129,8 +129,10 @@ export function SpotTable(props: Props) {
       <Box className='table-box-container'>
         <Table columns={columns} data={data} className='table-box' />
 
-        <Button onClick={() => onCreatStrategy()} mr4>Creat strategy</Button>
-        <Button onClick={() => onMergeStrategy()} mr4>Merge strategy</Button>
+        <Box mt-10>
+          <Button onClick={() => onCreatStrategy()} mr4>Creat strategy</Button>
+          <Button onClick={() => onMergeStrategy()} mr4>Merge strategy</Button>
+        </Box>
       </Box>
     </Box>
   );

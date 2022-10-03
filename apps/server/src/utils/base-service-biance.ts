@@ -104,6 +104,30 @@ export class BaseServiceBiance {
     }
   }
 
+  async spotPrice(symbol: string) {
+    try {
+      return await this.client.prices({ symbol });
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async futuresPrice(symbol: string) {
+    try {
+      return await this.client.futuresPrices();
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async candles(symbol: string) {
+    try {
+      return await this.client.candles({ symbol, interval: '1m' });
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
   async short(opt?: any) {
     return await this.exchange.short(opt);
   }

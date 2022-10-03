@@ -6,6 +6,10 @@ export interface balancesType {
   updateTime: number;
 }
 
+export interface SymbolType {
+  symbol: string;
+}
+
 export interface cryptoWalletType {
   makerCommission: number;
   takerCommission: number;

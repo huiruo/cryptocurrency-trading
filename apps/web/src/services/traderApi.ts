@@ -145,6 +145,10 @@ const traderApi = {
 		const url: string = `${traderApiUrl}/data/center/futureOrders`;
 		return http.post<resType>(data, url);
 	},
+	syncStrategyPriceApi(data: any) {
+		const url: string = `${traderApiUrl}/data/center/strategyPrice`;
+		return http.post<resType>(data, url);
+	}
 	// =========== Strategies Order end ===========
 }
 
