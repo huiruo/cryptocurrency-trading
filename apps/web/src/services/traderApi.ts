@@ -132,6 +132,20 @@ const traderApi = {
 		const url: string = `${traderApiUrl}/data/center/spotOrders`;
 		return http.post<resType>(data, url);
 	},
+	// =========== Strategies Order start ===========
+	creatStrategiesApi(data: any) {
+		const url: string = `${traderApiUrl}/data/center/createStrategies`;
+		return http.post<resType>(data, url);
+	},
+	strategiesOrderApi(data: any) {
+		const url: string = `${traderApiUrl}/data/center/strategiesOrder`;
+		return http.post<resType>(data, url);
+	},
+	mergeStrategiesApi(data: any) {
+		const url: string = `${traderApiUrl}/data/center/futureOrders`;
+		return http.post<resType>(data, url);
+	},
+	// =========== Strategies Order end ===========
 }
 
 export default traderApi;

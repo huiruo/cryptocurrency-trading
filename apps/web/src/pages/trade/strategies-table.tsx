@@ -14,7 +14,7 @@ interface Props {
 /**
  * Code annotation
  */
-export function SpotTable(props: Props) {
+export function StrategiesTable(props: Props) {
   const { data } = props
   const [selectRows, setSelectRows] = useState<number[]>([])
 
@@ -51,15 +51,6 @@ export function SpotTable(props: Props) {
   }
 
   const onSelectChange = (index: number, checked: boolean, keySet?: any) => {
-    /*
-    if (checked) {
-      keySet.delete(index);
-      setSelectRows(Array.from(keySet))
-    } else {
-      keySet.add(index);
-      setSelectRows(Array.from(keySet))
-    }
-    */
     const arrIndex = selectRows.findIndex(i => {
       return i === index;
     });
@@ -81,41 +72,27 @@ export function SpotTable(props: Props) {
       key: '',
       width: 200,
       render(_item: any, _e: any, index: number) {
-        /*
-        const keySet = new Set(selectRows);
-        const checked = keySet.has(index);
-        */
         const checked = selectRows.includes(index)
         return (
-          // <Checkbox checked={checked} onChange={() => onSelectChange(index, checked, keySet)} />
           <Checkbox checked={checked} onChange={() => onSelectChange(index, checked)} />
         )
       },
     },
-    { id: 'orderId', title: 'orderId', dataIndex: 'orderId', key: 'orderId', width: 100 },
-    { id: 'userId', title: 'userId', dataIndex: 'userId', key: 'userId', width: 100 },
     { id: 'symbol', title: 'symbol', dataIndex: 'symbol', key: 'symbol', width: 100 },
     { id: 'strategyId', title: 'strategyId', dataIndex: 'strategyId', key: 'strategyId', width: 100 },
-    { id: 'price', title: 'price', dataIndex: 'price', key: 'price', width: 100 },
-    { id: 'qty', title: 'qty', dataIndex: 'qty', key: 'qty', width: 100 },
-    { id: 'quoteQty', title: 'quoteQty', dataIndex: 'quoteQty', key: 'quoteQty', width: 100 },
-    { id: 'commission', title: 'commission', dataIndex: 'commission', key: 'commission', width: 100 },
-    { id: 'commissionAsset', title: 'commissionAsset', dataIndex: 'commissionAsset', key: 'commissionAsset' },
-    { id: 'isBuyer', title: 'isBuyer', dataIndex: 'isBuyer', key: 'isBuyer', width: 100 },
-    { id: 'isMaker', title: 'isMaker', dataIndex: 'isMaker', key: 'isMaker', width: 100 },
-    { id: 'isBestMatch', title: 'isBestMatch', dataIndex: 'isBestMatch', key: 'isBestMatch', width: 100 },
-    {
-      id: 'time', title: 'time', dataIndex: '', key: 'time', width: 100,
-      render(item: any) {
-        return <span>{formatUnixTime(Number(item.time))}</span>
-      },
-    },
     {
       id: 'updatedAt', title: 'updatedAt', dataIndex: '', key: 'updatedAt', width: 100,
       render(item: any) {
         return <span>{formatUnixTime(item.updatedAt)}</span>
       },
     },
+    { id: 'userId', title: 'userId', dataIndex: 'userId', key: 'userId', width: 100 },
+    { id: 'price', title: 'price', dataIndex: 'price', key: 'price', width: 100 },
+    { id: 'quantity', title: 'quantity', dataIndex: 'quantity', key: 'quantity', width: 100 },
+    { id: 'profit_ratio', title: 'profit_ratio', dataIndex: 'profit_ratio', key: 'profit_ratio', width: 100 },
+    { id: 'cost_price', title: 'cost_price', dataIndex: 'cost_price', key: 'cost_price', width: 100 },
+    { id: 'profit_amount', title: 'profit_amount', dataIndex: 'profit_amount', key: 'profit_amount', width: 100 },
+    { id: 'is_running', title: 'is_running', dataIndex: 'is_running', key: 'is_running', width: 100 },
     {
       id: 'createdAt', title: 'createdAt', dataIndex: '', key: 'createdAt', width: 100,
       render(item: any) {

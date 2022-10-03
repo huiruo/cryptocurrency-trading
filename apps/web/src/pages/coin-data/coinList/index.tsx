@@ -7,11 +7,12 @@ import { Input } from '@/components/Input';
 import { Table } from '@/components/Table/Table';
 import Header from '@/components/Header';
 import { useDocumentTitle } from '@/utils/useDocumentTitle';
-import { Checkbox } from '@/components/checkbox';
 
+/*
 interface Props {
   test: React.ReactNode
 }
+*/
 
 /**
  * CODE ANNOTATION

@@ -2,6 +2,8 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 // import { ConfigService } from '@nestjs/config';
 import { Result } from 'src/common/result.interface';
 import { DataCenterService } from './data-center.service';
+import { SpotOrder } from './spot-order.entity';
+import { StrategiesOrder } from './strategies-order.entity';
 
 export interface Page {
   currentPage: number
@@ -39,7 +41,6 @@ export class DataCenterController {
     const data = await this.DataCenterService.getCoin(page.currentPage, page.pageSize);
     return data;
   }
-
 
   // =========== Balances start ===========
   @Get('syncBalances')
@@ -98,4 +99,25 @@ export class DataCenterController {
     return await this.DataCenterService.getSpotAllOrders()
   }
   // =========== spot end ===========
+
+  // =========== Strategies Order start ===========
+  @Post('createStrategies')
+  async createStrategiesOrder(@Body() spotOrder: SpotOrder): Promise<Result> {
+    return await this.DataCenterService.createStrategiesOrder(spotOrder)
+  }
+
+  @Post('strategiesOrder')
+  async getStrategiesOrder(@Body() page: Page): Promise<Result> {
+
+    console.log('getStrategiesOrder', page);
+
+    return await this.DataCenterService.getStrategiesOrder(page.currentPage, page.pageSize)
+  }
+
+  @Post('createStrategies')
+  async mergeStrategy(@Body() page: Page): Promise<Result> {
+
+    return await this.DataCenterService.mergeStrategy(page.currentPage, page.pageSize)
+  }
+  // =========== Strategies Order end ===========
 }

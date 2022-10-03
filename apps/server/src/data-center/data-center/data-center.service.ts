@@ -5,7 +5,6 @@ import { get, isEmpty } from 'lodash';
 import { Result } from 'src/common/result.interface';
 import { createRequest } from 'src/binance-connector/helpers/utils';
 import { ConfigService } from '@nestjs/config';
-
 import { CoinCode } from './data-center.entity';
 import { Coin } from './coin.entity';
 import { CoinAddition } from './coin.addition.entity';
@@ -14,8 +13,10 @@ import { CoinDevMember } from './coin.member.entity';
 import { BaseServiceBiance } from 'src/utils/base-service-biance';
 import { Balances } from './balances.entity';
 import { FuturesOrder } from './futures-order.entity';
-import { QueryFuturesOrderResult } from 'binance-api-node';
 import { SpotOrder } from './spot-order.entity';
+import { StrategiesOrder } from './strategies-order.entity';
+import { nanoid } from 'nanoid';
+import { StrategyOrderId } from './strategy-orderid.entity';
 
 @Injectable()
 export class DataCenterService {
@@ -45,7 +46,13 @@ export class DataCenterService {
     private readonly futuresOrderRepo: Repository<FuturesOrder>,
 
     @InjectRepository(SpotOrder)
-    private readonly SpotOrderRepo: Repository<SpotOrder>,
+    private readonly spotOrderRepo: Repository<SpotOrder>,
+
+    @InjectRepository(StrategiesOrder)
+    private readonly strategiesOrderRepo: Repository<StrategiesOrder>,
+
+    @InjectRepository(StrategyOrderId)
+    private readonly strategyOrderIdRepo: Repository<StrategyOrderId>,
   ) {
     this.initBinanceApi();
   }
@@ -461,12 +468,12 @@ export class DataCenterService {
 
   // =========== spot start ===========
   private async savaSpotOrderUtil(spotOrder: SpotOrder) {
-    await this.SpotOrderRepo.save(spotOrder);
+    await this.spotOrderRepo.save(spotOrder);
   }
 
   private async findSpotOrderUtil(orderId: number): Promise<FuturesOrder> {
     const sql = `select symbol,orderId from spot_order where orderId='${orderId}'`;
-    const futureOrder = await this.SpotOrderRepo.query(sql);
+    const futureOrder = await this.spotOrderRepo.query(sql);
     return get(futureOrder, '[0]', {});
   }
 
@@ -474,7 +481,7 @@ export class DataCenterService {
     const sql = `select * from spot_order order by time desc limit ${(currentPage - 1) * pageSize
       },${pageSize}`;
 
-    const res = await this.SpotOrderRepo.query(sql);
+    const res = await this.spotOrderRepo.query(sql);
     return { code: 200, message: 'ok', data: res };
   }
 
@@ -524,4 +531,70 @@ export class DataCenterService {
     return { code: 200, message: 'ok', data: info };
   }
   // =========== spot end ===========
+
+  // =========== Strategies Order start ===========
+  private async saveStrategyOrderIdUtil(strategyOrderId: StrategyOrderId) {
+    await this.strategyOrderIdRepo.save(strategyOrderId);
+  }
+
+  private async findStrategyOrderIdUtil(orderId: number): Promise<StrategyOrderId> {
+    const sql = `select strategyId,orderId from strategy_orderid where orderId='${orderId}'`;
+    const strategyOrderId = await this.strategyOrderIdRepo.query(sql);
+    return strategyOrderId;
+  }
+
+  private async saveStrategiesOrderUtil(strategiesOrder: StrategiesOrder) {
+    await this.strategiesOrderRepo.save(strategiesOrder);
+  }
+
+  async getStrategiesOrder(currentPage: number, pageSize: number) {
+    const sql = `select * from strategies_order order by createdAt desc limit ${(currentPage - 1) * pageSize
+      },${pageSize}`;
+
+    const res = await this.strategiesOrderRepo.query(sql);
+    return { code: 200, message: 'ok', data: res };
+  }
+
+  async mergeStrategy(currentPage: number, pageSize: number) {
+    const sql = `select * from spot_order order by time desc limit ${(currentPage - 1) * pageSize
+      },${pageSize}`;
+
+    const res = await this.spotOrderRepo.query(sql);
+    return { code: 200, message: 'ok', data: res };
+  }
+
+  async createStrategiesOrder(spotOrder: SpotOrder) {
+    const { orderId, userId } = spotOrder
+
+    const strategyOrderId = await this.findStrategyOrderIdUtil(orderId)
+    console.log('strategyOrderId', strategyOrderId);
+
+    if (isEmpty(strategyOrderId)) {
+      console.log('== not exist strategy,insert...');
+      const strategyId = nanoid()
+      const strategiesOrder = {
+        userId: userId,
+        strategyId,
+        symbol: spotOrder.symbol,
+        price: '',
+        quantity: spotOrder.quoteQty,
+        profit_ratio: '',
+        cost_price: spotOrder.price,
+        profit_amount: 0,
+        is_running: true,
+      }
+
+      await this.saveStrategiesOrderUtil(strategiesOrder)
+      await this.saveStrategyOrderIdUtil({
+        userId,
+        strategyId,
+        orderId
+      })
+    } else {
+      console.log('== exist strategyOrderId,skip... ==');
+    }
+
+    return { code: 200, message: 'ok', data: null };
+  }
+  // =========== Strategies Order end ===========
 }

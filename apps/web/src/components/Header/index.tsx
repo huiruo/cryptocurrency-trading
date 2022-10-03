@@ -15,7 +15,7 @@ const Header = () => {
           </li>
 
           <li className='li'>
-            <NavLink to="/strategy" className={pathname === '/strategy' ? 'nav-active' : ''}>Strategy</NavLink>
+            <NavLink to="/trade/strategies" className={pathname === '/trade/strategies' ? 'nav-active' : ''}>Strategies</NavLink>
           </li>
 
           <li className='li'>

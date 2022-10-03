@@ -12,6 +12,7 @@ import { CoinList } from '@/pages/coin-data/coinList';
 import { Balances } from '@/pages/trade/balances';
 import { FutureOrders } from '@/pages/trade/future-orders';
 import { SpotOrders } from '@/pages/trade/spot-orders';
+import { Strategies } from "@/pages/trade/strategies";
 // import Account from '../pages/account/index';
 // import Strategy from '../pages/strategy/index'
 // import Detail from '../pages/detail/index';
@@ -54,6 +55,10 @@ const routesConfig = [
 	},
 	// == coin end== 
 	// == trade start== 
+	{
+		path: 'trade/strategies',
+		element: <Strategies />,
+	},
 	{
 		path: 'trade/balances',
 		element: <Balances />,

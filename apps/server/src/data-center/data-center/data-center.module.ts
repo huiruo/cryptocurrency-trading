@@ -10,6 +10,8 @@ import { CoinDevMember } from './coin.member.entity';
 import { Balances } from './balances.entity';
 import { FuturesOrder } from './futures-order.entity';
 import { SpotOrder } from './spot-order.entity';
+import { StrategiesOrder } from './strategies-order.entity';
+import { StrategyOrderId } from './strategy-orderid.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature(
@@ -21,7 +23,9 @@ import { SpotOrder } from './spot-order.entity';
       CoinDevMember,
       Balances,
       FuturesOrder,
-      SpotOrder
+      SpotOrder,
+      StrategiesOrder,
+      StrategyOrderId,
     ])],
   controllers: [DataCenterController],
   providers: [DataCenterService],

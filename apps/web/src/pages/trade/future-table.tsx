@@ -26,6 +26,8 @@ export function FutureTable(props: Props) {
       selectRows.push(index)
     }
     setSelectRows([...selectRows])
+
+    console.log('se；', selectRows);
   }
 
   const columns = [
@@ -88,8 +90,6 @@ export function FutureTable(props: Props) {
     },
     { id: 'origType', title: 'origType', dataIndex: 'origType', key: 'origType', width: 100 },
   ]
-
-  console.log('se；', selectRows);
 
   return (
     <Box toCenterX>
