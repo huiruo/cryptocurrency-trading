@@ -33,8 +33,7 @@ export function SpotOrders() {
     const res = await traderApi.syncSpotOrderApi()
     if (res.code === 200) {
       console.log('success');
-
-      // setFutureOrders(res.data)
+      getFutureOrders(1)
     } else {
       console.log("get future orders error")
     }

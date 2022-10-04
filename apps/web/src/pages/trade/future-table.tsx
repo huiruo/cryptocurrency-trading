@@ -3,9 +3,10 @@ import { Box } from '@fower/react';
 import { Table } from '@/components/Table/Table';
 import { formatUnixTime } from '@/utils';
 import { Checkbox } from '@/components/checkbox';
+import { FuturesOrder } from '@/utils/types';
 
 interface Props {
-  data: any
+  data: FuturesOrder[]
 }
 
 /**

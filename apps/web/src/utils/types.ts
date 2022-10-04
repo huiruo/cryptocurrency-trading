@@ -72,3 +72,79 @@ export interface strategyType {
   last_order_price: string,
   is_running: number
 }
+
+export interface SpotOrder {
+  id: number;
+  userId: number;
+  strategyId?: string;
+  orderId: number;
+  symbol: string;
+  price: string;
+  qty: string;
+  quoteQty: string;
+  commission: string;
+  commissionAsset: string;
+  isBuyer: boolean;
+  isMaker: boolean;
+  isBestMatch: boolean;
+  time: number;
+  updatedAt?: number;
+  createdAt?: number;
+}
+
+export interface StrategiesOrder {
+  id: number;
+  userId: number;
+  strategyId: string;
+  symbol: string;
+  price: string;
+  qty: string;
+  quoteQty: string;
+  profit: number;
+  profitRate: string;
+  entryPrice: string;
+  sellingPrice: string;
+  is_running: boolean;
+  time: number;
+  updatedAt?: number;
+  createdAt?: number;
+}
+
+export interface FuturesOrder {
+  id: number;
+  userId: number;
+  strategyId?: string;
+  orderId: number;
+  symbol: string;
+  status: string;
+  clientOrderId: string;
+  price: string;
+  avgPrice: string;
+  origQty: string;
+  executedQty: string;
+  cumQuote: string;
+  timeInForce: string;
+  type: string;
+  reduceOnly: boolean;
+  closePosition: boolean;
+  side: string;
+  positionSide: string;
+  stopPrice: string;
+  workingType: string;
+  priceProtect: boolean;
+  origType: string;
+  time: number;
+  updateTime?: number;
+  updatedAt?: number;
+  createdAt?: number;
+}
+
+export interface BalancesTypes {
+  id: number;
+  userId: number;
+  asset: string;
+  free: string;
+  locked: string;
+  updatedAt?: number;
+  createdAt?: number;
+}

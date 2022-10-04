@@ -6,16 +6,18 @@ import { Checkbox } from '@/components/checkbox';
 import { Button } from '@/components/Button';
 import traderApi from '@/services/traderApi';
 import { get } from 'lodash';
+import { StrategiesOrder } from '@/utils/types';
 
 interface Props {
-  data: any
+  data: StrategiesOrder[]
+  syncCallBack: () => void
 }
 
 /**
  * Code annotation
  */
 export function StrategiesTable(props: Props) {
-  const { data } = props
+  const { data, syncCallBack } = props
   const [selectRows, setSelectRows] = useState<number[]>([])
 
   const onSyncPrice = async () => {
@@ -45,7 +47,7 @@ export function StrategiesTable(props: Props) {
     if (res.code === 200) {
 
       console.log('create success');
-
+      syncCallBack()
     } else {
       console.log("creatStrategys error")
     }
@@ -85,7 +87,13 @@ export function StrategiesTable(props: Props) {
     },
     { id: 'symbol', title: 'symbol', dataIndex: 'symbol', key: 'symbol', width: 100 },
     {
-      id: 'updatedAt', title: 'updatedAt', dataIndex: '', key: 'updatedAt', width: 100,
+      id: 'time', title: 'time', dataIndex: '', key: 'time', width: 100,
+      render(item: any) {
+        return <span>{formatUnixTime(Number(item.time))}</span>
+      },
+    },
+    {
+      id: 'updatedAt', title: 'updated', dataIndex: '', key: 'updatedAt', width: 100,
       render(item: any) {
         return <span>{formatUnixTime(item.updatedAt)}</span>
       },

@@ -5,12 +5,13 @@ import { useDocumentTitle } from '@/utils/useDocumentTitle';
 import Header from '@/components/Header';
 import { Box } from '@fower/react';
 import { StrategiesTable } from './strategies-table';
+import { StrategiesOrder } from '@/utils/types';
 
 /**
  * CODE ANNOTATION
  */
 export function Strategies() {
-  const [strategies, setStrategies] = useState<any>([])
+  const [strategies, setStrategies] = useState<StrategiesOrder[]>([])
 
   useDocumentTitle("strategies");
 
@@ -28,15 +29,8 @@ export function Strategies() {
     }
   }
 
-  const onSyncFutureOrder = async () => {
-    const res = await traderApi.syncSpotOrderApi()
-    if (res.code === 200) {
-      console.log('success');
-
-      // setFutureOrders(res.data)
-    } else {
-      console.log("get future orders error")
-    }
+  const syncCallBack = () => {
+    getStrategies(1)
   }
 
   useEffect(() => {
@@ -50,12 +44,12 @@ export function Strategies() {
       <Box pb='50px' mt='20px'>
 
         <Box toCenterX mb='20px'>
-          <Box w='90%'>
+          {/* <Box w='90%'>
             <Button onClick={() => onSyncFutureOrder()} mr4>Sync spot orders</Button>
-          </Box>
+          </Box> */}
         </Box>
 
-        <StrategiesTable data={strategies} />
+        <StrategiesTable data={strategies} syncCallBack={syncCallBack} />
       </Box>
     </>
   );

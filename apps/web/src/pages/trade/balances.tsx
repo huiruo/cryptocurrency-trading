@@ -6,13 +6,14 @@ import { Button } from '@/components/Button';
 import { formatUnixTime } from '@/utils';
 import Header from '@/components/Header';
 import { Box } from '@fower/react';
+import { BalancesTypes } from '@/utils/types';
 
 /**
  * CODE ANNOTATION
  */
 export function Balances() {
 
-  const [balances, setBalances] = useState<any>([])
+  const [balances, setBalances] = useState<BalancesTypes[]>([])
 
   useDocumentTitle("balances order");
 
@@ -30,8 +31,7 @@ export function Balances() {
     const res = await traderApi.syncBalancesApi()
     if (res.code === 200) {
       console.log('success');
-
-      setBalances(res.data)
+      getBalances()
     } else {
       console.log("get balances error")
     }

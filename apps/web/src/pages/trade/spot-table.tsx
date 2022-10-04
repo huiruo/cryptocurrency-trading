@@ -6,9 +6,10 @@ import { Checkbox } from '@/components/checkbox';
 import { Button } from '@/components/Button';
 import traderApi from '@/services/traderApi';
 import { get } from 'lodash';
+import { SpotOrder } from '@/utils/types';
 
 interface Props {
-  data: any
+  data: SpotOrder[]
 }
 
 /**
@@ -17,6 +18,7 @@ interface Props {
 export function SpotTable(props: Props) {
   const { data } = props
   const [selectRows, setSelectRows] = useState<number[]>([])
+  const [selectRowData, setSelectRowData] = useState<SpotOrder[]>([])
 
   const onCreatStrategy = async () => {
     if (!selectRows.length) {
@@ -46,11 +48,20 @@ export function SpotTable(props: Props) {
     }
   }
 
-  const onMergeStrategy = () => {
+  const onCloseStrategy = () => {
     console.log('onMergeStrategy selectRows', selectRows);
   }
 
-  const onSelectChange = (index: number, checked: boolean, keySet?: any) => {
+  const onMergeStrategy = () => {
+    console.log('onMergeStrategy selectRows', selectRows);
+    if (!selectRows.length) {
+      alert('select empty')
+
+      return
+    }
+  }
+
+  const onSelectChange = (index: number, checked: boolean, item: SpotOrder) => {
     /*
     if (checked) {
       keySet.delete(index);
@@ -60,18 +71,26 @@ export function SpotTable(props: Props) {
       setSelectRows(Array.from(keySet))
     }
     */
-    const arrIndex = selectRows.findIndex(i => {
-      return i === index;
-    });
 
     if (checked) {
+      const { strategyId } = item
+      const arrIndex = selectRows.findIndex(i => {
+        return i === index;
+      });
+      const arrDataIndex = selectRowData.findIndex(item => {
+        return item.strategyId === strategyId;
+      });
       selectRows.splice(arrIndex, 1)
+      selectRowData.splice(arrDataIndex, 1)
     } else {
       selectRows.push(index)
+      selectRowData.push(item)
     }
     setSelectRows([...selectRows])
+    setSelectRowData([...selectRowData])
 
     console.log('se；', selectRows);
+    console.log('se；', selectRowData);
   }
 
   const columns = [
@@ -80,7 +99,7 @@ export function SpotTable(props: Props) {
       dataIndex: '',
       key: '',
       width: 200,
-      render(_item: any, _e: any, index: number) {
+      render(item: SpotOrder, _e: any, index: number) {
         /*
         const keySet = new Set(selectRows);
         const checked = keySet.has(index);
@@ -88,7 +107,7 @@ export function SpotTable(props: Props) {
         const checked = selectRows.includes(index)
         return (
           // <Checkbox checked={checked} onChange={() => onSelectChange(index, checked, keySet)} />
-          <Checkbox checked={checked} onChange={() => onSelectChange(index, checked)} />
+          <Checkbox checked={checked} onChange={() => onSelectChange(index, checked, item)} />
         )
       },
     },
@@ -132,6 +151,7 @@ export function SpotTable(props: Props) {
         <Box mt-10>
           <Button onClick={() => onCreatStrategy()} mr4>Creat strategy</Button>
           <Button onClick={() => onMergeStrategy()} mr4>Merge strategy</Button>
+          <Button onClick={() => onCloseStrategy()} mr4>Close strategy</Button>
         </Box>
       </Box>
     </Box>
