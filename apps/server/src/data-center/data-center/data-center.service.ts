@@ -17,7 +17,8 @@ import { SpotOrder } from './spot-order.entity';
 import { StrategiesOrder } from './strategies-order.entity';
 import { nanoid } from 'nanoid';
 import { StrategyOrderId } from './strategy-orderid.entity';
-import { StrategyProfit } from 'src/common/types';
+import { AssetType, StrategyProfit } from 'src/common/types';
+import { TradeAsset } from './asset.entity';
 
 @Injectable()
 export class DataCenterService {
@@ -54,6 +55,9 @@ export class DataCenterService {
 
     @InjectRepository(StrategyOrderId)
     private readonly strategyOrderIdRepo: Repository<StrategyOrderId>,
+
+    @InjectRepository(TradeAsset)
+    private readonly tradeAssetRepo: Repository<TradeAsset>,
   ) {
     this.initBinanceApi();
   }
@@ -476,6 +480,25 @@ export class DataCenterService {
     const sql = `select symbol,orderId from spot_order where orderId='${orderId}'`;
     const futureOrder = await this.spotOrderRepo.query(sql);
     return get(futureOrder, '[0]', {});
+  }
+
+  async getAsset(name: string) {
+    const sql = `select * from asset where name='${name}'`;
+    const symbolData = await this.tradeAssetRepo.query(sql);
+
+    return get(symbolData, '[0]', {});
+  }
+
+  async addAsset(asset: AssetType): Promise<Result> {
+    const { name } = asset;
+
+    const assetData = await this.getAsset(name);
+    if (isEmpty(assetData)) {
+      const res = await this.tradeAssetRepo.save(asset);
+      return { code: 200, message: 'ok', data: res };
+    } else {
+      return { code: 500, message: 'Duplicate asset', data: null };
+    }
   }
 
   async getSpotOrder(currentPage: number, pageSize: number): Promise<Result> {

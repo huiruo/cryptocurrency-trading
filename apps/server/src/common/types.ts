@@ -27,3 +27,9 @@ export interface StrategyProfit {
   profit: number
   profitRate: string
 }
+
+export interface AssetType {
+  name: string
+  symbol: string
+  code?: string
+}

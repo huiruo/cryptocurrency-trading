@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 // import { ConfigService } from '@nestjs/config';
 import { Result } from 'src/common/result.interface';
-import { SymbolType } from 'src/common/types';
+import { AssetType, SymbolType } from 'src/common/types';
 import { DataCenterService } from './data-center.service';
 import { SpotOrder } from './spot-order.entity';
 import { StrategiesOrder } from './strategies-order.entity';
@@ -76,10 +76,17 @@ export class DataCenterController {
   // =========== future end ===========
 
   // =========== spot start ===========
+  // =========== spot start ===========
   @Post('spotOrders')
   async getSpotOrder(@Body() page: Page): Promise<Result> {
 
     return await this.DataCenterService.getSpotOrder(page.currentPage, page.pageSize)
+  }
+
+  @Post('addAsset')
+  async addAsset(@Body() asset: AssetType): Promise<Result> {
+
+    return await this.DataCenterService.addAsset(asset)
   }
 
   @Get('syncSpotOrder')
@@ -109,6 +116,7 @@ export class DataCenterController {
   async closeSpotStrategy(@Body() spotOrders: SpotOrder[]): Promise<Result> {
     return await this.DataCenterService.closeSpotStrategy(spotOrders)
   }
+  // =========== spot end ===========
   // =========== spot end ===========
 
   // =========== Strategies Order start ===========
