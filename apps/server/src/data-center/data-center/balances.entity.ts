@@ -19,9 +19,4 @@ export class Balances {
   @Column({ comment: 'locked', }) locked: string;
   @Column('bigint', { comment: 'updatedAt', }) updatedAt?: number;
   @Column('bigint', { comment: 'createdAt', }) createdAt?: number;
-  // @CreateDateColumn({
-  //   type: 'int',
-  //   name: 'updateTime',
-  // })
-  // updateTime: number;
 }

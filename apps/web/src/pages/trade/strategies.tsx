@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import traderApi from '@/services/traderApi';
-import { Button } from '@/components/Button';
 import { useDocumentTitle } from '@/utils/useDocumentTitle';
 import Header from '@/components/Header';
 import { Box } from '@fower/react';

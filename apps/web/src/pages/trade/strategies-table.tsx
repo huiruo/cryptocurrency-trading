@@ -36,7 +36,7 @@ export function StrategiesTable(props: Props) {
     const index = get(selectRows, '[0]', 0)
     const selectRow = get(data, `${[index]}`, 0)
     if (!selectRow.is_running) {
-      alert('This strategyis closed and cannot be updated')
+      alert('This strategy was closed and cannot be updated')
 
       return
     }
@@ -51,10 +51,6 @@ export function StrategiesTable(props: Props) {
     } else {
       console.log("creatStrategys error")
     }
-  }
-
-  const onMergeStrategy = () => {
-    console.log('onMergeStrategy selectRows', selectRows);
   }
 
   const onSelectChange = (index: number, checked: boolean, keySet?: any) => {
@@ -74,7 +70,7 @@ export function StrategiesTable(props: Props) {
 
   const columns = [
     {
-      title: 'Select',
+      title: '',
       dataIndex: '',
       key: '',
       width: 200,
@@ -85,35 +81,72 @@ export function StrategiesTable(props: Props) {
         )
       },
     },
-    { id: 'symbol', title: 'symbol', dataIndex: 'symbol', key: 'symbol', width: 100 },
     {
-      id: 'time', title: 'time', dataIndex: '', key: 'time', width: 100,
-      render(item: any) {
-        return <span>{formatUnixTime(Number(item.time))}</span>
+      id: 'time', title: 'Date', dataIndex: '', key: 'time', width: 100,
+      render(item: StrategiesOrder) {
+        return <Box w='198px'>
+          <Box>begin:{formatUnixTime(Number(item.time))}</Box>
+          {item.is_running ? <Box>fresh:{formatUnixTime(item.sellingTime)}</Box> : <Box>ended:{formatUnixTime(Number(item.sellingTime))}</Box>}
+        </Box>
+      },
+    },
+    { id: 'symbol', title: 'Symbol', dataIndex: 'symbol', key: 'symbol', width: 100 },
+    {
+      id: 'is_running', title: 'Status', dataIndex: 'is_running', key: 'is_running', width: 100,
+      render(item: StrategiesOrder) {
+        return <Box>
+          {item.is_running ? <Box as='span' color='#0ECB81'>Running</Box>
+            : <Box as='span' color='#F6465D'>Ended</Box>
+          }
+        </Box>
+      },
+    },
+    { id: 'price', title: 'Price', dataIndex: 'price', key: 'price', width: 100 },
+    {
+      id: 'profit', title: 'Profit', dataIndex: '', key: 'profit', width: 100,
+      render(item: StrategiesOrder) {
+        return <span>{item.profit} {item.profitRate}</span>
       },
     },
     {
-      id: 'updatedAt', title: 'updated', dataIndex: '', key: 'updatedAt', width: 100,
-      render(item: any) {
-        return <span>{formatUnixTime(item.updatedAt)}</span>
+      id: 'realizedProfit', title: 'Final profit', dataIndex: '', key: 'profit', width: 100,
+      render(item: StrategiesOrder) {
+        return <Box w='100px'>{item.realizedProfit} {item.realizedProfitRate}</Box>
       },
     },
-    { id: 'price', title: 'price', dataIndex: 'price', key: 'price', width: 100 },
-    { id: 'profit', title: 'profit', dataIndex: 'profit', key: 'profit', width: 100 },
-    { id: 'profitRate', title: 'profitRate', dataIndex: 'profitRate', key: 'profitRate', width: 100 },
-    { id: 'entryPrice', title: 'entryPrice', dataIndex: 'entryPrice', key: 'entryPrice', width: 100 },
-    { id: 'sellingPrice', title: 'sellingPrice', dataIndex: 'sellingPrice', key: 'sellingPrice', width: 100 },
-    { id: 'qty', title: 'qty', dataIndex: 'qty', key: 'qty', width: 100 },
-    { id: 'quoteQty', title: 'quoteQty', dataIndex: 'quoteQty', key: 'quoteQty', width: 100 },
-    { id: 'is_running', title: 'is_running', dataIndex: 'is_running', key: 'is_running', width: 100 },
-    { id: 'strategyId', title: 'strategyId', dataIndex: 'strategyId', key: 'strategyId', width: 100 },
-    { id: 'userId', title: 'userId', dataIndex: 'userId', key: 'userId', width: 100 },
-    // {
-    //   id: 'createdAt', title: 'createdAt', dataIndex: '', key: 'createdAt', width: 100,
-    //   render(item: any) {
-    //     return <span>{formatUnixTime(item.createdAt)}</span>
-    //   },
-    // },
+    {
+      id: 'entryPrice', title: 'Trade price', dataIndex: '', key: 'entryPrice', width: 100,
+      render(item: StrategiesOrder) {
+        return <Box>
+          <Box>{item.entryPrice}</Box>
+          <Box>{item.sellingPrice ? item.sellingPrice : 'running'}</Box>
+        </Box>
+      },
+    },
+    {
+      id: 'qty', title: 'Trade qty', dataIndex: '', key: 'qty', width: 100,
+      render(item: StrategiesOrder) {
+        return <Box>
+          <Box>{item.qty}</Box>
+          <Box>{item.quoteQty}</Box>
+        </Box>
+      },
+    },
+    {
+      id: 'sellingQty', title: 'Selling qty', dataIndex: '', key: 'sellingQty', width: 100,
+      render(item: StrategiesOrder) {
+        return <Box>
+          <Box>
+            {item.sellingQty}
+          </Box>
+          <Box>
+            {item.sellingQuoteQty}
+          </Box>
+        </Box>
+      },
+    },
+    { id: 'strategyId', title: 'StrategyId', dataIndex: 'strategyId', key: 'strategyId', width: 100 },
+    { id: 'userId', title: 'UserId', dataIndex: 'userId', key: 'userId', width: 100 },
   ]
 
   return (
@@ -123,7 +156,6 @@ export function StrategiesTable(props: Props) {
 
         <Box mt-10>
           <Button onClick={() => onSyncPrice()} mr4>Sync price</Button>
-          <Button onClick={() => onMergeStrategy()} mr4>Merge strategy</Button>
         </Box>
       </Box>
     </Box>

@@ -17,6 +17,7 @@ import { SpotOrder } from './spot-order.entity';
 import { StrategiesOrder } from './strategies-order.entity';
 import { nanoid } from 'nanoid';
 import { StrategyOrderId } from './strategy-orderid.entity';
+import { StrategyProfit } from 'src/common/types';
 
 @Injectable()
 export class DataCenterService {
@@ -488,7 +489,8 @@ export class DataCenterService {
   async syncSpotOrder(): Promise<Result> {
     const info: any = await this.client.myTrades(
       {
-        symbol: 'BTCUSDT',
+        // symbol: 'BTCUSDT',
+        symbol: 'BTCBUSD',
         // endTime: 1664467199999,
         // startTime: 1662566400000,
       }
@@ -514,7 +516,8 @@ export class DataCenterService {
   async getSpotAllOrders(): Promise<Result> {
     const info = await this.client.allOrders(
       {
-        symbol: 'BTCUSDT',
+        // symbol: 'BTCUSDT',
+        symbol: 'BTCBUSD',
         // endTime: 1664467199999,
         // startTime: 1662566400000,
       }
@@ -529,6 +532,134 @@ export class DataCenterService {
     );
 
     return { code: 200, message: 'ok', data: info };
+  }
+
+  private calculateStrategyProfit(price: string, entryPrice: string, qty: string, quoteQty: string): StrategyProfit {
+    const currentPrice = Number(price)
+    const costPriceInt = Number(entryPrice)
+    const qtyInt = Number(qty)
+    const quoteQtyInt = Number(quoteQty)
+
+    // 浮动盈亏: profit =（当天结算价－开仓价格）×持仓量×合约单位－手续费
+    const profit = (currentPrice - costPriceInt) * qtyInt
+    const profitRate = parseFloat(((profit / quoteQtyInt) * 100).toFixed(2)) + '%'
+
+    return {
+      profit,
+      profitRate
+    }
+  }
+
+  async closeSpotStrategy(spotOrders: SpotOrder[]): Promise<Result> {
+    console.log('closeSpotStrategy', spotOrders);
+
+    const ordersLength = spotOrders.length
+    const ordersIsGreaterThan2 = spotOrders.length > 2
+    const firstOrder = get(spotOrders, '[0]', {})
+    const lastOrder = get(spotOrders, `[${ordersLength - 1}]`, {})
+
+    const { orderId, userId } = firstOrder
+
+    const strategyOrderId = await this.findStrategyOrderIdUtil(orderId)
+    console.log('strategyOrderId', strategyOrderId);
+
+    if (isEmpty(strategyOrderId)) {
+      console.log('== not exist strategy,create closeSpotStrategy ...');
+      let qty = ''
+      let quoteQty = ''
+      let entryPrice = ''
+      let sellingPrice = ''
+      let sellingQty = ''
+      let sellingQuoteQty = ''
+      const strategyId = nanoid()
+      // create strategy
+      spotOrders.forEach(async (item, index) => {
+        console.log('spotOrders item:', index, 'item:', item);
+        const { orderId, userId } = item
+        /*
+        await this.saveStrategyOrderIdUtil({
+          userId,
+          strategyId,
+          orderId
+        })
+        */
+        if (ordersIsGreaterThan2) {
+          console.log('=== Increase or decrease coin position ===');
+        } else {
+          console.log('=== Buy and sell only once ===');
+        }
+      })
+
+      if (ordersIsGreaterThan2) {
+        console.log('=== Increase or decrease coin position ===');
+      } else {
+        console.log('=== Buy and sell only once ===');
+        qty = firstOrder.qty
+        quoteQty = firstOrder.quoteQty
+        entryPrice = firstOrder.price
+        sellingPrice = lastOrder.price
+        sellingQty = lastOrder.qty
+        sellingQuoteQty = lastOrder.quoteQty
+      }
+
+      const { profit, profitRate } = this.calculateStrategyProfit(sellingPrice, entryPrice, qty, quoteQty)
+
+      const strategiesOrder = {
+        userId,
+        strategyId,
+        symbol: firstOrder.symbol,
+        price: '',
+        qty: qty,
+        quoteQty: quoteQty,
+        sellingQty,
+        sellingQuoteQty,
+        profit: 0,
+        profitRate: '',
+        realizedProfit: profit,
+        realizedProfitRate: profitRate,
+        entryPrice: entryPrice,
+        sellingPrice: sellingPrice,
+        is_running: false,
+        time: firstOrder.time,
+        sellingTime: lastOrder.time
+      }
+
+      console.log('strategiesOrder:', strategiesOrder);
+
+      await this.saveStrategiesOrderUtil(strategiesOrder)
+    } else {
+      console.log('== exist strategyOrderId,update strategy ... ==');
+    }
+
+    return { code: 200, message: 'ok', data: null };
+  }
+
+  async mergeSpotStrategies(spotOrders: SpotOrder[]): Promise<Result> {
+    console.log('spotOrder', spotOrders);
+    const firstOrder = get(spotOrders, '[0]', {})
+    const { orderId } = firstOrder
+    console.log('orderId', orderId);
+    const strategyOrderId = await this.findStrategyOrderIdUtil(orderId)
+    console.log('strategyOrderId', strategyOrderId);
+
+    if (isEmpty(strategyOrderId)) {
+      console.log('== not exist strategy,create strategy ...');
+      const strategyId = nanoid()
+      // create strategy
+      spotOrders.forEach(async (item) => {
+        console.log('spotOrders item:', item);
+        const { orderId, userId } = item
+        await this.saveStrategyOrderIdUtil({
+          userId,
+          strategyId,
+          orderId
+        })
+      })
+    } else {
+      console.log('== exist strategyOrderId,update strategy ... ==');
+    }
+
+    return { code: 200, message: 'ok', data: null };
   }
   // =========== spot end ===========
 
@@ -579,11 +710,17 @@ export class DataCenterService {
         price: '',
         qty: spotOrder.qty,
         quoteQty: spotOrder.quoteQty,
+        sellingQty: '',
+        sellingQuoteQty: '',
         profit: 0,
         profitRate: '',
         entryPrice: spotOrder.price,
         sellingPrice: '',
         is_running: true,
+        time: spotOrder.time,
+        realizedProfit: 0,
+        realizedProfitRate: '',
+        sellingTime: null
       }
 
       await this.saveStrategiesOrderUtil(strategiesOrder)
@@ -614,17 +751,11 @@ export class DataCenterService {
     if (!price) {
       return { code: 500, message: 'error', data: null };
     }
-    const currentPrice = Number(price)
-    const costPriceInt = Number(entryPrice)
-    const qtyInt = Number(qty)
-    const quoteQtyInt = Number(quoteQty)
 
-    // 浮动盈亏: profit =（当天结算价－开仓价格）×持仓量×合约单位－手续费
-    const profit = (currentPrice - costPriceInt) * qtyInt
-    const profitRate = parseFloat(((profit / quoteQtyInt) * 100).toFixed(2)) + '%'
+    const { profit, profitRate } = this.calculateStrategyProfit(price, entryPrice, qty, quoteQty)
 
-    let sql = `update strategies_order set price = "${price}",profitRate = "${profitRate}",profit = "${profit}" WHERE strategyId = "${strategyId}"`;
-    const result = await this.strategyOrderIdRepo.query(sql);
+    const sql = `update strategies_order set price = "${price}",profitRate = "${profitRate}",profit = "${profit}" WHERE strategyId = "${strategyId}"`;
+    const result = await this.strategiesOrderRepo.query(sql);
 
     return { code: 200, message: 'ok', data: result };
   }

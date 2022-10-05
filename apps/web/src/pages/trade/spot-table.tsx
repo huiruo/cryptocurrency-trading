@@ -48,16 +48,48 @@ export function SpotTable(props: Props) {
     }
   }
 
-  const onCloseStrategy = () => {
-    console.log('onMergeStrategy selectRows', selectRows);
+  const onCloseStrategy = async () => {
+    console.log('onCloseStrategy selectRows', selectRows);
+    if (!selectRows.length) {
+      alert('select empty')
+
+      return
+    }
+
+    selectRowData.sort((a: SpotOrder, b: SpotOrder) => {
+      // return Number(b.time) - Number(a.time);
+      return Number(a.time) - Number(b.time);
+    })
+    console.log('sorted:', selectRowData);
+    const res = await traderApi.closeSpotStrategyApi(selectRowData)
+    if (res.code === 200) {
+
+      console.log('Merge strategy success');
+
+    } else {
+      console.log("Merge strategy error")
+    }
   }
 
-  const onMergeStrategy = () => {
+  const onMergeStrategy = async () => {
     console.log('onMergeStrategy selectRows', selectRows);
     if (!selectRows.length) {
       alert('select empty')
 
       return
+    }
+
+    selectRowData.sort((a: SpotOrder, b: SpotOrder) => {
+      return Number(b.time) - Number(a.time);
+    })
+    console.log('sorted:', selectRowData);
+    const res = await traderApi.mergeSpotStrategiesApi(selectRowData)
+    if (res.code === 200) {
+
+      console.log('Merge strategy success');
+
+    } else {
+      console.log("Merge strategy error")
     }
   }
 
@@ -95,7 +127,7 @@ export function SpotTable(props: Props) {
 
   const columns = [
     {
-      title: 'Select',
+      title: '',
       dataIndex: '',
       key: '',
       width: 200,
@@ -111,34 +143,52 @@ export function SpotTable(props: Props) {
         )
       },
     },
-    { id: 'orderId', title: 'orderId', dataIndex: 'orderId', key: 'orderId', width: 100 },
-    { id: 'userId', title: 'userId', dataIndex: 'userId', key: 'userId', width: 100 },
-    { id: 'symbol', title: 'symbol', dataIndex: 'symbol', key: 'symbol', width: 100 },
-    { id: 'strategyId', title: 'strategyId', dataIndex: 'strategyId', key: 'strategyId', width: 100 },
-    { id: 'price', title: 'price', dataIndex: 'price', key: 'price', width: 100 },
-    { id: 'qty', title: 'qty', dataIndex: 'qty', key: 'qty', width: 100 },
-    { id: 'quoteQty', title: 'quoteQty', dataIndex: 'quoteQty', key: 'quoteQty', width: 100 },
-    { id: 'commission', title: 'commission', dataIndex: 'commission', key: 'commission', width: 100 },
-    { id: 'commissionAsset', title: 'commissionAsset', dataIndex: 'commissionAsset', key: 'commissionAsset' },
-    { id: 'isBuyer', title: 'isBuyer', dataIndex: 'isBuyer', key: 'isBuyer', width: 100 },
-    { id: 'isMaker', title: 'isMaker', dataIndex: 'isMaker', key: 'isMaker', width: 100 },
-    { id: 'isBestMatch', title: 'isBestMatch', dataIndex: 'isBestMatch', key: 'isBestMatch', width: 100 },
     {
-      id: 'time', title: 'time', dataIndex: '', key: 'time', width: 100,
-      render(item: any) {
-        return <span>{formatUnixTime(Number(item.time))}</span>
+      id: 'time', title: 'Date', dataIndex: '', key: 'time', width: 100,
+      render(item: SpotOrder) {
+        return <Box w='145px'>{formatUnixTime(Number(item.time))}</Box>
       },
     },
+    { id: 'symbol', title: 'Symbol', dataIndex: 'symbol', key: 'symbol', width: 100 },
     {
-      id: 'updatedAt', title: 'updatedAt', dataIndex: '', key: 'updatedAt', width: 100,
-      render(item: any) {
-        return <span>{formatUnixTime(item.updatedAt)}</span>
+      id: 'isBuyer', title: 'Side', dataIndex: '', key: 'isBuyer', width: 100,
+      render(item: SpotOrder) {
+        return <Box>
+          {item.isBuyer ? <Box as='span' color='#0ECB81'>BUY</Box>
+            : <Box as='span' color='#F6465D'>SELL</Box>}
+        </Box>
       },
     },
+    { id: 'price', title: 'price', dataIndex: 'Price', key: 'price', width: 100 },
     {
-      id: 'createdAt', title: 'createdAt', dataIndex: '', key: 'createdAt', width: 100,
+      id: 'qty', title: 'qty', dataIndex: '', key: 'qty', width: 100,
+      render(item: SpotOrder) {
+        return <Box>
+          <Box>{item.qty}</Box>
+          <Box>{item.quoteQty}</Box>
+        </Box>
+      },
+    },
+    // { id: 'qty', title: 'qty', dataIndex: 'qty', key: 'qty', width: 100 },
+    // { id: 'quoteQty', title: 'quoteQty', dataIndex: 'quoteQty', key: 'quoteQty', width: 100 },
+    { id: 'orderId', title: 'OrderId', dataIndex: 'orderId', key: 'orderId', width: 100 },
+    {
+      id: 'strategyId', title: 'StrategyId', dataIndex: '', key: 'strategyId', width: 100,
+      render(item: SpotOrder) {
+        return <Box>
+          <Box>{item.strategyId}</Box>
+          <Box>UserId:{item.userId}</Box>
+        </Box>
+      },
+    },
+    { id: 'commission', title: 'Commission', dataIndex: 'commission', key: 'commission', width: 100 },
+    { id: 'commissionAsset', title: 'CommissionAsset', dataIndex: 'commissionAsset', key: 'commissionAsset' },
+    { id: 'isMaker', title: 'IsMaker', dataIndex: 'isMaker', key: 'isMaker', width: 100 },
+    { id: 'isBestMatch', title: 'IsBestMatch', dataIndex: 'isBestMatch', key: 'isBestMatch', width: 100 },
+    {
+      id: 'updatedAt', title: 'Updated', dataIndex: '', key: 'updatedAt', width: 100,
       render(item: any) {
-        return <span>{formatUnixTime(item.createdAt)}</span>
+        return <Box w='145px'>{formatUnixTime(item.updatedAt)}</Box>
       },
     },
   ]

@@ -38,21 +38,21 @@ export function Balances() {
   }
 
   const columns = [
-    { id: 'asset', title: 'asset', dataIndex: 'asset', key: 'asset', width: 100 },
-    { id: 'free', title: 'free', dataIndex: 'free', key: 'free', width: 100 },
-    { id: 'locked', title: 'locked', dataIndex: 'locked', key: 'locked', width: 100 },
+    { id: 'asset', title: 'Symbol', dataIndex: 'asset', key: 'asset', width: 100 },
+    { id: 'free', title: 'Free', dataIndex: 'free', key: 'free', width: 100 },
+    { id: 'locked', title: 'Locked', dataIndex: 'locked', key: 'locked', width: 100 },
     {
-      id: 'updatedAt', title: 'updatedAt', dataIndex: '', key: 'updatedAt', width: 100,
+      id: 'updatedAt', title: 'Updated', dataIndex: '', key: 'updatedAt', width: 100,
       render(item: any) {
         return <span>{formatUnixTime(item.updatedAt)}</span>
       },
     },
-    {
-      id: 'createdAt', title: 'createdAt', dataIndex: '', key: 'createdAt', width: 50,
-      render(item: any) {
-        return <span>{formatUnixTime(item.createdAt)}</span>
-      },
-    },
+    // {
+    //   id: 'createdAt', title: 'createdAt', dataIndex: '', key: 'createdAt', width: 50,
+    //   render(item: any) {
+    //     return <span>{formatUnixTime(item.createdAt)}</span>
+    //   },
+    // },
   ]
 
   useEffect(() => {

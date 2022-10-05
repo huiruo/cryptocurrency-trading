@@ -100,12 +100,17 @@ export interface StrategiesOrder {
   price: string;
   qty: string;
   quoteQty: string;
+  sellingQty: string;
+  sellingQuoteQty: string;
   profit: number;
   profitRate: string;
+  realizedProfit: number;
+  realizedProfitRate: string;
   entryPrice: string;
   sellingPrice: string;
   is_running: boolean;
   time: number;
+  sellingTime: number;
   updatedAt?: number;
   createdAt?: number;
 }

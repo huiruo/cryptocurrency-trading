@@ -22,3 +22,8 @@ export interface cryptoWalletType {
   accountType: string;
   balances: balancesType[];
 }
+
+export interface StrategyProfit {
+  profit: number
+  profitRate: string
+}

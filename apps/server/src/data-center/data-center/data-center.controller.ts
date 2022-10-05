@@ -99,6 +99,16 @@ export class DataCenterController {
 
     return await this.DataCenterService.getSpotAllOrders()
   }
+
+  @Post('mergeSpotStrategies')
+  async mergeSpotStrategies(@Body() spotOrders: SpotOrder[]): Promise<Result> {
+    return await this.DataCenterService.mergeSpotStrategies(spotOrders)
+  }
+
+  @Post('closeSpotStrategy')
+  async closeSpotStrategy(@Body() spotOrders: SpotOrder[]): Promise<Result> {
+    return await this.DataCenterService.closeSpotStrategy(spotOrders)
+  }
   // =========== spot end ===========
 
   // =========== Strategies Order start ===========

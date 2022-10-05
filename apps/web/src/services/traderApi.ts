@@ -123,6 +123,7 @@ const traderApi = {
 		return http.post<resType>(data, url);
 	},
 
+	// =========== Spot Order start ===========
 	syncSpotOrderApi() {
 		const url: string = `${traderApiUrl}/data/center/syncSpotOrder`;
 		return http.get<resType>({}, url);
@@ -132,6 +133,16 @@ const traderApi = {
 		const url: string = `${traderApiUrl}/data/center/spotOrders`;
 		return http.post<resType>(data, url);
 	},
+	mergeSpotStrategiesApi(data: any) {
+		const url: string = `${traderApiUrl}/data/center/mergeSpotStrategies`;
+		return http.post<resType>(data, url);
+	},
+	closeSpotStrategyApi(data: any) {
+		const url: string = `${traderApiUrl}/data/center/closeSpotStrategy`;
+		return http.post<resType>(data, url);
+	},
+	// =========== Spot Order end ===========
+
 	// =========== Strategies Order start ===========
 	creatStrategiesApi(data: any) {
 		const url: string = `${traderApiUrl}/data/center/createStrategies`;
