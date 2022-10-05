@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { get, isEmpty } from 'lodash';
 import { Result } from 'src/common/result.interface';
-import { createRequest } from 'src/binance-connector/helpers/utils';
+import { createRequest } from 'src/common/binance-connector/helpers/utils';
 import { ConfigService } from '@nestjs/config';
 import { CoinCode } from './data-center.entity';
 import { Coin } from './coin.entity';

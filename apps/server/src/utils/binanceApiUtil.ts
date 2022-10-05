@@ -1,4 +1,4 @@
-import { binanceConnector } from '../binance-connector/index';
+import { binanceConnector } from '../common/binance-connector/index';
 
 export const getSymbolPriceUtil = async (
   binance_api_key: string,

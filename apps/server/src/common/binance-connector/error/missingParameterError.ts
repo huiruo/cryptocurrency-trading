@@ -1,11 +1,10 @@
-import { Error } from '../error/error';
+import { Error } from './error';
 
 // export{}
 export class MissingParameterError extends Error {
   constructor(paramNames?) {
     super(
-      `One or more of required parameters is missing: ${
-        paramNames ? paramNames.slice().join(', ') : ''
+      `One or more of required parameters is missing: ${paramNames ? paramNames.slice().join(', ') : ''
       } `,
     );
     this.name = 'MissingParameterError';

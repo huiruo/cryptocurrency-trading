@@ -8,13 +8,13 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { Result } from '../../common/result.interface';
+import { Result } from '../common/result.interface';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
-  constructor(@Inject(UserService) private readonly UserService: UserService) {}
+  constructor(@Inject(UserService) private readonly UserService: UserService) { }
 
   /*
     关于传参：
