@@ -1,38 +1,38 @@
-import React,{ useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Box } from '@fower/react'
-import { Input } from '../../components/Input/index'
+import { Input } from '@/common/input/index'
 import useDebounce from '../../utils/useDebounce'
 // import useThrottle from '../../utils/useThrottle'
 // import {debounce} from 'lodash'
 
-const CrytoIncreaseCalculator =()=>{
+const CrytoIncreaseCalculator = () => {
 
   const [inputVal, setInputVal] = useState<string>('100')
 
-  const queryUtil = (val:string)=>{
-    console.log('分割线------>','query:',val)
+  const queryUtil = (val: string) => {
+    console.log('分割线------>', 'query:', val)
   }
 
-  const delayQuery = useDebounce((val)=>queryUtil(val),1000)
+  const delayQuery = useDebounce((val) => queryUtil(val), 1000)
   // const delayQuery = debounce((val)=>queryUtil(val),1000)
   // const delayQuery = useThrottle((val)=>queryUtil(val),1000)
 
-  const onInput = (e:any)=>{
+  const onInput = (e: any) => {
     const val = e.target.value
-    console.log('input:',val)
+    console.log('input:', val)
 
     delayQuery(val)
 
     setInputVal(val)
   }
 
-  useEffect(()=>{
-  },[])
+  useEffect(() => {
+  }, [])
 
   return (
     <Box>
-      CrytoIncreaseCalculator 
-      <Input onChange={(e) => onInput(e)} value={inputVal} placeholder="请输入价格"/>
+      CrytoIncreaseCalculator
+      <Input onChange={(e) => onInput(e)} value={inputVal} placeholder="请输入价格" />
     </Box>
   );
 }

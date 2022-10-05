@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import traderApi from '@/services/traderApi';
-import { Table } from '@/components/Table/Table';
+import { Table } from '@/common/table/Table';
 import { useDocumentTitle } from "@/utils/useDocumentTitle"
-import { Button } from '@/components/Button';
+import { Button } from '@/common/button';
 import { formatUnixTime } from '@/utils';
 import Header from '@/components/Header';
 import { Box } from '@fower/react';
@@ -47,12 +47,6 @@ export function Balances() {
         return <span>{formatUnixTime(item.updatedAt)}</span>
       },
     },
-    // {
-    //   id: 'createdAt', title: 'createdAt', dataIndex: '', key: 'createdAt', width: 50,
-    //   render(item: any) {
-    //     return <span>{formatUnixTime(item.createdAt)}</span>
-    //   },
-    // },
   ]
 
   useEffect(() => {

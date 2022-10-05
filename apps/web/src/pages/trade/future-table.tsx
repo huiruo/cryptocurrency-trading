@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Box } from '@fower/react';
-import { Table } from '@/components/Table/Table';
+import { Table } from '@/common/table/Table';
 import { formatUnixTime } from '@/utils';
-import { Checkbox } from '@/components/checkbox';
+import { Checkbox } from '@/common/checkbox';
 import { FuturesOrder } from '@/utils/types';
 
 interface Props {

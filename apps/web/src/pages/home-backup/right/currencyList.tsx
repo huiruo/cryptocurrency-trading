@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Input } from '../../../components/Input/index'
+import { Input } from '@/common/input/index'
 import traderApi from '@/services/traderApi';
 
 interface itemType {

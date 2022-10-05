@@ -141,6 +141,10 @@ const traderApi = {
 		const url: string = `${traderApiUrl}/data/center/closeSpotStrategy`;
 		return http.post<resType>(data, url);
 	},
+	addAssetApi(data: any) {
+		const url: string = `${traderApiUrl}/data/center/addAsset`;
+		return http.post<resType>(data, url);
+	},
 	// =========== Spot Order end ===========
 
 	// =========== Strategies Order start ===========

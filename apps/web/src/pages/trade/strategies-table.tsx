@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Box } from '@fower/react';
-import { Table } from '@/components/Table/Table';
+import { Table } from '@/common/table/Table';
 import { formatUnixTime } from '@/utils';
-import { Checkbox } from '@/components/checkbox';
-import { Button } from '@/components/Button';
+import { Checkbox } from '@/common/checkbox';
+import { Button } from '@/common/button';
 import traderApi from '@/services/traderApi';
 import { get } from 'lodash';
 import { StrategiesOrder } from '@/utils/types';
@@ -86,13 +86,13 @@ export function StrategiesTable(props: Props) {
       render(item: StrategiesOrder) {
         return <Box w='198px'>
           <Box>begin:{formatUnixTime(Number(item.time))}</Box>
-          {item.is_running ? <Box>fresh:{formatUnixTime(item.sellingTime)}</Box> : <Box>ended:{formatUnixTime(Number(item.sellingTime))}</Box>}
+          {item.is_running ? <Box>fresh:{formatUnixTime(item.updatedAt)}</Box> : <Box>ended:{formatUnixTime(Number(item.sellingTime))}</Box>}
         </Box>
       },
     },
     { id: 'symbol', title: 'Symbol', dataIndex: 'symbol', key: 'symbol', width: 100 },
     {
-      id: 'is_running', title: 'Status', dataIndex: 'is_running', key: 'is_running', width: 100,
+      id: 'is_running', title: 'Status', dataIndex: '', key: 'is_running', width: 100,
       render(item: StrategiesOrder) {
         return <Box>
           {item.is_running ? <Box as='span' color='#0ECB81'>Running</Box>
@@ -101,7 +101,12 @@ export function StrategiesTable(props: Props) {
         </Box>
       },
     },
-    { id: 'price', title: 'Price', dataIndex: 'price', key: 'price', width: 100 },
+    {
+      id: 'price', title: 'Price', dataIndex: '', key: 'price', width: 100,
+      render(item: StrategiesOrder) {
+        return <span>{item.price ? item.price : '-'} </span>
+      },
+    },
     {
       id: 'profit', title: 'Profit', dataIndex: '', key: 'profit', width: 100,
       render(item: StrategiesOrder) {
@@ -111,7 +116,11 @@ export function StrategiesTable(props: Props) {
     {
       id: 'realizedProfit', title: 'Final profit', dataIndex: '', key: 'profit', width: 100,
       render(item: StrategiesOrder) {
-        return <Box w='100px'>{item.realizedProfit} {item.realizedProfitRate}</Box>
+        return <Box w='100px'>
+          {item.is_running ? 'Running' : <span>
+            {item.realizedProfit} {item.realizedProfitRate}
+          </span>}
+        </Box>
       },
     },
     {
@@ -119,7 +128,7 @@ export function StrategiesTable(props: Props) {
       render(item: StrategiesOrder) {
         return <Box>
           <Box>{item.entryPrice}</Box>
-          <Box>{item.sellingPrice ? item.sellingPrice : 'running'}</Box>
+          <Box>{item.sellingPrice ? item.sellingPrice : '-'}</Box>
         </Box>
       },
     },
@@ -136,12 +145,16 @@ export function StrategiesTable(props: Props) {
       id: 'sellingQty', title: 'Selling qty', dataIndex: '', key: 'sellingQty', width: 100,
       render(item: StrategiesOrder) {
         return <Box>
-          <Box>
-            {item.sellingQty}
-          </Box>
-          <Box>
-            {item.sellingQuoteQty}
-          </Box>
+          {item.is_running ? 'Running' :
+            <>
+              <Box>
+                {item.sellingQty}
+              </Box>
+              <Box>
+                {item.sellingQuoteQty}
+              </Box>
+            </>
+          }
         </Box>
       },
     },

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Box } from '@fower/react';
-import { Table } from '@/components/Table/Table';
+import { Table } from '@/common/table/Table';
 import { formatUnixTime } from '@/utils';
-import { Checkbox } from '@/components/checkbox';
-import { Button } from '@/components/Button';
+import { Checkbox } from '@/common/checkbox';
+import { Button } from '@/common/button';
 import traderApi from '@/services/traderApi';
 import { get } from 'lodash';
 import { SpotOrder } from '@/utils/types';
@@ -159,7 +159,7 @@ export function SpotTable(props: Props) {
         </Box>
       },
     },
-    { id: 'price', title: 'price', dataIndex: 'Price', key: 'price', width: 100 },
+    { id: 'price', title: 'Price', dataIndex: 'price', key: 'price', width: 100 },
     {
       id: 'qty', title: 'qty', dataIndex: '', key: 'qty', width: 100,
       render(item: SpotOrder) {

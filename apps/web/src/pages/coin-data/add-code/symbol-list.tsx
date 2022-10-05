@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import traderApi from '@/services/traderApi';
 import { SymbolListType } from '@/utils/types';
-import { Button } from '@/components/Button';
+import { Button } from '@/common/button';
 
 interface SymbolListProps { }
 

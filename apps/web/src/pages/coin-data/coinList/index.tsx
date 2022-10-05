@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import traderApi from '@/services/traderApi';
 import { formatUnixTime } from '@/utils';
-import { Button } from '@/components/Button';
+import { Button } from '@/common/button';
 import { Box } from '@fower/react';
-import { Input } from '@/components/Input';
-import { Table } from '@/components/Table/Table';
+import { Input } from '@/common/input';
+import { Table } from '@/common/table/Table';
 import Header from '@/components/Header';
 import { useDocumentTitle } from '@/utils/useDocumentTitle';
+import { useNavigate } from 'react-router-dom';
 
 /*
 interface Props {
@@ -22,6 +23,8 @@ export function CoinList() {
   const [coinData, setCoinData] = useState<any>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [searchSymbol, setSearchSymbol] = useState<string>('')
+
+  const navigate = useNavigate();
 
   useDocumentTitle("coin list");
 
@@ -102,6 +105,10 @@ export function CoinList() {
     // setCoinData(res)
   }
 
+  const onAddCode = () => {
+    navigate('/coin/addCode')
+  }
+
   useEffect(() => {
     getCoin(1)
   }, [])
@@ -113,13 +120,17 @@ export function CoinList() {
       <Box pb='50px' mt='20px'>
         <Box toCenterX mb='20px'>
           <Box w='90%'>
-            <Box flex w='400px'>
-              <Input
-                placeholder="Seach coin"
-                value={searchSymbol}
-                onChange={(e) => setSearchSymbol(e.target.value)}
-              />
-              <Button ml2 onClick={onSearch}>Search</Button>
+            <Box flex>
+              <Box flex w='400px'>
+                <Input
+                  placeholder="Seach coin"
+                  value={searchSymbol}
+                  onChange={(e) => setSearchSymbol(e.target.value)}
+                />
+                <Button ml2 onClick={onSearch}>Search</Button>
+              </Box>
+
+              <Button ml2 onClick={onAddCode}>Add code</Button>
             </Box>
           </Box>
         </Box>

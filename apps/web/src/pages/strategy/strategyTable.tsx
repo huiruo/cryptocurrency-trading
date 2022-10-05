@@ -3,7 +3,7 @@ import { Box } from '@fower/react'
 import traderApi from '@/services/traderApi';
 import { strategyType } from '../../utils/types'
 import { formatUnixTime } from '../../utils/index'
-import { Button } from '../../components/Button/index'
+import { Button } from '../../common/button/index'
 
 const StrategyTable = () => {
 

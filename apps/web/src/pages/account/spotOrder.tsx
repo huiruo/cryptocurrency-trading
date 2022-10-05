@@ -3,7 +3,7 @@ import { Box } from '@fower/react'
 import { itemType, orderItemType } from '../../utils/types'
 import traderApi from '@/services/traderApi';
 import { formatUnixTime } from '../../utils/index'
-import { Button } from '../../components/Button/index'
+import { Button } from '../../common/button/index'
 
 const SpotOrder = () => {
 
