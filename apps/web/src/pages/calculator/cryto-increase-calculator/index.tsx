@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Box } from '@fower/react'
 import { Input } from '@/common/input/index'
-import useDebounce from '../../utils/useDebounce'
-// import useThrottle from '../../utils/useThrottle'
-// import {debounce} from 'lodash'
+import useDebounce from '@/utils/useDebounce'
 
 const CrytoIncreaseCalculator = () => {
 

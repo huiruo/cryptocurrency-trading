@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Box } from '@fower/react'
 import { Input } from '@/common/input/index'
-import TableList from '../../components/table-list/index'
+import TableList from '@/components/table-list'
 // import useDebounce from '../../utils/useDebounce'
 
 const range: number[] = [

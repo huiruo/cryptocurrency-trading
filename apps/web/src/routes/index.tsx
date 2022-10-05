@@ -5,7 +5,6 @@ import {
 } from "react-router-dom";
 import Home from '../pages/home/index';
 import NotFound from '../pages/notFound/index'
-import CrytoIncreaseCalculator from '../pages/cryto-increase-calculator/index';
 import { AddCode } from '@/pages/coin-data/add-code';
 import { CoinInfo } from '@/pages/coin-data/coinInfo';
 import { CoinList } from '@/pages/coin-data/coinList';
@@ -14,28 +13,9 @@ import { FutureOrders } from '@/pages/trade/future-orders';
 import { SpotOrders } from '@/pages/trade/spot-orders';
 import { Strategies } from "@/pages/trade/strategies";
 import { AddAsset } from "@/pages/trade/add-asset";
-// import Account from '../pages/account/index';
-// import Strategy from '../pages/strategy/index'
-// import Detail from '../pages/detail/index';
-// import StockIncreaseCalculator from '../pages/stock-increase-calculator/index';
+import CrytoIncreaseCalculator from "@/pages/calculator/cryto-increase-calculator";
 
 const routesConfig = [
-	// {
-	// 	path: 'detail',
-	// 	element: <Detail />,
-	// },
-	// {
-	// 	path: 'account',
-	// 	element: <Account />,
-	// },
-	// {
-	// 	path: 'strategy',
-	// 	element: <Strategy />,
-	// },
-	// {
-	// 	path: 'stockCalculator',
-	// 	element: <StockIncreaseCalculator />,
-	// },
 	{
 		path: 'crytoCalculator',
 		element: <CrytoIncreaseCalculator />,
