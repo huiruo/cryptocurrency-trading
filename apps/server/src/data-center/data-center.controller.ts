@@ -1,7 +1,8 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { get } from 'lodash';
 // import { ConfigService } from '@nestjs/config';
 import { Result } from 'src/common/result.interface';
-import { AssetType, SymbolType } from 'src/common/types';
+import { AssetType, SymbolType, SyncSpotOrderParams } from 'src/common/types';
 import { DataCenterService } from './data-center.service';
 import { SpotOrder } from './spot-order.entity';
 import { StrategiesOrder } from './strategies-order.entity';
@@ -77,6 +78,11 @@ export class DataCenterController {
 
   // =========== spot start ===========
   // =========== spot start ===========
+  @Get('asset')
+  async getAssets(): Promise<Result> {
+    return await this.DataCenterService.getAssetList()
+  }
+
   @Post('spotOrders')
   async getSpotOrder(@Body() page: Page): Promise<Result> {
 
@@ -89,10 +95,10 @@ export class DataCenterController {
     return await this.DataCenterService.addAsset(asset)
   }
 
-  @Get('syncSpotOrder')
-  async syncSpotOrder(): Promise<Result> {
+  @Post('syncSpotOrder')
+  async syncSpotOrder(@Body() asset: SyncSpotOrderParams): Promise<Result> {
 
-    return await this.DataCenterService.syncSpotOrder()
+    return await this.DataCenterService.syncSpotOrder(asset)
   }
 
   @Get('spotOpenOrders')

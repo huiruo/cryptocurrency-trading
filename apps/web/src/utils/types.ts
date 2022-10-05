@@ -20,40 +20,9 @@ export type TickerInter = {
   count: number;  //成交笔数
 }
 
-export interface itemType {
-  id: number,
-  symbol: string
-}
-
-export interface orderItemType {
-  symbol: string,
-  id: number,
-  orderId: number,
-  orderListId: number,
-  price: string,
-  qty: string,
-  quoteQty: string,
-  commission: string,
-  commissionAsset: string,
-  time: number,
-  isBuyer: boolean,
-  isMaker: boolean,
-  isBestMatch: boolean
-}
-
-export interface balancesType {
-  id?: string,
-  asset: string,
-  free: string,
-  locked: string,
-  updateTime: number
-}
-
 export interface SymbolListType {
   id?: string,
   symbol: string,
-  // baseAsset:string,
-  // quoteAsset:string,
   code: string,
 }
 
@@ -144,7 +113,7 @@ export interface FuturesOrder {
   createdAt?: number;
 }
 
-export interface BalancesTypes {
+export interface BalancesType {
   id: number;
   userId: number;
   asset: string;
@@ -152,4 +121,11 @@ export interface BalancesTypes {
   locked: string;
   updatedAt?: number;
   createdAt?: number;
+}
+
+export interface AssetType {
+  id?: number;
+  name: string;
+  symbol: string;
+  code: string;
 }

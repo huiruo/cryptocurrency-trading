@@ -33,3 +33,7 @@ export interface AssetType {
   symbol: string
   code?: string
 }
+
+export interface SyncSpotOrderParams {
+  name: string
+}

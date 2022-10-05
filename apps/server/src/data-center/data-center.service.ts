@@ -17,7 +17,7 @@ import { SpotOrder } from './spot-order.entity';
 import { StrategiesOrder } from './strategies-order.entity';
 import { nanoid } from 'nanoid';
 import { StrategyOrderId } from './strategy-orderid.entity';
-import { AssetType, StrategyProfit } from 'src/common/types';
+import { AssetType, StrategyProfit, SyncSpotOrderParams } from 'src/common/types';
 import { TradeAsset } from './asset.entity';
 
 @Injectable()
@@ -472,6 +472,13 @@ export class DataCenterService {
   // =========== future end =========== 
 
   // =========== spot start ===========
+  async getAssetList(): Promise<Result> {
+
+    const res = await this.tradeAssetRepo.find();
+
+    return { code: 200, message: 'ok', data: res };
+  }
+
   private async savaSpotOrderUtil(spotOrder: SpotOrder) {
     await this.spotOrderRepo.save(spotOrder);
   }
@@ -482,7 +489,7 @@ export class DataCenterService {
     return get(futureOrder, '[0]', {});
   }
 
-  async getAsset(name: string) {
+  private async getAsset(name: string) {
     const sql = `select * from asset where name='${name}'`;
     const symbolData = await this.tradeAssetRepo.query(sql);
 
@@ -509,16 +516,17 @@ export class DataCenterService {
     return { code: 200, message: 'ok', data: res };
   }
 
-  async syncSpotOrder(): Promise<Result> {
+  async syncSpotOrder(asset: SyncSpotOrderParams): Promise<Result> {
     const info: any = await this.client.myTrades(
       {
         // symbol: 'BTCUSDT',
-        symbol: 'BTCBUSD',
+        // symbol: 'BTCBUSD',
+        symbol: asset.name,
         // endTime: 1664467199999,
         // startTime: 1662566400000,
       }
     );
-    console.log('=== spot order ====', info.length);
+    console.log('asset.name:', asset.name, '=== spot order ====', info.length);
 
     info.forEach(async (item) => {
       const { orderId } = item as any

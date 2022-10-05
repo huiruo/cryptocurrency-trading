@@ -6,14 +6,14 @@ import { Button } from '@/common/button';
 import { formatUnixTime } from '@/utils';
 import Header from '@/components/feader';
 import { Box } from '@fower/react';
-import { BalancesTypes } from '@/utils/types';
+import { BalancesType } from '@/utils/types';
 
 /**
  * CODE ANNOTATION
  */
 export function Balances() {
 
-  const [balances, setBalances] = useState<BalancesTypes[]>([])
+  const [balances, setBalances] = useState<BalancesType[]>([])
 
   useDocumentTitle("balances order");
 
