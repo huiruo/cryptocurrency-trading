@@ -1,10 +1,9 @@
 import React, { FC } from 'react'
+import { forwardRef, __DEV__ } from '../utils'
 import { Box } from '@fower/react'
 import { FowerHTMLProps, Colors } from '@fower/core'
 import { AtomicProps } from '@fower/atomic-props'
 import { upFirst } from '@fower/utils'
-
-import { forwardRef, __DEV__ } from '../utils/index'
 import { Placement, useInputGroupContext } from './context'
 import { Id } from './types'
 
@@ -23,7 +22,8 @@ interface Attrs extends AtomicProps {
 }
 
 function useStyles(props: InputProps, h: any) {
-  let attrs: Attrs = { rounded: true }
+  // let attrs: Attrs = { rounded: true }
+  let attrs: Attrs = {}
   const ctx = useInputGroupContext()
 
   // pure input, not with input group
@@ -73,14 +73,15 @@ interface Sizes {
     h: number
     text: number
     px?: number
+    rounded?: number
   }
 }
 
 function getSizeStyle(size: Size) {
   const sizes: Sizes = {
-    sm: { px: 12, h: 32, text: 14 },
-    md: { px: 16, h: 40, text: 16 },
-    lg: { px: 16, h: 48, text: 18 },
+    sm: { px: 12, h: 32, text: 14, rounded: 6 },
+    md: { px: 16, h: 40, text: 16, rounded: 8 },
+    lg: { px: 16, h: 48, text: 18, rounded: 10 },
   }
 
   if (typeof size === 'string') return sizes[size]
@@ -88,34 +89,35 @@ function getSizeStyle(size: Size) {
     h: size,
     px: size * 0.35,
     text: size * 0.35,
-    rounded: size * 0.1,
+    rounded: size * 0.2,
   }
 }
 
-const Input: FC<InputProps> = forwardRef((props: InputProps, ref) => {
-
+export const Input: FC<InputProps> = forwardRef((props: InputProps, ref) => {
   const { colorScheme = 'brand500', size = 'md', variant = 'outline', ...rest } = props
   const { disabled } = props
   const sizesStyle = getSizeStyle(size)
 
   const attrs = useStyles(props, sizesStyle.h)
 
-  attrs[`ring${upFirst(colorScheme)}-1--focus`] = true
+  if (variant !== 'unstyled') {
+    attrs[`ring${upFirst(colorScheme)}-1--focus`] = true
+    // attrs[`ring${upFirst(colorScheme)}-1--focus`] = true
+    attrs['borderTransparent--focus'] = true
+  }
 
   const variants = {
     outline: {
       border: true,
+      'borderGray200--T30': true,
       borderGray200: true,
     },
     filled: {
       bgGray100: true,
-      border: true,
       borderColor: 'transparent',
       'bgGray100--D4--hover': !disabled,
     },
     unstyled: {
-      border: 'none',
-      'border--focus': 'none',
       'shadow--focus': 'none',
       px: 0,
     },
@@ -134,7 +136,6 @@ const Input: FC<InputProps> = forwardRef((props: InputProps, ref) => {
       placeholderGray400
       opacity-40={!!disabled}
       cursorNotAllowed={!!disabled}
-      borderColor--focus={colorScheme}
       transitionCommon
       duration-300
       {...sizesStyle}
@@ -150,5 +151,3 @@ if (__DEV__) {
 }
 
 ;(Input as any).id = 'Input'
-
-export {Input};
