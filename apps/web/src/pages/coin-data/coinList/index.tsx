@@ -4,8 +4,8 @@ import { formatUnixTime } from '@/utils';
 import { Button } from '@/common/button';
 import { Box } from '@fower/react';
 import { Input } from '@/common/input';
-import { Table } from '@/common/table/Table';
-import Header from '@/components/Header';
+import { Table } from '@/common/table';
+import Header from '@/components/feader';
 import { useDocumentTitle } from '@/utils/useDocumentTitle';
 import { useNavigate } from 'react-router-dom';
 

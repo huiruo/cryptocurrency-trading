@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import traderApi from '@/services/traderApi';
 import { useDocumentTitle } from '@/utils/useDocumentTitle';
-import Header from '@/components/Header';
+import Header from '@/components/feader';
 import { Box } from '@fower/react';
 import { StrategiesTable } from './strategies-table';
 import { StrategiesOrder } from '@/utils/types';

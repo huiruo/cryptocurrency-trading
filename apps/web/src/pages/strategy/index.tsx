@@ -1,5 +1,5 @@
 import React from 'react'
-import Header from '../../components/Header/index'
+import Header from '../../components/feader/index'
 import StrategyTable from './strategyTable'
 
 const Strategy = () => {

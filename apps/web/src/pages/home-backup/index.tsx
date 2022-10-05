@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import Header from '../../components/Header/index'
+import Header from '../../components/feader/index'
 // import Footer from '../../components/Footer/index'
 import Trader from './trader'
 

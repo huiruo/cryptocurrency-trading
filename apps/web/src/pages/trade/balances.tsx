@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import traderApi from '@/services/traderApi';
-import { Table } from '@/common/table/Table';
+import { Table } from '@/common/table';
 import { useDocumentTitle } from "@/utils/useDocumentTitle"
 import { Button } from '@/common/button';
 import { formatUnixTime } from '@/utils';
-import Header from '@/components/Header';
+import Header from '@/components/feader';
 import { Box } from '@fower/react';
 import { BalancesTypes } from '@/utils/types';
 
