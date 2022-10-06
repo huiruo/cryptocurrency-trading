@@ -17,7 +17,11 @@ import { SpotOrder } from './spot-order.entity';
 import { StrategiesOrder } from './strategies-order.entity';
 import { nanoid } from 'nanoid';
 import { StrategyOrderId } from './strategy-orderid.entity';
-import { AssetType, StrategyProfit, SyncSpotOrderParams } from 'src/common/types';
+import {
+  AssetType,
+  StrategyProfit,
+  SyncSpotOrderParams,
+} from 'src/common/types';
 import { TradeAsset } from './asset.entity';
 
 @Injectable()
@@ -91,8 +95,9 @@ export class DataCenterService {
   }
 
   async getCoin(currentPage: number, pageSize: number): Promise<Result> {
-    const sql = `select * from coin order by ranked asc limit ${(currentPage - 1) * pageSize
-      },${pageSize}`;
+    const sql = `select * from coin order by ranked asc limit ${
+      (currentPage - 1) * pageSize
+    },${pageSize}`;
 
     return await this.coninRepo.query(sql);
   }
@@ -390,9 +395,9 @@ export class DataCenterService {
       //{asset: 'ETH', free: '0.00003934', locked: '0.00000000'}
       balances.forEach(async (item) => {
         // mock userId
-        item.userId = 1
-        this.saveBalancesUtil(item)
-      })
+        item.userId = 1;
+        this.saveBalancesUtil(item);
+      });
 
       return { code: 200, message: 'ok', data: balances };
     } catch (error) {
@@ -412,9 +417,13 @@ export class DataCenterService {
     return get(futureOrder, '[0]', {});
   }
 
-  async getFutureOrders(currentPage: number, pageSize: number): Promise<Result> {
-    const sql = `select * from futures_order order by updateTime desc limit ${(currentPage - 1) * pageSize
-      },${pageSize}`;
+  async getFutureOrders(
+    currentPage: number,
+    pageSize: number,
+  ): Promise<Result> {
+    const sql = `select * from futures_order order by updateTime desc limit ${
+      (currentPage - 1) * pageSize
+    },${pageSize}`;
 
     const res = await this.futuresOrderRepo.query(sql);
     return { code: 200, message: 'ok', data: res };
@@ -423,18 +432,18 @@ export class DataCenterService {
   async futuresAllOrders(): Promise<Result> {
     const info = await this.client.futuresAllOrders();
     if (Array.isArray(info)) {
-      info.forEach(async item => {
-        const { orderId } = item
+      info.forEach(async (item) => {
+        const { orderId } = item;
         // mock userId
-        item.userId = 1
-        const existFutureOrder = await this.findFutureOrderUtil(orderId)
+        item.userId = 1;
+        const existFutureOrder = await this.findFutureOrderUtil(orderId);
         if (isEmpty(existFutureOrder)) {
           console.log('== not exist FutureOrder,insert...');
-          await this.savefutureOrderUtil(item)
+          await this.savefutureOrderUtil(item);
         } else {
           console.log('== exist FutureOrder,skip... ==');
         }
-      })
+      });
     }
 
     return { code: 200, message: 'ok', data: info };
@@ -459,7 +468,7 @@ export class DataCenterService {
   },]
   */
   async futuresAccountInfo(): Promise<Result> {
-    const info = await this.client.futuresAccountInfo()
+    const info = await this.client.futuresAccountInfo();
 
     return { code: 200, message: 'ok', data: info };
   }
@@ -469,11 +478,10 @@ export class DataCenterService {
 
     return { code: 200, message: 'ok', data: info };
   }
-  // =========== future end =========== 
+  // =========== future end ===========
 
   // =========== spot start ===========
   async getAssetList(): Promise<Result> {
-
     const res = await this.tradeAssetRepo.find();
 
     return { code: 200, message: 'ok', data: res };
@@ -509,104 +517,107 @@ export class DataCenterService {
   }
 
   async getSpotOrder(currentPage: number, pageSize: number): Promise<Result> {
-    const sql = `select * from spot_order order by time desc limit ${(currentPage - 1) * pageSize
-      },${pageSize}`;
+    const sql = `select * from spot_order order by time desc limit ${
+      (currentPage - 1) * pageSize
+    },${pageSize}`;
 
     const res = await this.spotOrderRepo.query(sql);
     return { code: 200, message: 'ok', data: res };
   }
 
   async syncSpotOrder(asset: SyncSpotOrderParams): Promise<Result> {
-    const info: any = await this.client.myTrades(
-      {
-        // symbol: 'BTCUSDT',
-        // symbol: 'BTCBUSD',
-        symbol: asset.name,
-        // endTime: 1664467199999,
-        // startTime: 1662566400000,
-      }
-    );
+    const info: any = await this.client.myTrades({
+      // symbol: 'BTCUSDT',
+      // symbol: 'BTCBUSD',
+      symbol: asset.name,
+      // endTime: 1664467199999,
+      // startTime: 1662566400000,
+    });
     console.log('asset.name:', asset.name, '=== spot order ====', info.length);
 
     info.forEach(async (item) => {
-      const { orderId } = item as any
+      const { orderId } = item as any;
       // mock userId
-      item.userId = 1
-      const existSpotOrder = await this.findSpotOrderUtil(orderId)
+      item.userId = 1;
+      const existSpotOrder = await this.findSpotOrderUtil(orderId);
       if (isEmpty(existSpotOrder)) {
         console.log('== not exist spotOrder,insert...');
-        this.savaSpotOrderUtil(item)
+        this.savaSpotOrderUtil(item);
       } else {
         console.log('== exist spotOrder,skip... ==');
       }
-    })
+    });
 
     return { code: 200, message: 'ok', data: null };
   }
 
   async getSpotAllOrders(): Promise<Result> {
-    const info = await this.client.allOrders(
-      {
-        // symbol: 'BTCUSDT',
-        symbol: 'BTCBUSD',
-        // endTime: 1664467199999,
-        // startTime: 1662566400000,
-      }
-    );
+    const info = await this.client.allOrders({
+      // symbol: 'BTCUSDT',
+      symbol: 'BTCBUSD',
+      // endTime: 1664467199999,
+      // startTime: 1662566400000,
+    });
 
     return { code: 200, message: 'ok', data: info };
   }
 
   async getSpotOpenOrders(): Promise<Result> {
-    const info = await this.client.openOrders(
-      { symbol: 'BTCUSDT', }
-    );
+    const info = await this.client.openOrders({ symbol: 'BTCUSDT' });
 
     return { code: 200, message: 'ok', data: info };
   }
 
-  private calculateStrategyProfit(price: string, entryPrice: string, qty: string, quoteQty: string): StrategyProfit {
-    const currentPrice = Number(price)
-    const costPriceInt = Number(entryPrice)
-    const qtyInt = Number(qty)
-    const quoteQtyInt = Number(quoteQty)
+  private calculateStrategyProfit(
+    price: string,
+    entryPrice: string,
+    qty: string,
+    quoteQty: string,
+  ): StrategyProfit {
+    const currentPrice = Number(price);
+    const costPriceInt = Number(entryPrice);
+    const qtyInt = Number(qty);
+    const quoteQtyInt = Number(quoteQty);
 
     // 浮动盈亏: profit =（当天结算价－开仓价格）×持仓量×合约单位－手续费
-    const profit = (currentPrice - costPriceInt) * qtyInt
-    const profitRate = parseFloat(((profit / quoteQtyInt) * 100).toFixed(2)) + '%'
+    const profit = (currentPrice - costPriceInt) * qtyInt;
+    const profitRate =
+      parseFloat(((profit / quoteQtyInt) * 100).toFixed(2)) + '%';
 
     return {
       profit,
-      profitRate
-    }
+      profitRate,
+    };
   }
 
   async closeSpotStrategy(spotOrders: SpotOrder[]): Promise<Result> {
     console.log('closeSpotStrategy', spotOrders);
 
-    const ordersLength = spotOrders.length
-    const ordersIsGreaterThan2 = spotOrders.length > 2
-    const firstOrder = get(spotOrders, '[0]', {})
-    const lastOrder = get(spotOrders, `[${ordersLength - 1}]`, {})
+    const ordersLength = spotOrders.length;
+    const ordersIsGreaterThan2 = spotOrders.length > 2;
+    const firstOrder = get(spotOrders, '[0]', {});
+    const lastOrder = get(spotOrders, `[${ordersLength - 1}]`, {});
 
-    const { orderId, userId } = firstOrder
+    const { orderId, userId } = firstOrder;
 
-    const strategyOrderId = await this.findStrategyOrderIdUtil(orderId)
+    const strategyOrderId = await this.findStrategyOrderIdUtil(orderId);
     console.log('strategyOrderId', strategyOrderId);
+    console.log('strategyOrderId-isEmpty', isEmpty(strategyOrderId));
+    // return { code: 200, message: 'ok', data: null };
 
     if (isEmpty(strategyOrderId)) {
       console.log('== not exist strategy,create closeSpotStrategy ...');
-      let qty = ''
-      let quoteQty = ''
-      let entryPrice = ''
-      let sellingPrice = ''
-      let sellingQty = ''
-      let sellingQuoteQty = ''
-      const strategyId = nanoid()
+      let qty = '';
+      let quoteQty = '';
+      let entryPrice = '';
+      let sellingPrice = '';
+      let sellingQty = '';
+      let sellingQuoteQty = '';
+      const strategyId = nanoid();
       // create strategy
       spotOrders.forEach(async (item, index) => {
         console.log('spotOrders item:', index, 'item:', item);
-        const { orderId, userId } = item
+        const { orderId, userId } = item;
         /*
         await this.saveStrategyOrderIdUtil({
           userId,
@@ -619,21 +630,26 @@ export class DataCenterService {
         } else {
           console.log('=== Buy and sell only once ===');
         }
-      })
+      });
 
       if (ordersIsGreaterThan2) {
         console.log('=== Increase or decrease coin position ===');
       } else {
         console.log('=== Buy and sell only once ===');
-        qty = firstOrder.qty
-        quoteQty = firstOrder.quoteQty
-        entryPrice = firstOrder.price
-        sellingPrice = lastOrder.price
-        sellingQty = lastOrder.qty
-        sellingQuoteQty = lastOrder.quoteQty
+        qty = firstOrder.qty;
+        quoteQty = firstOrder.quoteQty;
+        entryPrice = firstOrder.price;
+        sellingPrice = lastOrder.price;
+        sellingQty = lastOrder.qty;
+        sellingQuoteQty = lastOrder.quoteQty;
       }
 
-      const { profit, profitRate } = this.calculateStrategyProfit(sellingPrice, entryPrice, qty, quoteQty)
+      const { profit, profitRate } = this.calculateStrategyProfit(
+        sellingPrice,
+        entryPrice,
+        qty,
+        quoteQty,
+      );
 
       const strategiesOrder = {
         userId,
@@ -652,14 +668,45 @@ export class DataCenterService {
         sellingPrice: sellingPrice,
         is_running: false,
         time: firstOrder.time,
-        sellingTime: lastOrder.time
-      }
+        sellingTime: lastOrder.time,
+      };
 
       console.log('strategiesOrder:', strategiesOrder);
 
-      await this.saveStrategiesOrderUtil(strategiesOrder)
+      await this.saveStrategiesOrderUtil(strategiesOrder);
     } else {
       console.log('== exist strategyOrderId,update strategy ... ==');
+
+      let qty = '';
+      let quoteQty = '';
+      let entryPrice = '';
+      let sellingPrice = '';
+      let sellingQty = '';
+      let sellingQuoteQty = '';
+      let sellingTime = 0;
+      if (ordersIsGreaterThan2) {
+        console.log('=== Increase or decrease coin position ===');
+      } else {
+        console.log('=== Buy and sell only once ===');
+        qty = firstOrder.qty;
+        quoteQty = firstOrder.quoteQty;
+        entryPrice = firstOrder.price;
+        sellingPrice = lastOrder.price;
+        sellingQty = lastOrder.qty;
+        sellingQuoteQty = lastOrder.quoteQty;
+        sellingTime = lastOrder.time;
+        const strategyId = get(strategyOrderId, '[0].strategyId', '');
+        console.log('strategyId:', strategyId);
+        const { profit, profitRate } = this.calculateStrategyProfit(
+          sellingPrice,
+          entryPrice,
+          qty,
+          quoteQty,
+        );
+        const sql = `update strategies_order set sellingPrice="${sellingPrice}",sellingQty="${sellingQty}",sellingQuoteQty="${sellingQuoteQty}",realizedProfitRate = "${profitRate}",realizedProfit = "${profit}",sellingTime="${sellingTime}",is_running = 0  WHERE strategyId = "${strategyId}"`;
+        console.log('update sql:', sql);
+        const result = await this.strategiesOrderRepo.query(sql);
+      }
     }
 
     return { code: 200, message: 'ok', data: null };
@@ -667,25 +714,25 @@ export class DataCenterService {
 
   async mergeSpotStrategies(spotOrders: SpotOrder[]): Promise<Result> {
     console.log('spotOrder', spotOrders);
-    const firstOrder = get(spotOrders, '[0]', {})
-    const { orderId } = firstOrder
+    const firstOrder = get(spotOrders, '[0]', {});
+    const { orderId } = firstOrder;
     console.log('orderId', orderId);
-    const strategyOrderId = await this.findStrategyOrderIdUtil(orderId)
+    const strategyOrderId = await this.findStrategyOrderIdUtil(orderId);
     console.log('strategyOrderId', strategyOrderId);
 
     if (isEmpty(strategyOrderId)) {
       console.log('== not exist strategy,create strategy ...');
-      const strategyId = nanoid()
+      const strategyId = nanoid();
       // create strategy
       spotOrders.forEach(async (item) => {
         console.log('spotOrders item:', item);
-        const { orderId, userId } = item
+        const { orderId, userId } = item;
         await this.saveStrategyOrderIdUtil({
           userId,
           strategyId,
-          orderId
-        })
-      })
+          orderId,
+        });
+      });
     } else {
       console.log('== exist strategyOrderId,update strategy ... ==');
     }
@@ -699,41 +746,47 @@ export class DataCenterService {
     await this.strategyOrderIdRepo.save(strategyOrderId);
   }
 
-  private async findStrategyOrderIdUtil(orderId: number): Promise<StrategyOrderId> {
+  private async findStrategyOrderIdUtil(
+    orderId: number,
+  ): Promise<StrategyOrderId> {
     const sql = `select strategyId,orderId from strategy_orderid where orderId='${orderId}'`;
-    const strategyOrderId = await this.strategyOrderIdRepo.query(sql);
-    return strategyOrderId;
+    return await this.strategyOrderIdRepo.query(sql);
   }
 
   private async saveStrategiesOrderUtil(strategiesOrder: StrategiesOrder) {
     await this.strategiesOrderRepo.save(strategiesOrder);
   }
 
-  async getStrategiesOrder(currentPage: number, pageSize: number): Promise<Result> {
-    const sql = `select * from strategies_order order by createdAt desc limit ${(currentPage - 1) * pageSize
-      },${pageSize}`;
+  async getStrategiesOrder(
+    currentPage: number,
+    pageSize: number,
+  ): Promise<Result> {
+    const sql = `select * from strategies_order order by createdAt desc limit ${
+      (currentPage - 1) * pageSize
+    },${pageSize}`;
 
     const res = await this.strategiesOrderRepo.query(sql);
     return { code: 200, message: 'ok', data: res };
   }
 
   async mergeStrategy(currentPage: number, pageSize: number): Promise<Result> {
-    const sql = `select * from spot_order order by time desc limit ${(currentPage - 1) * pageSize
-      },${pageSize}`;
+    const sql = `select * from spot_order order by time desc limit ${
+      (currentPage - 1) * pageSize
+    },${pageSize}`;
 
     const res = await this.spotOrderRepo.query(sql);
     return { code: 200, message: 'ok', data: res };
   }
 
   async createStrategiesOrder(spotOrder: SpotOrder): Promise<Result> {
-    const { orderId, userId } = spotOrder
+    const { orderId, userId } = spotOrder;
 
-    const strategyOrderId = await this.findStrategyOrderIdUtil(orderId)
+    const strategyOrderId = await this.findStrategyOrderIdUtil(orderId);
     console.log('strategyOrderId', strategyOrderId);
 
     if (isEmpty(strategyOrderId)) {
       console.log('== not exist strategy,insert...');
-      const strategyId = nanoid()
+      const strategyId = nanoid();
       const strategiesOrder = {
         userId: userId,
         strategyId,
@@ -751,15 +804,15 @@ export class DataCenterService {
         time: spotOrder.time,
         realizedProfit: 0,
         realizedProfitRate: '',
-        sellingTime: null
-      }
+        sellingTime: null,
+      };
 
-      await this.saveStrategiesOrderUtil(strategiesOrder)
+      await this.saveStrategiesOrderUtil(strategiesOrder);
       await this.saveStrategyOrderIdUtil({
         userId,
         strategyId,
-        orderId
-      })
+        orderId,
+      });
     } else {
       console.log('== exist strategyOrderId,skip... ==');
     }
@@ -771,19 +824,24 @@ export class DataCenterService {
     /*
       { BTCUSDT: '19376.16000000' }
     */
-    return await this.client.spotPrice(symbol)
+    return await this.client.spotPrice(symbol);
   }
 
   async syncStrategyPrice(strategiesOrder: StrategiesOrder): Promise<Result> {
-    const { symbol, entryPrice, quoteQty, qty, strategyId } = strategiesOrder
-    const spotPrice = await this.getSpotPrice(symbol)
-    const price = get(spotPrice, `${symbol}`, '')
+    const { symbol, entryPrice, quoteQty, qty, strategyId } = strategiesOrder;
+    const spotPrice = await this.getSpotPrice(symbol);
+    const price = get(spotPrice, `${symbol}`, '');
 
     if (!price) {
       return { code: 500, message: 'error', data: null };
     }
 
-    const { profit, profitRate } = this.calculateStrategyProfit(price, entryPrice, qty, quoteQty)
+    const { profit, profitRate } = this.calculateStrategyProfit(
+      price,
+      entryPrice,
+      qty,
+      quoteQty,
+    );
 
     const sql = `update strategies_order set price = "${price}",profitRate = "${profitRate}",profit = "${profit}" WHERE strategyId = "${strategyId}"`;
     const result = await this.strategiesOrderRepo.query(sql);

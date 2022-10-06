@@ -7,17 +7,12 @@ interface resType {
 	message?: string
 }
 
-interface Ticker24hrType {
-	data: any,
-	code?: number,
-	message?: string
-}
-
 interface onLoginType {
 	data: any,
 	code?: number,
 	message?: string
 }
+
 const traderApi = {
 	onLogin(data: any) {
 		const url = `${traderApiUrl}/trader/user/login`;
