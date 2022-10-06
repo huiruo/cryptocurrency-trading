@@ -159,6 +159,12 @@ export function SpotTable(props: Props) {
         </Box>
       },
     },
+    /*
+    0 : original
+    1 : running
+    2 : ended
+    */
+    { id: 'strategyStatus', title: 'strategyStatus', dataIndex: 'strategyStatus', key: 'strategyStatus', width: 100 },
     { id: 'price', title: 'Price', dataIndex: 'price', key: 'price', width: 100 },
     {
       id: 'qty', title: 'qty', dataIndex: '', key: 'qty', width: 100,

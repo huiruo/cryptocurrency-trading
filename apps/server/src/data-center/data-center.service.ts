@@ -590,6 +590,8 @@ export class DataCenterService {
     };
   }
 
+  private updateOrderStrategyStatus() {}
+
   async closeSpotStrategy(spotOrders: SpotOrder[]): Promise<Result> {
     console.log('closeSpotStrategy', spotOrders);
 

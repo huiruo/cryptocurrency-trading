@@ -12,6 +12,7 @@ CREATE TABLE `spot_order`(
   `commissionAsset` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'commissionAsset',
   `time` bigint(60) NULL DEFAULT NULL,
   `isBuyer` tinyint(1) NOT NULL,
+  `strategyStatus` int(6) NOT NULL DEFAULT 0,
   `isMaker` tinyint(1) NOT NULL,
   `isBestMatch` tinyint(1) NOT NULL,
   `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
