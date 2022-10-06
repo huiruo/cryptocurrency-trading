@@ -37,3 +37,19 @@ export interface AssetType {
 export interface SyncSpotOrderParams {
   name: string
 }
+
+
+export interface CreateOrdersStrategy {
+  userId: number
+  qty: string
+  quoteQty: string
+  entryPrice: string
+  sellingPrice: string
+  sellingQty: string
+  sellingQuoteQty: string
+
+  sellingTime: number
+  symbol: string
+  time: number
+  strategyId: string
+}
