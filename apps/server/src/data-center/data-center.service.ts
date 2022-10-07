@@ -97,8 +97,9 @@ export class DataCenterService {
   }
 
   async getCoin(currentPage: number, pageSize: number): Promise<Result> {
-    const sql = `select * from coin order by ranked asc limit ${(currentPage - 1) * pageSize
-      },${pageSize}`;
+    const sql = `select * from coin order by ranked asc limit ${
+      (currentPage - 1) * pageSize
+    },${pageSize}`;
 
     return await this.coninRepo.query(sql);
   }
@@ -422,8 +423,9 @@ export class DataCenterService {
     currentPage: number,
     pageSize: number,
   ): Promise<Result> {
-    const sql = `select * from futures_order order by updateTime desc limit ${(currentPage - 1) * pageSize
-      },${pageSize}`;
+    const sql = `select * from futures_order order by updateTime desc limit ${
+      (currentPage - 1) * pageSize
+    },${pageSize}`;
 
     const res = await this.futuresOrderRepo.query(sql);
     return { code: 200, message: 'ok', data: res };
@@ -517,8 +519,9 @@ export class DataCenterService {
   }
 
   async getSpotOrder(currentPage: number, pageSize: number): Promise<Result> {
-    const sql = `select * from spot_order order by time desc limit ${(currentPage - 1) * pageSize
-      },${pageSize}`;
+    const sql = `select * from spot_order order by time desc limit ${
+      (currentPage - 1) * pageSize
+    },${pageSize}`;
 
     const res = await this.spotOrderRepo.query(sql);
     return { code: 200, message: 'ok', data: res };
@@ -589,8 +592,12 @@ export class DataCenterService {
     };
   }
 
-  private async updateOrderStatus(type: string, orderId: number, strategyId: string, strategyStatus: number) {
-
+  private async updateOrderStatus(
+    type: string,
+    orderId: number,
+    strategyId: string,
+    strategyStatus: number,
+  ) {
     if (type === 'spot') {
       const sql = `update spot_order set strategyId="${strategyId}",strategyStatus = "${strategyStatus}"  WHERE orderId = "${orderId}"`;
       await this.spotOrderRepo.query(sql);
@@ -602,13 +609,23 @@ export class DataCenterService {
     }
   }
 
-  private async createOrdersStrategyUtil(type: string, createOrdersStrategy: CreateOrdersStrategy) {
-    const { userId, qty, quoteQty, entryPrice, sellingPrice, sellingQty, sellingQuoteQty,
+  private async createOrdersStrategyUtil(
+    type: string,
+    createOrdersStrategy: CreateOrdersStrategy,
+  ) {
+    const {
+      userId,
+      qty,
+      quoteQty,
+      entryPrice,
+      sellingPrice,
+      sellingQty,
+      sellingQuoteQty,
       symbol,
       time,
       sellingTime,
-      strategyId
-    } = createOrdersStrategy
+      strategyId,
+    } = createOrdersStrategy;
 
     if (type === 'create') {
       const { profit, profitRate } = this.calculateStrategyProfit(
@@ -639,7 +656,6 @@ export class DataCenterService {
       };
 
       await this.createStrategiesOrderUtil(strategiesOrder);
-
     } else if (type === 'update') {
       const { profit, profitRate } = this.calculateStrategyProfit(
         sellingPrice,
@@ -665,11 +681,11 @@ export class DataCenterService {
     let sellingPrice = '';
     let sellingQty = '';
     let sellingQuoteQty = '';
-    let sellingTime = 0
+    let sellingTime = 0;
 
     const strategyOrderId = await this.findStrategyOrderIdUtil(orderId);
     if (isEmpty(strategyOrderId)) {
-      const strategyId = nanoid()
+      const strategyId = nanoid();
       console.log('== not exist strategy,create closeSpotStrategy ...');
       if (ordersGreaterThan2) {
         console.log('=== Increase or decrease coin position ===');
@@ -696,22 +712,22 @@ export class DataCenterService {
         time: firstOrder.time,
         sellingTime: lastOrder.time,
         strategyId,
-      }
+      };
 
-      await this.createOrdersStrategyUtil('create', createOrdersStrategy)
+      await this.createOrdersStrategyUtil('create', createOrdersStrategy);
 
-      // create StrategyOrderId by fist order 
-      this.createStrategyOrderIdUtil({ userId, strategyId, orderId })
+      // create StrategyOrderId by fist order
+      this.createStrategyOrderIdUtil({ userId, strategyId, orderId });
       // UpdateSpotOrders start
-      const running = 1
+      const running = 1;
       spotOrders.forEach(async (item) => {
         const { orderId } = item;
-        this.updateOrderStatus('spot', orderId, strategyId, running)
+        this.updateOrderStatus('spot', orderId, strategyId, running);
       });
       // UpdateSpotOrders end
     } else {
       console.log('== exist strategyOrderId,update strategy ... ==');
-      const strategyId = get(strategyOrderId, '[0].strategyId', '')
+      const strategyId = get(strategyOrderId, '[0].strategyId', '');
       if (ordersGreaterThan2) {
         console.log('=== Increase or decrease coin position ===');
       } else {
@@ -737,14 +753,14 @@ export class DataCenterService {
         sellingTime: lastOrder.time,
         strategyId,
         time: 0,
-      }
+      };
 
-      await this.createOrdersStrategyUtil('update', createOrdersStrategy)
+      await this.createOrdersStrategyUtil('update', createOrdersStrategy);
       // UpdateSpotOrders start
-      const running = 1
+      const running = 1;
       spotOrders.forEach(async (item) => {
         const { orderId } = item;
-        this.updateOrderStatus('spot', orderId, strategyId, running)
+        this.updateOrderStatus('spot', orderId, strategyId, running);
       });
       // UpdateSpotOrders end
     }
@@ -803,16 +819,18 @@ export class DataCenterService {
     currentPage: number,
     pageSize: number,
   ): Promise<Result> {
-    const sql = `select * from strategies_order order by createdAt desc limit ${(currentPage - 1) * pageSize
-      },${pageSize}`;
+    const sql = `select * from strategies_order order by createdAt desc limit ${
+      (currentPage - 1) * pageSize
+    },${pageSize}`;
 
     const res = await this.strategiesOrderRepo.query(sql);
     return { code: 200, message: 'ok', data: res };
   }
 
   async mergeStrategy(currentPage: number, pageSize: number): Promise<Result> {
-    const sql = `select * from spot_order order by time desc limit ${(currentPage - 1) * pageSize
-      },${pageSize}`;
+    const sql = `select * from spot_order order by time desc limit ${
+      (currentPage - 1) * pageSize
+    },${pageSize}`;
 
     const res = await this.spotOrderRepo.query(sql);
     return { code: 200, message: 'ok', data: res };
@@ -846,8 +864,8 @@ export class DataCenterService {
       };
 
       this.createStrategyOrderIdUtil({ userId, strategyId, orderId });
-      const running = 1
-      this.updateOrderStatus('spot', orderId, strategyId, running)
+      const running = 1;
+      this.updateOrderStatus('spot', orderId, strategyId, running);
       await this.createStrategiesOrderUtil(strategiesOrder);
     } else {
       console.log('== exist strategyOrderId,skip... ==');
