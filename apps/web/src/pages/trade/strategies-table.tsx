@@ -20,6 +20,17 @@ export function StrategiesTable(props: Props) {
   const { data, syncCallBack } = props
   const [selectRows, setSelectRows] = useState<number[]>([])
 
+  const syncPriceUtil = async (order: StrategiesOrder) => {
+    const res = await traderApi.syncStrategyPriceApi(order)
+    if (res.code === 200) {
+
+      console.log('create success');
+      syncCallBack()
+    } else {
+      console.log("creatStrategys error")
+    }
+  }
+
   const onSyncPrice = async () => {
     if (!selectRows.length) {
       alert('select empty')
@@ -40,17 +51,10 @@ export function StrategiesTable(props: Props) {
 
       return
     }
-    const params = {
-      ...selectRow
-    }
-    const res = await traderApi.syncStrategyPriceApi(params)
-    if (res.code === 200) {
 
-      console.log('create success');
-      syncCallBack()
-    } else {
-      console.log("creatStrategys error")
-    }
+    const params = { ...selectRow }
+
+    syncPriceUtil(params)
   }
 
   const onSelectChange = (index: number, checked: boolean, keySet?: any) => {
@@ -84,9 +88,9 @@ export function StrategiesTable(props: Props) {
     {
       id: 'time', title: 'Date', dataIndex: '', key: 'time', width: 100,
       render(item: StrategiesOrder) {
-        return <Box w='198px'>
+        return <Box w='200px'>
           <Box>begin:{formatUnixTime(Number(item.time))}</Box>
-          {item.is_running ? <Box>fresh:{formatUnixTime(item.updatedAt)}</Box> : <Box>ended:{formatUnixTime(Number(item.sellingTime))}</Box>}
+          {item.is_running ? <Box>update:{formatUnixTime(item.updatedAt)}</Box> : <Box>ended:{formatUnixTime(Number(item.sellingTime))}</Box>}
         </Box>
       },
     },
@@ -94,17 +98,23 @@ export function StrategiesTable(props: Props) {
     {
       id: 'is_running', title: 'Status', dataIndex: '', key: 'is_running', width: 100,
       render(item: StrategiesOrder) {
-        return <Box>
+        return <>
           {item.is_running ? <Box as='span' color='#0ECB81'>Running</Box>
             : <Box as='span' color='#F6465D'>Ended</Box>
           }
-        </Box>
+        </>
       },
     },
     {
       id: 'price', title: 'Price', dataIndex: '', key: 'price', width: 100,
       render(item: StrategiesOrder) {
         return <span>{item.price ? item.price : '-'} </span>
+      },
+    },
+    {
+      id: 'action', title: 'Action', dataIndex: '', key: 'action', width: 100,
+      render(item: StrategiesOrder) {
+        return <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => syncPriceUtil(item)}>Update</Box>
       },
     },
     {

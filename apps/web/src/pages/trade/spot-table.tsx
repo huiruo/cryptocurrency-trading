@@ -13,6 +13,11 @@ interface Props {
   spotCallBack: (currentPage: number) => void
 }
 
+const strategyStatusMap = [
+  'original',
+  'running',
+  'ended'
+]
 /**
  * Code annotation
  */
@@ -36,12 +41,17 @@ export function SpotTable(props: Props) {
 
     const index = get(selectRows, '[0]', 0)
     const selectRow = get(data, `${[index]}`, 0)
-    const params = {
-      ...selectRow
-    }
-    const res = await traderApi.creatStrategiesApi(params)
+    const params = { ...selectRow }
+
+    creatStrategyUtil(params)
+  }
+
+  const creatStrategyUtil = async (order: SpotOrder) => {
+    console.log('creatStrategyUtil:', order);
+    const res = await traderApi.creatStrategiesApi(order)
     if (res.code === 200) {
       console.log('create success');
+      spotCallBack(1)
     } else {
       console.log("creatStrategys error")
     }
@@ -167,16 +177,20 @@ export function SpotTable(props: Props) {
     0 : original 1 : running 2 : ended
     */
     {
-      id: 'strategyStatus', title: 'strategyStatus', dataIndex: '', key: 'strategyStatus', width: 100,
+      id: 'strategyStatus', title: 'Status', dataIndex: '', key: 'strategyStatus', width: 100,
       render(item: SpotOrder) {
-        return <Box>
-          <Box>
-            <Box as='span'>{item.strategyStatus}</Box>
-            {item.strategyStatus !== 0 &&
-              <Box as='button' cursor='pointer' onClick={() => onResetOrderStatus(item)}>Reset</Box>
-            }
-          </Box>
-        </Box>
+        return <Box as='span' mr='5px'>{strategyStatusMap[item.strategyStatus]}</Box>
+      },
+    },
+    {
+      id: 'action', title: 'Action', dataIndex: '', key: 'action', width: 100,
+      render(item: SpotOrder) {
+        return <>
+          {item.strategyStatus !== 0 ?
+            <Box as='button' cursor='pointer' color='#fff' bg='#ff7875' rounded-4px onClick={() => onResetOrderStatus(item)}>Reset</Box> :
+            <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => creatStrategyUtil(item)}>Create</Box>
+          }
+        </>
       },
     },
     { id: 'price', title: 'Price', dataIndex: 'price', key: 'price', width: 100 },
