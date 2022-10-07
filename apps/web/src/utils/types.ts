@@ -56,6 +56,7 @@ export interface SpotOrder {
   isBuyer: boolean;
   isMaker: boolean;
   isBestMatch: boolean;
+  strategyStatus:number;
   time: number;
   updatedAt?: number;
   createdAt?: number;

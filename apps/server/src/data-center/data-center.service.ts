@@ -768,6 +768,35 @@ export class DataCenterService {
     return { code: 200, message: 'ok', data: null };
   }
 
+  // update spot_order strategyStatus and delete strategies_order record
+  async resetSpotOrderStatus(spotOrder: SpotOrder): Promise<Result> {
+    const { orderId, strategyId } = spotOrder;
+    console.log('resetSpotOrderStatus', orderId, 'strategyId:', strategyId);
+
+    const sql = `update spot_order set strategyId="",strategyStatus = 0  WHERE orderId = "${orderId}"`;
+    await this.spotOrderRepo.query(sql);
+
+    await this.delectStrategiesOrder(strategyId);
+
+    await this.delectStrategyOrderId(strategyId);
+
+    return { code: 200, message: 'ok', data: null };
+  }
+
+  private async delectStrategiesOrder(strategyId: string) {
+    const sql = `delete from strategies_order WHERE strategyId = "${strategyId}"`;
+    console.log('delectStrategiesOrder sql:', sql);
+
+    await this.strategyOrderIdRepo.query(sql);
+  }
+
+  private async delectStrategyOrderId(strategyId: string) {
+    const sql = `delete from strategy_orderid WHERE strategyId = "${strategyId}"`;
+    console.log('delectStrategiesOrder sql:', sql);
+
+    await this.strategyOrderIdRepo.query(sql);
+  }
+
   async mergeSpotStrategies(spotOrders: SpotOrder[]): Promise<Result> {
     console.log('spotOrder', spotOrders);
     const firstOrder = get(spotOrders, '[0]', {});
@@ -812,6 +841,10 @@ export class DataCenterService {
   }
 
   private async createStrategiesOrderUtil(strategiesOrder: StrategiesOrder) {
+    return await this.strategiesOrderRepo.save(strategiesOrder);
+  }
+
+  private async deleteStrategyOrder(strategiesOrder: StrategiesOrder) {
     return await this.strategiesOrderRepo.save(strategiesOrder);
   }
 

@@ -10,13 +10,14 @@ import { SpotOrder } from '@/utils/types';
 
 interface Props {
   data: SpotOrder[]
+  spotCallBack: (currentPage: number) => void
 }
 
 /**
  * Code annotation
  */
 export function SpotTable(props: Props) {
-  const { data } = props
+  const { data, spotCallBack } = props
   const [selectRows, setSelectRows] = useState<number[]>([])
   const [selectRowData, setSelectRowData] = useState<SpotOrder[]>([])
 
@@ -40,9 +41,7 @@ export function SpotTable(props: Props) {
     }
     const res = await traderApi.creatStrategiesApi(params)
     if (res.code === 200) {
-
       console.log('create success');
-
     } else {
       console.log("creatStrategys error")
     }
@@ -57,17 +56,24 @@ export function SpotTable(props: Props) {
     }
 
     selectRowData.sort((a: SpotOrder, b: SpotOrder) => {
-      // return Number(b.time) - Number(a.time);
       return Number(a.time) - Number(b.time);
     })
     console.log('sorted:', selectRowData);
     const res = await traderApi.closeSpotStrategyApi(selectRowData)
     if (res.code === 200) {
-
       console.log('Merge strategy success');
-
     } else {
       console.log("Merge strategy error")
+    }
+  }
+
+  const onResetOrderStatus = async (item: SpotOrder) => {
+    const res = await traderApi.resetSpotOrderStatus(item)
+    if (res.code === 200) {
+      console.log('ResetOrderStatus success');
+      spotCallBack(1)
+    } else {
+      console.log("ResetOrderStatus error")
     }
   }
 
@@ -85,9 +91,7 @@ export function SpotTable(props: Props) {
     console.log('sorted:', selectRowData);
     const res = await traderApi.mergeSpotStrategiesApi(selectRowData)
     if (res.code === 200) {
-
       console.log('Merge strategy success');
-
     } else {
       console.log("Merge strategy error")
     }
@@ -160,11 +164,21 @@ export function SpotTable(props: Props) {
       },
     },
     /*
-    0 : original
-    1 : running
-    2 : ended
+    0 : original 1 : running 2 : ended
     */
-    { id: 'strategyStatus', title: 'strategyStatus', dataIndex: 'strategyStatus', key: 'strategyStatus', width: 100 },
+    {
+      id: 'strategyStatus', title: 'strategyStatus', dataIndex: '', key: 'strategyStatus', width: 100,
+      render(item: SpotOrder) {
+        return <Box>
+          <Box>
+            <Box as='span'>{item.strategyStatus}</Box>
+            {item.strategyStatus !== 0 &&
+              <Box as='button' cursor='pointer' onClick={() => onResetOrderStatus(item)}>Reset</Box>
+            }
+          </Box>
+        </Box>
+      },
+    },
     { id: 'price', title: 'Price', dataIndex: 'price', key: 'price', width: 100 },
     {
       id: 'qty', title: 'qty', dataIndex: '', key: 'qty', width: 100,

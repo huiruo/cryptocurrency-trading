@@ -71,7 +71,7 @@ export function SpotOrders() {
       <Header />
       <Box pb='50px' mt='20px'>
         <AssetSelect options={asset} spotCallBack={onSyncSpotOrder} />
-        <SpotTable data={spotOrders} />
+        <SpotTable data={spotOrders} spotCallBack={getSpotOrders} />
       </Box>
     </>
   );

@@ -7,7 +7,6 @@ import { AssetType } from '@/utils/types';
 import { get } from 'lodash';
 
 interface Props {
-  // test: React.ReactNode
   spotCallBack: (value: string | number) => void
   options: AssetType[]
 }
@@ -24,9 +23,6 @@ export function AssetSelect(props: Props) {
   const onAddAsset = () => {
     navigate('/trade/addAsset')
   }
-
-  console.log('fjeo:', get(options, '[0]', ''));
-
 
   return (
     <>

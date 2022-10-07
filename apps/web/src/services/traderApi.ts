@@ -70,9 +70,12 @@ const traderApi = {
 		const url: string = `${traderApiUrl}/data/center/syncSpotOrder`;
 		return http.post<resType>(data, url);
 	},
-
 	spotOrdersApi(data: any) {
 		const url: string = `${traderApiUrl}/data/center/spotOrders`;
+		return http.post<resType>(data, url);
+	},
+	resetSpotOrderStatus(data: any) {
+		const url: string = `${traderApiUrl}/data/center/resetSpotOrderStatus`;
 		return http.post<resType>(data, url);
 	},
 	mergeSpotStrategiesApi(data: any) {
