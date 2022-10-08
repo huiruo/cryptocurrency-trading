@@ -16,7 +16,7 @@ export interface Page {
 export class DataCenterController {
   constructor(
     private readonly DataCenterService: DataCenterService, // private configService: ConfigService,
-  ) {}
+  ) { }
 
   @Post('addCode')
   async addCode(@Body() symbol: any): Promise<Result> {
@@ -132,7 +132,7 @@ export class DataCenterController {
 
   // =========== Strategies Order start ===========
   @Post('createStrategies')
-  async createStrategiesOrder(@Body() spotOrder: SpotOrder): Promise<Result> {
+  async createStrategiesOrder(@Body() spotOrder: SpotOrder[]): Promise<Result> {
     return await this.DataCenterService.createStrategiesOrder(spotOrder);
   }
 

@@ -33,20 +33,28 @@ export function SpotTable(props: Props) {
       return
     }
 
+    /*
     if (selectRows.length >= 2) {
       alert('select Greater than 2')
 
       return
     }
+    */
+    selectRowData.sort((a: SpotOrder, b: SpotOrder) => {
+      return Number(a.time) - Number(b.time);
+    })
 
+    /*
     const index = get(selectRows, '[0]', 0)
     const selectRow = get(data, `${[index]}`, 0)
     const params = { ...selectRow }
+    */
 
-    creatStrategyUtil(params)
+    console.log('selectRowData:', selectRowData);
+    creatStrategyUtil(selectRowData)
   }
 
-  const creatStrategyUtil = async (order: SpotOrder) => {
+  const creatStrategyUtil = async (order: SpotOrder[]) => {
     console.log('creatStrategyUtil:', order);
     const res = await traderApi.creatStrategiesApi(order)
     if (res.code === 200) {
@@ -188,7 +196,7 @@ export function SpotTable(props: Props) {
         return <>
           {item.strategyStatus !== 0 ?
             <Box as='button' cursor='pointer' color='#fff' bg='#ff7875' rounded-4px onClick={() => onResetOrderStatus(item)}>Reset</Box> :
-            <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => creatStrategyUtil(item)}>Create</Box>
+            <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => creatStrategyUtil([item])}>Create</Box>
           }
         </>
       },

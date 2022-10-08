@@ -19,6 +19,7 @@ import { nanoid } from 'nanoid';
 import { StrategyOrderId } from './strategy-orderid.entity';
 import {
   AssetType,
+  CalculateStrategiesOrderType,
   CreateOrdersStrategy,
   StrategyProfit,
   SyncSpotOrderParams,
@@ -97,9 +98,8 @@ export class DataCenterService {
   }
 
   async getCoin(currentPage: number, pageSize: number): Promise<Result> {
-    const sql = `select * from coin order by ranked asc limit ${
-      (currentPage - 1) * pageSize
-    },${pageSize}`;
+    const sql = `select * from coin order by ranked asc limit ${(currentPage - 1) * pageSize
+      },${pageSize}`;
 
     return await this.coninRepo.query(sql);
   }
@@ -423,9 +423,8 @@ export class DataCenterService {
     currentPage: number,
     pageSize: number,
   ): Promise<Result> {
-    const sql = `select * from futures_order order by updateTime desc limit ${
-      (currentPage - 1) * pageSize
-    },${pageSize}`;
+    const sql = `select * from futures_order order by updateTime desc limit ${(currentPage - 1) * pageSize
+      },${pageSize}`;
 
     const res = await this.futuresOrderRepo.query(sql);
     return { code: 200, message: 'ok', data: res };
@@ -519,9 +518,8 @@ export class DataCenterService {
   }
 
   async getSpotOrder(currentPage: number, pageSize: number): Promise<Result> {
-    const sql = `select * from spot_order order by time desc limit ${
-      (currentPage - 1) * pageSize
-    },${pageSize}`;
+    const sql = `select * from spot_order order by time desc limit ${(currentPage - 1) * pageSize
+      },${pageSize}`;
 
     const res = await this.spotOrderRepo.query(sql);
     return { code: 200, message: 'ok', data: res };
@@ -671,7 +669,7 @@ export class DataCenterService {
 
   async closeSpotStrategy(spotOrders: SpotOrder[]): Promise<Result> {
     const ordersLength = spotOrders.length;
-    const ordersGreaterThan2 = spotOrders.length > 2;
+    const ordersGreaterThan2 = spotOrders.length >= 2;
     const lastOrder = get(spotOrders, `[${ordersLength - 1}]`, {});
     const firstOrder = get(spotOrders, '[0]', {});
     const { orderId, userId } = firstOrder;
@@ -852,45 +850,81 @@ export class DataCenterService {
     currentPage: number,
     pageSize: number,
   ): Promise<Result> {
-    const sql = `select * from strategies_order order by createdAt desc limit ${
-      (currentPage - 1) * pageSize
-    },${pageSize}`;
+    const sql = `select * from strategies_order order by createdAt desc limit ${(currentPage - 1) * pageSize
+      },${pageSize}`;
 
     const res = await this.strategiesOrderRepo.query(sql);
     return { code: 200, message: 'ok', data: res };
   }
 
   async mergeStrategy(currentPage: number, pageSize: number): Promise<Result> {
-    const sql = `select * from spot_order order by time desc limit ${
-      (currentPage - 1) * pageSize
-    },${pageSize}`;
+    const sql = `select * from spot_order order by time desc limit ${(currentPage - 1) * pageSize
+      },${pageSize}`;
 
     const res = await this.spotOrderRepo.query(sql);
     return { code: 200, message: 'ok', data: res };
   }
 
-  // Only one is selected, so there is no loop
-  async createStrategiesOrder(spotOrder: SpotOrder): Promise<Result> {
-    const { orderId, userId } = spotOrder;
+  private calculateSpotStrategiesOrder(spotOrders: SpotOrder[], firstSymbol: string): CalculateStrategiesOrderType {
+    let qtyTotal = 0
+    let quoteQtyTotal = 0
+    let isTheSameSymbol = true
+
+    spotOrders.forEach(item => {
+      const { qty, quoteQty, symbol, isBuyer } = item
+      if (firstSymbol !== symbol) {
+        isTheSameSymbol = false
+      }
+
+      if (isBuyer) {
+        qtyTotal = Number(qty) + qtyTotal
+        quoteQtyTotal = Number(quoteQty) + quoteQtyTotal
+      } else {
+        qtyTotal = qtyTotal - Number(qty)
+        quoteQtyTotal = quoteQtyTotal - Number(quoteQty)
+      }
+    })
+
+    return {
+      qty: qtyTotal.toString(),
+      quoteQty: quoteQtyTotal.toString(),
+      entryPrice: (quoteQtyTotal / qtyTotal).toFixed(8),
+      isTheSameSymbol
+    }
+  }
+
+  async createStrategiesOrder(spotOrders: SpotOrder[]): Promise<Result> {
+    const firstOrder = get(spotOrders, '[0]', {});
+    const { orderId, userId, time, symbol } = firstOrder
     const strategyOrderId = await this.findStrategyOrderIdUtil(orderId);
     if (isEmpty(strategyOrderId)) {
       console.log('== not exist strategy,insert...');
       const strategyId = nanoid();
+
+      const { qty, quoteQty, entryPrice, isTheSameSymbol } = this.calculateSpotStrategiesOrder(spotOrders, symbol)
+      if (!isTheSameSymbol) {
+        return { code: 500, message: 'The selected order not the same Symbol', data: null };
+      }
+
       const strategiesOrder = {
         userId: userId,
         strategyId,
-        symbol: spotOrder.symbol,
+        symbol,
         price: '',
-        qty: spotOrder.qty,
-        quoteQty: spotOrder.quoteQty,
+        // qty: spotOrder.qty,
+        qty,
+        // quoteQty: spotOrder.quoteQty,
+        quoteQty,
         sellingQty: '',
         sellingQuoteQty: '',
         profit: 0,
         profitRate: '',
-        entryPrice: spotOrder.price,
+        // entryPrice: spotOrder.price,
+        entryPrice,
         sellingPrice: '',
         is_running: true,
-        time: spotOrder.time,
+        // time: spotOrder.time,
+        time,
         realizedProfit: 0,
         realizedProfitRate: '',
         sellingTime: null,
@@ -901,7 +935,7 @@ export class DataCenterService {
       this.updateOrderStatus('spot', orderId, strategyId, running);
       await this.createStrategiesOrderUtil(strategiesOrder);
     } else {
-      console.log('== exist strategyOrderId,skip... ==');
+      console.log('== exist strategyOrderId,update... ==');
     }
 
     return { code: 200, message: 'ok', data: null };

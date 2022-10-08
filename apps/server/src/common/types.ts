@@ -47,9 +47,15 @@ export interface CreateOrdersStrategy {
   sellingPrice: string
   sellingQty: string
   sellingQuoteQty: string
-
   sellingTime: number
   symbol: string
   time: number
   strategyId: string
+}
+
+export interface CalculateStrategiesOrderType {
+  qty: string
+  quoteQty: string
+  entryPrice: string
+  isTheSameSymbol: boolean
 }
