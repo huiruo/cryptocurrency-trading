@@ -1,12 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import NiceModal from '@ebay/nice-modal-react';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <NiceModal.Provider>
+      <App />
+    </NiceModal.Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );

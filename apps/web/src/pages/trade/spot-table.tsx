@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
+import NiceModal from '@ebay/nice-modal-react'
 import { Box } from '@fower/react';
 import { Table } from '@/common/table';
 import { formatUnixTime } from '@/utils';
 import { Checkbox } from '@/common/checkbox';
 import { Button } from '@/common/button';
 import traderApi from '@/services/traderApi';
-import { get } from 'lodash';
 import { SpotOrder } from '@/utils/types';
+import { MergeStrategyModal } from '@/components/mergeStrategyModal';
 
 interface Props {
   data: SpotOrder[]
@@ -18,6 +19,7 @@ const strategyStatusMap = [
   'running',
   'ended'
 ]
+
 /**
  * Code annotation
  */
@@ -95,7 +97,20 @@ export function SpotTable(props: Props) {
     }
   }
 
-  const onMergeStrategy = async () => {
+  const handleNewUser = (selectRowData: SpotOrder[]) => {
+    console.log('handleNewUser====',);
+    /*
+    NiceModal.show(MergeStrategyModal, selectRowData).then((selectRowData) => {
+      // userModal.show(MergeStrategyModal,selectRowData).then((selectRowData) => {
+      // setUsers([newUser, ...users]);
+      console.log('handleNewUser selectRowData:', selectRowData);
+    });
+    */
+
+    NiceModal.show('mergeStrategyModal')
+  };
+
+  const onMergeStrategy = () => {
     console.log('onMergeStrategy selectRows', selectRows);
     if (!selectRows.length) {
       alert('select empty')
@@ -106,13 +121,21 @@ export function SpotTable(props: Props) {
     selectRowData.sort((a: SpotOrder, b: SpotOrder) => {
       return Number(b.time) - Number(a.time);
     })
+
     console.log('sorted:', selectRowData);
+
+    // setVisible(true)
+    // show()
+
+    handleNewUser(selectRowData)
+    /*
     const res = await traderApi.mergeSpotStrategiesApi(selectRowData)
     if (res.code === 200) {
       console.log('Merge strategy success');
     } else {
       console.log("Merge strategy error")
     }
+    */
   }
 
   const onSelectChange = (index: number, checked: boolean, item: SpotOrder) => {
@@ -238,6 +261,7 @@ export function SpotTable(props: Props) {
   return (
     <Box toCenterX>
       <Box className='table-box-container'>
+
         <Table columns={columns} data={data} className='table-box' />
 
         <Box mt-10>
@@ -245,6 +269,8 @@ export function SpotTable(props: Props) {
           <Button onClick={() => onMergeStrategy()} mr4>Merge strategy</Button>
           <Button onClick={() => onCloseStrategy()} mr4>Close strategy</Button>
         </Box>
+
+        <MergeStrategyModal id='mergeStrategyModal' mergeOrders={selectRowData} />
       </Box>
     </Box>
   );

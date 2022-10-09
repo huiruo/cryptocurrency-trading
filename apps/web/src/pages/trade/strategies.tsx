@@ -24,7 +24,7 @@ export function Strategies() {
 
       setStrategies(res.data)
     } else {
-      console.log("get future orders error")
+      console.log("get Strategies orders error")
     }
   }
 

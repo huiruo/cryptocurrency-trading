@@ -1,0 +1,153 @@
+.trade-modal-mask {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    height: 100%;
+    z-index: 999;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.trade-modal-wrap {
+    position: fixed;
+    overflow: auto;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 100%;
+    z-index: 999;
+    -webkit-overflow-scrolling: touch;
+    outline: 0;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-transform: translateZ(1px);
+    transform: translateZ(1px);
+}
+
+.trade-modal-transparent {
+    position: relative;
+    max-width: 80%;
+}
+
+.trade-modal-content {
+    position: relative;
+    background-color: #fff;
+    border: 0;
+    background-clip: padding-box;
+    text-align: center;
+    height: 100%;
+    overflow: hidden;
+
+    border-radius: 7px;
+    /* padding-top: 10px; */
+}
+
+.trade-modal-close {
+    position: absolute;
+    z-index: 999;
+    height: 21px;
+    width: 21px;
+    border: 0;
+    padding: 0;
+    background-color: transparent;
+    outline: none;
+    right: 15px;
+    top: 10px;
+    cursor: pointer;
+}
+
+.trade-modal-close-x {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg%20width%3D'30'%20height%3D'30'%20viewBox%3D'0%200%2030%2030'%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%3E%20%3Cdefs%3E%3C%2Fdefs%3E%20%3Cg%20id%3D'ALL-ICON'%20stroke%3D'none'%20stroke-width%3D'1'%20fill%3D'none'%20fill-rule%3D'evenodd'%3E%20%3Cg%20id%3D'Rectangle-283-%2B-Rectangle-283'%20fill%3D'%23888888'%3E%20%3Crect%20id%3D'Rectangle-283'%20transform%3D'translate(14.849242%2C%2014.849242)%20rotate(-315.000000)%20translate(-14.849242%2C%20-14.849242)%20'%20x%3D'-5.1507576'%20y%3D'13.8492424'%20width%3D'40'%20height%3D'2'%3E%3C%2Frect%3E%20%3Crect%20id%3D'Rectangle-283'%20transform%3D'translate(14.849242%2C%2014.849242)%20scale(-1%2C%201)%20rotate(-315.000000)%20translate(-14.849242%2C%20-14.849242)%20'%20x%3D'-5.1507576'%20y%3D'13.8492424'%20width%3D'40'%20height%3D'2'%3E%3C%2Frect%3E%20%3C%2Fg%3E%20%3C%2Fg%3E%20%3C%2Fsvg%3E");
+}
+
+.trade-modal-header {
+    height: 32px;
+}
+
+.trade-modal-title {
+    margin: 0;
+    font-size: 16px;
+    line-height: 32px;
+    color: #000;
+    text-align: center;
+}
+
+.trade-modal-body {
+    font-size: 15px;
+    height: 100%;
+    line-height: 1.5;
+    overflow: auto;
+    padding: 0 10px 10px;
+}
+
+
+/*动画start*/
+.trade-modal-enter,
+.trade-modal-appear {
+    opacity: 0;
+    transform: scale(0.9);
+}
+
+/*
+trade-modal-appear trade-modal-appear-active
+*/
+.trade-modal-enter-active,
+.trade-modal-appear-active {
+    /*animation-name: amFadeIn;*/
+    /*animation-duration:.1s;*/
+    /*animation-play-state: running;*/
+    opacity: 1;
+    transform: translateX(0);
+    transition: opacity 300ms, transform 300ms;
+}
+
+@keyframes amFadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+/*
+trade-modal-appear-done trade-modal-enter-done
+*/
+.trade-modal-enter-active.trade-modal-appear-done {}
+
+.trade-modal-enter-done {}
+
+.trade-modal-exit {
+    opacity: 1;
+}
+
+.trade-modal-exit-active {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 300ms, transform 300ms;
+    ;
+}
+
+.trade-modal-exit-done {
+    opacity: 0;
+}
+
+/*动画end*/

@@ -35,7 +35,7 @@ function SymbolList(props: SymbolListProps) {
     const res = await traderApi.syncCoinInfoApi(req)
     const { data, code } = res
     if (code === 200) {
-      console.log('sync success', res);
+      console.log('sync success', data);
     } else {
       console.log("同步失败")
     }

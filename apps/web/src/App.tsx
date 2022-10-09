@@ -4,9 +4,7 @@ import '@/style/common.scss'
 
 function App() {
   return (
-    <>
-      <Routes />
-    </>
+    <Routes />
   );
 }
 
