@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 import { get } from 'lodash';
 // import { ConfigService } from '@nestjs/config';
 import { Result } from 'src/common/result.interface';
-import { AssetType, SymbolType, SyncSpotOrderParams } from 'src/common/types';
+import { AssetType, MergeSpotStrategyParams, SymbolType, SyncSpotOrderParams } from 'src/common/types';
 import { DataCenterService } from './data-center.service';
 import { SpotOrder } from './spot-order.entity';
 import { StrategiesOrder } from './strategies-order.entity';
@@ -113,40 +113,37 @@ export class DataCenterController {
     return await this.DataCenterService.getSpotAllOrders();
   }
 
-  @Post('mergeSpotStrategies')
-  async mergeSpotStrategies(@Body() spotOrders: SpotOrder[]): Promise<Result> {
-    return await this.DataCenterService.mergeSpotStrategies(spotOrders);
-  }
-
   @Post('resetSpotOrderStatus')
   async resetSpotOrderStatus(@Body() spotOrder: SpotOrder): Promise<Result> {
     return await this.DataCenterService.resetSpotOrderStatus(spotOrder);
+  }
+  // =========== spot end ===========
+  // =========== spot end ===========
+
+  // =========== Strategies Order start ===========
+  @Post('createStrategy')
+  async createStrategy(@Body() spotOrder: SpotOrder[]): Promise<Result> {
+    return await this.DataCenterService.createStrategy(spotOrder);
+  }
+
+  @Post('mergeSpotStrategy')
+  async mergeSpotStrategy(@Body() params: MergeSpotStrategyParams): Promise<Result> {
+    const { spotOrders, strategyOrder } = params
+
+    return await this.DataCenterService.mergeSpotStrategy(
+      spotOrders,
+      strategyOrder,
+    );
   }
 
   @Post('closeSpotStrategy')
   async closeSpotStrategy(@Body() spotOrders: SpotOrder[]): Promise<Result> {
     return await this.DataCenterService.closeSpotStrategy(spotOrders);
   }
-  // =========== spot end ===========
-  // =========== spot end ===========
-
-  // =========== Strategies Order start ===========
-  @Post('createStrategies')
-  async createStrategiesOrder(@Body() spotOrder: SpotOrder[]): Promise<Result> {
-    return await this.DataCenterService.createStrategiesOrder(spotOrder);
-  }
 
   @Post('strategiesOrder')
   async getStrategiesOrder(@Body() page: Page): Promise<Result> {
     return await this.DataCenterService.getStrategiesOrder(
-      page.currentPage,
-      page.pageSize,
-    );
-  }
-
-  @Post('createStrategies')
-  async mergeStrategy(@Body() page: Page): Promise<Result> {
-    return await this.DataCenterService.mergeStrategy(
       page.currentPage,
       page.pageSize,
     );

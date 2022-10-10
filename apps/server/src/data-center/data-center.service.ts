@@ -592,17 +592,17 @@ export class DataCenterService {
 
   private async updateOrderStatus(
     type: string,
-    orderId: number,
+    id: number,
     strategyId: string,
     strategyStatus: number,
   ) {
     if (type === 'spot') {
-      const sql = `update spot_order set strategyId="${strategyId}",strategyStatus = "${strategyStatus}"  WHERE orderId = "${orderId}"`;
+      const sql = `update spot_order set strategyId="${strategyId}",strategyStatus = "${strategyStatus}"  WHERE id = "${id}"`;
       await this.spotOrderRepo.query(sql);
     }
 
     if (type === 'future') {
-      const sql = `update futures_order set strategyId="${strategyId}",strategyStatus = "${strategyStatus}"  WHERE orderId = "${orderId}"`;
+      const sql = `update futures_order set strategyId="${strategyId}",strategyStatus = "${strategyStatus}"  WHERE id = "${id}"`;
       await this.futuresOrderRepo.query(sql);
     }
   }
@@ -653,7 +653,7 @@ export class DataCenterService {
         sellingTime,
       };
 
-      await this.createStrategiesOrderUtil(strategiesOrder);
+      await this.createStrategyOrderUtil(strategiesOrder);
     } else if (type === 'update') {
       const { profit, profitRate } = this.calculateStrategyProfit(
         sellingPrice,
@@ -719,8 +719,8 @@ export class DataCenterService {
       // UpdateSpotOrders start
       const running = 1;
       spotOrders.forEach(async (item) => {
-        const { orderId } = item;
-        this.updateOrderStatus('spot', orderId, strategyId, running);
+        const { id } = item;
+        this.updateOrderStatus('spot', id, strategyId, running);
       });
       // UpdateSpotOrders end
     } else {
@@ -757,8 +757,8 @@ export class DataCenterService {
       // UpdateSpotOrders start
       const running = 1;
       spotOrders.forEach(async (item) => {
-        const { orderId } = item;
-        this.updateOrderStatus('spot', orderId, strategyId, running);
+        const { id } = item;
+        this.updateOrderStatus('spot', id, strategyId, running);
       });
       // UpdateSpotOrders end
     }
@@ -771,56 +771,28 @@ export class DataCenterService {
     const { orderId, strategyId } = spotOrder;
     console.log('resetSpotOrderStatus', orderId, 'strategyId:', strategyId);
 
-    const sql = `update spot_order set strategyId="",strategyStatus = 0  WHERE orderId = "${orderId}"`;
+    const sql = `update spot_order set strategyId="",strategyStatus = 0  WHERE strategyId = "${strategyId}"`;
     await this.spotOrderRepo.query(sql);
 
-    await this.delectStrategiesOrder(strategyId);
+    await this.delectStrategyOrder(strategyId);
 
     await this.delectStrategyOrderId(strategyId);
 
     return { code: 200, message: 'ok', data: null };
   }
 
-  private async delectStrategiesOrder(strategyId: string) {
+  private async delectStrategyOrder(strategyId: string) {
     const sql = `delete from strategies_order WHERE strategyId = "${strategyId}"`;
-    console.log('delectStrategiesOrder sql:', sql);
+    console.log('delectStrategyOrder sql:', sql);
 
     await this.strategyOrderIdRepo.query(sql);
   }
 
   private async delectStrategyOrderId(strategyId: string) {
     const sql = `delete from strategy_orderid WHERE strategyId = "${strategyId}"`;
-    console.log('delectStrategiesOrder sql:', sql);
+    console.log('delectStrategyOrder sql:', sql);
 
     await this.strategyOrderIdRepo.query(sql);
-  }
-
-  async mergeSpotStrategies(spotOrders: SpotOrder[]): Promise<Result> {
-    console.log('spotOrder', spotOrders);
-    const firstOrder = get(spotOrders, '[0]', {});
-    const { orderId } = firstOrder;
-    console.log('orderId', orderId);
-    const strategyOrderId = await this.findStrategyOrderIdUtil(orderId);
-    console.log('strategyOrderId', strategyOrderId);
-
-    if (isEmpty(strategyOrderId)) {
-      console.log('== not exist strategy,create strategy ...');
-      const strategyId = nanoid();
-      // create strategy
-      spotOrders.forEach(async (item) => {
-        console.log('spotOrders item:', item);
-        const { orderId, userId } = item;
-        await this.createStrategyOrderIdUtil({
-          userId,
-          strategyId,
-          orderId,
-        });
-      });
-    } else {
-      console.log('== exist strategyOrderId,update strategy ... ==');
-    }
-
-    return { code: 200, message: 'ok', data: null };
   }
   // =========== spot end ===========
 
@@ -833,17 +805,20 @@ export class DataCenterService {
     orderId: number,
   ): Promise<StrategyOrderId> {
     const sql = `select strategyId,orderId from strategy_orderid where orderId='${orderId}'`;
-    console.log('sql:', sql);
 
     return await this.strategyOrderIdRepo.query(sql);
   }
 
-  private async createStrategiesOrderUtil(strategiesOrder: StrategiesOrder) {
+  private async createStrategyOrderUtil(strategiesOrder: StrategiesOrder) {
     return await this.strategiesOrderRepo.save(strategiesOrder);
   }
 
-  private async deleteStrategyOrder(strategiesOrder: StrategiesOrder) {
-    return await this.strategiesOrderRepo.save(strategiesOrder);
+  private async updateStrategyOrderUtil(strategiesOrder: StrategiesOrder) {
+
+    const { strategyId, qty, quoteQty, entryPrice } = strategiesOrder
+
+    const sql = `update strategies_order set qty = "${qty}",quoteQty = "${quoteQty}",entryPrice="${entryPrice}" WHERE strategyId = "${strategyId}"`;
+    const result = await this.strategiesOrderRepo.query(sql);
   }
 
   async getStrategiesOrder(
@@ -857,22 +832,95 @@ export class DataCenterService {
     return { code: 200, message: 'ok', data: res };
   }
 
-  async mergeStrategy(currentPage: number, pageSize: number): Promise<Result> {
-    const sql = `select * from spot_order order by time desc limit ${(currentPage - 1) * pageSize
-      },${pageSize}`;
+  async mergeSpotStrategy(spotOrders: SpotOrder[], strategyOrder: StrategiesOrder): Promise<Result> {
+    console.log('spotOrders', spotOrders);
+    console.log('strategyOrder', strategyOrder);
 
-    const res = await this.spotOrderRepo.query(sql);
-    return { code: 200, message: 'ok', data: res };
+    const { qty, quoteQty, entryPrice, isTheSameSymbol } = this.calculateSpotOrderMergeStrategy(spotOrders, strategyOrder)
+    if (!isTheSameSymbol) {
+      return { code: 500, message: 'The selected order not the same Symbol', data: null };
+    }
+
+    const { userId, strategyId, symbol, time } = strategyOrder
+
+    const strategiesOrder = {
+      userId,
+      strategyId,
+      symbol,
+      price: '',
+      // qty: spotOrder.qty,
+      qty,
+      // quoteQty: spotOrder.quoteQty,
+      quoteQty,
+      sellingQty: '',
+      sellingQuoteQty: '',
+      profit: 0,
+      profitRate: '',
+      // entryPrice: spotOrder.price,
+      entryPrice,
+      sellingPrice: '',
+      is_running: true,
+      // time: spotOrder.time,
+      time,
+      realizedProfit: 0,
+      realizedProfitRate: '',
+      sellingTime: null,
+    };
+
+    /*
+    this.createStrategyOrderIdUtil({ userId, strategyId, orderId });
+    */
+    await this.updateStrategyOrderUtil(strategiesOrder)
+    const running = 1;
+    spotOrders.forEach(item => {
+      const { id: idUpdate } = item
+      this.updateOrderStatus('spot', idUpdate, strategyId, running);
+    })
+    return { code: 200, message: 'ok', data: null };
   }
 
-  private calculateSpotStrategiesOrder(spotOrders: SpotOrder[], firstSymbol: string): CalculateStrategiesOrderType {
+  private calculateSpotOrderMergeStrategy(spotOrders: SpotOrder[], strategyOrder: StrategiesOrder): CalculateStrategiesOrderType {
+    const { symbol } = strategyOrder
+    let qtyTotal = 0
+    let quoteQtyTotal = 0
+    let isTheSameSymbol = true
+    const targetSymbol = symbol
+
+    spotOrders.forEach(item => {
+      const { qty, quoteQty, symbol, isBuyer } = item
+      if (targetSymbol !== symbol) {
+        isTheSameSymbol = false
+      }
+
+      if (isBuyer) {
+        qtyTotal = Number(qty) + qtyTotal
+        quoteQtyTotal = Number(quoteQty) + quoteQtyTotal
+      } else {
+        qtyTotal = qtyTotal - Number(qty)
+        quoteQtyTotal = quoteQtyTotal - Number(quoteQty)
+      }
+    })
+
+    const { qty, quoteQty } = strategyOrder
+    qtyTotal = Number(qty) + qtyTotal
+    quoteQtyTotal = Number(quoteQty) + quoteQtyTotal
+
+    return {
+      qty: qtyTotal.toString(),
+      quoteQty: quoteQtyTotal.toString(),
+      entryPrice: (quoteQtyTotal / qtyTotal).toFixed(8),
+      isTheSameSymbol
+    }
+  }
+
+  private calculateSpotStrategiesOrder(spotOrders: SpotOrder[], targetSymbol: string): CalculateStrategiesOrderType {
     let qtyTotal = 0
     let quoteQtyTotal = 0
     let isTheSameSymbol = true
 
     spotOrders.forEach(item => {
       const { qty, quoteQty, symbol, isBuyer } = item
-      if (firstSymbol !== symbol) {
+      if (targetSymbol !== symbol) {
         isTheSameSymbol = false
       }
 
@@ -893,9 +941,9 @@ export class DataCenterService {
     }
   }
 
-  async createStrategiesOrder(spotOrders: SpotOrder[]): Promise<Result> {
+  async createStrategy(spotOrders: SpotOrder[]): Promise<Result> {
     const firstOrder = get(spotOrders, '[0]', {});
-    const { orderId, userId, time, symbol } = firstOrder
+    const { orderId, userId, time, symbol, id } = firstOrder
     const strategyOrderId = await this.findStrategyOrderIdUtil(orderId);
     if (isEmpty(strategyOrderId)) {
       console.log('== not exist strategy,insert...');
@@ -931,9 +979,12 @@ export class DataCenterService {
       };
 
       this.createStrategyOrderIdUtil({ userId, strategyId, orderId });
+      await this.createStrategyOrderUtil(strategiesOrder);
       const running = 1;
-      this.updateOrderStatus('spot', orderId, strategyId, running);
-      await this.createStrategiesOrderUtil(strategiesOrder);
+      spotOrders.forEach(item => {
+        const { id: idUpdate } = item
+        this.updateOrderStatus('spot', idUpdate, strategyId, running);
+      })
     } else {
       console.log('== exist strategyOrderId,update... ==');
     }

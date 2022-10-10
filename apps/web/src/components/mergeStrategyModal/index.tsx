@@ -13,7 +13,7 @@ import { TradeModal } from '../modal';
 
 interface Props {
   mergeOrders: SpotOrder[]
-  // onCloseCallBack?(): void
+  spotTableCallBack(): void
 }
 
 /**
@@ -22,7 +22,7 @@ interface Props {
 export const MergeStrategyModal = NiceModal.create((props: Props) => {
 
   const { visible, hide } = useModal()
-  const { mergeOrders } = props
+  const { mergeOrders, spotTableCallBack } = props
   const [strategies, setStrategies] = useState<StrategiesOrder[]>([])
   const [selectRows, setSelectRows] = useState<number[]>([])
 
@@ -38,6 +38,10 @@ export const MergeStrategyModal = NiceModal.create((props: Props) => {
     } else {
       console.log("get Strategies orders error")
     }
+  }
+
+  const afterClose = () => {
+    setSelectRows([])
   }
 
   useEffect(() => {
@@ -80,10 +84,23 @@ export const MergeStrategyModal = NiceModal.create((props: Props) => {
       return
     }
 
-    const params = { ...selectRow }
+    const strategyOrder = { ...selectRow }
 
-    console.log('params:', params);
+    console.log('params:', strategyOrder);
     console.log('mergeOrders:', mergeOrders);
+    const params = {
+      spotOrders: mergeOrders,
+      strategyOrder,
+    }
+
+    const res = await traderApi.mergeSpotStrategy(params)
+    if (res.code === 200) {
+      console.log('Merge strategy success');
+      hide()
+      spotTableCallBack()
+    } else {
+      console.log("Merge strategy error")
+    }
 
     // syncPriceUtil(params)
   }
@@ -150,11 +167,12 @@ export const MergeStrategyModal = NiceModal.create((props: Props) => {
       showMask={true}
       showCloseButton={true}
       maskClosable={true}
-      header="Select orders to be merged"
+      header="Select Strategy to be merged"
       width='70%'
       isVisible={visible}
       onClose={hide}
       onOpen={() => getStrategies(1)}
+      afterClose={() => afterClose()}
     >
       <Box position='relative' h='412px'>
         <Table columns={columns} data={strategies} className='table-box' />

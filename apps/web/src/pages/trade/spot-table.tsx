@@ -51,17 +51,22 @@ export function SpotTable(props: Props) {
     const selectRow = get(data, `${[index]}`, 0)
     const params = { ...selectRow }
     */
-
-    console.log('selectRowData:', selectRowData);
+    const isStrategyRelatedOrder = isStrategyRelatedOrderUtil(selectRowData)
+    if (isStrategyRelatedOrder) {
+      alert('Can not select strategy related order')
+      return
+    }
     creatStrategyUtil(selectRowData)
   }
 
   const creatStrategyUtil = async (order: SpotOrder[]) => {
     console.log('creatStrategyUtil:', order);
-    const res = await traderApi.creatStrategiesApi(order)
+    const res = await traderApi.creatStrategyApi(order)
     if (res.code === 200) {
       console.log('create success');
       spotCallBack(1)
+      setSelectRowData([])
+      setSelectRows([])
     } else {
       console.log("creatStrategys error")
     }
@@ -87,28 +92,29 @@ export function SpotTable(props: Props) {
     }
   }
 
+  const isStrategyRelatedOrderUtil = (selectRowData: SpotOrder[]): boolean => {
+    let isStrategyRelatedOrder = false
+    selectRowData.forEach(item => {
+      const { strategyId } = item
+      if (strategyId) {
+        isStrategyRelatedOrder = true
+      }
+    })
+
+    return isStrategyRelatedOrder
+  }
+
   const onResetOrderStatus = async (item: SpotOrder) => {
     const res = await traderApi.resetSpotOrderStatus(item)
     if (res.code === 200) {
       console.log('ResetOrderStatus success');
       spotCallBack(1)
+      setSelectRowData([])
+      setSelectRows([])
     } else {
       console.log("ResetOrderStatus error")
     }
   }
-
-  const handleNewUser = (selectRowData: SpotOrder[]) => {
-    console.log('handleNewUser====',);
-    /*
-    NiceModal.show(MergeStrategyModal, selectRowData).then((selectRowData) => {
-      // userModal.show(MergeStrategyModal,selectRowData).then((selectRowData) => {
-      // setUsers([newUser, ...users]);
-      console.log('handleNewUser selectRowData:', selectRowData);
-    });
-    */
-
-    NiceModal.show('mergeStrategyModal')
-  };
 
   const onMergeStrategy = () => {
     console.log('onMergeStrategy selectRows', selectRows);
@@ -118,23 +124,24 @@ export function SpotTable(props: Props) {
       return
     }
 
+    const isStrategyRelatedOrder = isStrategyRelatedOrderUtil(selectRowData)
+    if (isStrategyRelatedOrder) {
+      alert('Can not select strategy related order')
+      return
+    }
+
     selectRowData.sort((a: SpotOrder, b: SpotOrder) => {
       return Number(b.time) - Number(a.time);
     })
 
     console.log('sorted:', selectRowData);
-
-    // setVisible(true)
-    // show()
-
-    handleNewUser(selectRowData)
+    NiceModal.show('mergeStrategyModal')
     /*
-    const res = await traderApi.mergeSpotStrategiesApi(selectRowData)
-    if (res.code === 200) {
-      console.log('Merge strategy success');
-    } else {
-      console.log("Merge strategy error")
-    }
+    NiceModal.show(MergeStrategyModal, selectRowData).then((selectRowData) => {
+      // userModal.show(MergeStrategyModal,selectRowData).then((selectRowData) => {
+      // setUsers([newUser, ...users]);
+      console.log('handleNewUser selectRowData:', selectRowData);
+    });
     */
   }
 
@@ -168,6 +175,12 @@ export function SpotTable(props: Props) {
 
     console.log('se；', selectRows);
     console.log('se；', selectRowData);
+  }
+
+  const spotTableCallBack = () => {
+    spotCallBack(1)
+    setSelectRowData([])
+    setSelectRows([])
   }
 
   const columns = [
@@ -270,7 +283,7 @@ export function SpotTable(props: Props) {
           <Button onClick={() => onCloseStrategy()} mr4>Close strategy</Button>
         </Box>
 
-        <MergeStrategyModal id='mergeStrategyModal' mergeOrders={selectRowData} />
+        <MergeStrategyModal id='mergeStrategyModal' mergeOrders={selectRowData} spotTableCallBack={() => spotTableCallBack()} />
       </Box>
     </Box>
   );

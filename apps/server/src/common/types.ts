@@ -1,3 +1,6 @@
+import { SpotOrder } from "src/data-center/spot-order.entity";
+import { StrategiesOrder } from "src/data-center/strategies-order.entity";
+
 export interface balancesType {
   id?: string;
   asset: string;
@@ -58,4 +61,9 @@ export interface CalculateStrategiesOrderType {
   quoteQty: string
   entryPrice: string
   isTheSameSymbol: boolean
+}
+
+export interface MergeSpotStrategyParams {
+  spotOrders: SpotOrder[]
+  strategyOrder: StrategiesOrder
 }
