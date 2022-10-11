@@ -12,17 +12,17 @@ import { TradeModal } from '../modal';
 
 
 interface Props {
-  mergeOrders: SpotOrder[]
+  closeOrders: SpotOrder[]
   spotTableCallBack(): void
 }
 
 /**
  * Code annotation
  */
-export const MergeStrategyModal = NiceModal.create((props: Props) => {
+export const CloseStrategyModal = NiceModal.create((props: Props) => {
 
   const { visible, hide } = useModal()
-  const { mergeOrders, spotTableCallBack } = props
+  const { closeOrders, spotTableCallBack } = props
   const [strategies, setStrategies] = useState<StrategiesOrder[]>([])
   const [selectRows, setSelectRows] = useState<number[]>([])
 
@@ -63,7 +63,7 @@ export const MergeStrategyModal = NiceModal.create((props: Props) => {
     console.log('se；', selectRows);
   }
 
-  const onMergeStrategy = async () => {
+  const onCloseStrategy = async () => {
     if (!selectRows.length) {
       alert('select empty')
 
@@ -87,13 +87,13 @@ export const MergeStrategyModal = NiceModal.create((props: Props) => {
     const strategyOrder = { ...selectRow }
 
     console.log('params:', strategyOrder);
-    console.log('mergeOrders:', mergeOrders);
+    console.log('closeOrders:', closeOrders);
     const params = {
-      spotOrders: mergeOrders,
+      spotOrders: closeOrders,
       strategyOrder,
     }
 
-    const res = await traderApi.mergeSpotStrategy(params)
+    const res = await traderApi.closeSpotStrategyApi(params)
     if (res.code === 200) {
       console.log('Merge strategy success');
       hide()
@@ -177,7 +177,7 @@ export const MergeStrategyModal = NiceModal.create((props: Props) => {
       showMask={true}
       showCloseButton={true}
       maskClosable={true}
-      header="Select Strategy to be merged"
+      header="Select Strategy to be closed"
       width='70%'
       isVisible={visible}
       onClose={hide}
@@ -187,7 +187,7 @@ export const MergeStrategyModal = NiceModal.create((props: Props) => {
       <Box position='relative' h='412px'>
         <Table columns={columns} data={strategies} className='table-box' />
         <Box mt-10 position='absolute' bottom0>
-          <Button onClick={() => onMergeStrategy()} mr4>Merge strategy</Button>
+          <Button onClick={() => onCloseStrategy()} mr4>Close strategy</Button>
         </Box>
       </Box>
     </TradeModal>

@@ -11,7 +11,7 @@ export class SpotOrder {
   @Column({ comment: 'quoteQty' }) quoteQty: string;
   @Column({ comment: 'commission' }) commission: string;
   @Column({ comment: 'commissionAsset' }) commissionAsset: string;
-  @Column({ comment: 'isBuyer' }) isBuyer: boolean;
+  @Column({ comment: 'isBuyer' }) isBuyer: number;
   @Column({ comment: 'strategyStatus' }) strategyStatus?: number;
   @Column({ comment: 'isMaker' }) isMaker: boolean;
   @Column({ comment: 'isBestMatch' }) isBestMatch: boolean;

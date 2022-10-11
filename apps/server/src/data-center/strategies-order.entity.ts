@@ -6,6 +6,7 @@ export class StrategiesOrder {
   @Column({ comment: 'strategyId', }) strategyId: string;
   @Column({ comment: 'symbol', }) symbol: string;
   @Column({ comment: 'price', }) price: string;
+  @Column({ comment: 'side', }) side: number;
   @Column({ comment: 'qty', }) qty: string;
   @Column({ comment: 'quoteQty', }) quoteQty: string;
   @Column({ comment: 'sellingQty', }) sellingQty: string;

@@ -8,6 +8,7 @@ import { Button } from '@/common/button';
 import traderApi from '@/services/traderApi';
 import { SearchParmas, SpotOrder } from '@/utils/types';
 import { MergeStrategyModal } from '@/components/mergeStrategyModal';
+import { CloseStrategyModal } from '@/components/closeStrategyModal';
 
 interface Props {
   data: SpotOrder[]
@@ -78,26 +79,6 @@ export function SpotTable(props: Props) {
     }
   }
 
-  const onCloseStrategy = async () => {
-    console.log('onCloseStrategy selectRows', selectRows);
-    if (!selectRows.length) {
-      alert('select empty')
-
-      return
-    }
-
-    selectRowData.sort((a: SpotOrder, b: SpotOrder) => {
-      return Number(a.time) - Number(b.time);
-    })
-    console.log('sorted:', selectRowData);
-    const res = await traderApi.closeSpotStrategyApi(selectRowData)
-    if (res.code === 200) {
-      console.log('Merge strategy success');
-    } else {
-      console.log("Merge strategy error")
-    }
-  }
-
   const isStrategyRelatedOrderUtil = (selectRowData: SpotOrder[]): boolean => {
     let isStrategyRelatedOrder = false
     selectRowData.forEach(item => {
@@ -154,6 +135,20 @@ export function SpotTable(props: Props) {
       console.log('handleNewUser selectRowData:', selectRowData);
     });
     */
+  }
+
+  const onCloseStrategy = async () => {
+    if (!selectRows.length) {
+      alert('select empty')
+
+      return
+    }
+
+    selectRowData.sort((a: SpotOrder, b: SpotOrder) => {
+      return Number(a.time) - Number(b.time);
+    })
+
+    NiceModal.show('closeStrategyModal')
   }
 
   const onSelectChange = (index: number, checked: boolean, item: SpotOrder) => {
@@ -320,8 +315,9 @@ export function SpotTable(props: Props) {
           <Button onClick={() => onCloseStrategy()} mr4>Close strategy</Button>
         </Box>
         <MergeStrategyModal id='mergeStrategyModal' mergeOrders={selectRowData} spotTableCallBack={() => spotTableCallBack()} />
+        <CloseStrategyModal id='closeStrategyModal' closeOrders={selectRowData} spotTableCallBack={() => spotTableCallBack()} />
         <Box mt='20px' mb='20px'>
-          <Button onClick={onPrePage}>上一页</Button>  当前页：{currentPage} <Button onClick={onNextPage}>下一页</Button>
+          <Button onClick={onPrePage}>Previous page</Button>  Current Page：{currentPage} <Button onClick={onNextPage}>Next page</Button>
         </Box>
       </Box>
     </Box>

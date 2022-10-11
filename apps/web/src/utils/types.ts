@@ -68,6 +68,7 @@ export interface StrategiesOrder {
   strategyId: string;
   symbol: string;
   price: string;
+  side: number;
   qty: string;
   quoteQty: string;
   sellingQty: string;

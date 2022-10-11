@@ -63,6 +63,16 @@ export interface CalculateStrategiesOrderType {
   isTheSameSymbol: boolean
 }
 
+export interface CalculateCloseStrategyOrderType {
+  sellingQty: string
+  sellingQuoteQty: string
+  sellingPrice: string
+  realizedProfit: number,
+  realizedProfitRate: string,
+  isTheSameSymbol: boolean
+  isTheSameSide: boolean
+}
+
 export interface MergeSpotStrategyParams {
   spotOrders: SpotOrder[]
   strategyOrder: StrategiesOrder

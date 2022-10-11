@@ -96,6 +96,16 @@ export function StrategiesTable(props: Props) {
     },
     { id: 'symbol', title: 'Symbol', dataIndex: 'symbol', key: 'symbol', width: 100 },
     {
+      id: 'side', title: 'Side', dataIndex: '', key: 'side', width: 100,
+      render(item: StrategiesOrder) {
+        return <>
+          {item.side ? <Box as='span' color='#0ECB81'>Long</Box>
+            : <Box as='span' color='#F6465D'>Short</Box>
+          }
+        </>
+      },
+    },
+    {
       id: 'is_running', title: 'Status', dataIndex: '', key: 'is_running', width: 100,
       render(item: StrategiesOrder) {
         return <>

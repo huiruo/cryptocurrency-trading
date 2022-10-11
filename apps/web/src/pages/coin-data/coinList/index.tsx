@@ -143,7 +143,7 @@ export function CoinList() {
 
         <Box toCenterX mt='20px' mb='20px'>
           <Box w='90%'>
-            <Button onClick={onPrePage}>上一页</Button>  当前页：{currentPage} <Button onClick={onNextPage}>下一页</Button>
+            <Button onClick={onPrePage}>Previous page</Button>  Current Page：{currentPage} <Button onClick={onNextPage}>Next page</Button>
           </Box>
         </Box>
       </Box>

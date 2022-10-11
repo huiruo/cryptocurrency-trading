@@ -135,8 +135,13 @@ export class DataCenterController {
   }
 
   @Post('closeSpotStrategy')
-  async closeSpotStrategy(@Body() spotOrders: SpotOrder[]): Promise<Result> {
-    return await this.DataCenterService.closeSpotStrategy(spotOrders);
+  async closeSpotStrategy(@Body() params: MergeSpotStrategyParams): Promise<Result> {
+    const { spotOrders, strategyOrder } = params
+
+    return await this.DataCenterService.closeSpotStrategy(
+      spotOrders,
+      strategyOrder,
+    );
   }
 
   @Post('strategiesOrder')
