@@ -56,7 +56,7 @@ export interface SpotOrder {
   isBuyer: boolean;
   isMaker: boolean;
   isBestMatch: boolean;
-  strategyStatus:number;
+  strategyStatus: number;
   time: number;
   updatedAt?: number;
   createdAt?: number;
@@ -129,4 +129,10 @@ export interface AssetType {
   name: string;
   symbol: string;
   code: string;
+}
+
+export interface SearchParmas {
+  currentPage: number;
+  pageSize?: number;
+  symbol?: string;
 }

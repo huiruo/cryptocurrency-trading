@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import traderApi from '@/services/traderApi';
+import { AssetSearch } from '@/components/asset-search';
 import { useDocumentTitle } from '@/utils/useDocumentTitle';
 import Header from '@/components/feader';
 import { Box } from '@fower/react';
 import { SpotTable } from './spot-table';
 import { AssetSelect } from '@/components/asset-select';
-import { AssetType, SpotOrder } from '@/utils/types';
+import { AssetType, SearchParmas, SpotOrder } from '@/utils/types';
 import { get } from 'lodash';
 
 /**
@@ -18,10 +19,12 @@ export function SpotOrders() {
 
   useDocumentTitle("spot order");
 
-  const getSpotOrders = async (currentPage: number, pageSize?: number) => {
+  const getSpotOrders = async (params: SearchParmas) => {
+    const { currentPage, pageSize, symbol } = params
     const data = {
       currentPage: currentPage || 1,
-      pageSize: pageSize || 10
+      pageSize: pageSize || 10,
+      symbol: symbol || ''
     }
     const res = await traderApi.spotOrdersApi(data)
     if (res.code === 200) {
@@ -44,7 +47,12 @@ export function SpotOrders() {
     const res = await traderApi.syncSpotOrderApi(params)
     if (res.code === 200) {
       console.log('success');
-      getSpotOrders(1)
+      const params = {
+        currentPage: 1,
+        pageSize: 10,
+        symbol: ''
+      }
+      getSpotOrders(params)
     } else {
       console.log("get future orders error")
     }
@@ -62,7 +70,12 @@ export function SpotOrders() {
   }
 
   useEffect(() => {
-    getSpotOrders(1)
+    const params = {
+      currentPage: 1,
+      pageSize: 10,
+      symbol: ''
+    }
+    getSpotOrders(params)
     getAsset()
   }, [])
 
@@ -70,7 +83,14 @@ export function SpotOrders() {
     <>
       <Header />
       <Box pb='50px' mt='20px'>
-        <AssetSelect options={asset} spotCallBack={onSyncSpotOrder} />
+
+        <Box toCenterX mb='20px'>
+          <Box w='90%'>
+            <AssetSelect options={asset} spotCallBack={onSyncSpotOrder} />
+            <AssetSearch spotCallBack={getSpotOrders} options={asset} />
+          </Box>
+        </Box>
+
         <SpotTable data={spotOrders} spotCallBack={getSpotOrders} />
       </Box>
     </>

@@ -21,6 +21,7 @@ import {
   AssetType,
   CalculateStrategiesOrderType,
   CreateOrdersStrategy,
+  SearchParmas,
   StrategyProfit,
   SyncSpotOrderParams,
 } from 'src/common/types';
@@ -517,11 +518,25 @@ export class DataCenterService {
     }
   }
 
-  async getSpotOrder(currentPage: number, pageSize: number): Promise<Result> {
-    const sql = `select * from spot_order order by time desc limit ${(currentPage - 1) * pageSize
-      },${pageSize}`;
+  async getSpotOrder(searchParmas: SearchParmas): Promise<Result> {
+    const { currentPage, pageSize, symbol } = searchParmas
+    let sql = '';
+    if (symbol) {
+      sql = `select * from spot_order where symbol ="${symbol}" order by time desc limit ${(currentPage - 1) * pageSize
+        },${pageSize}`;
+    } else {
+      sql = `select * from spot_order order by time desc limit ${(currentPage - 1) * pageSize
+        },${pageSize}`;
+    }
+    console.log('sql:', sql);
+
 
     const res = await this.spotOrderRepo.query(sql);
+    /*
+    const sql = `select * from spot_order order by time desc limit ${(currentPage - 1) * pageSize
+      },${pageSize}`;
+    const res = await this.spotOrderRepo.query(sql);
+    */
     return { code: 200, message: 'ok', data: res };
   }
 
@@ -533,6 +548,7 @@ export class DataCenterService {
       // endTime: 1664467199999,
       // startTime: 1662566400000,
     });
+
     console.log('asset.name:', asset.name, '=== spot order ====', info.length);
 
     info.forEach(async (item) => {

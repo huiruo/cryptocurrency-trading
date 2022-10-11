@@ -67,3 +67,9 @@ export interface MergeSpotStrategyParams {
   spotOrders: SpotOrder[]
   strategyOrder: StrategiesOrder
 }
+
+export interface SearchParmas {
+  currentPage: number;
+  pageSize: number;
+  symbol?: string;
+}

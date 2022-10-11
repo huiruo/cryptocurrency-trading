@@ -25,24 +25,18 @@ export function AssetSelect(props: Props) {
   }
 
   return (
-    <>
-      <Box toCenterX mb='20px'>
-        <Box w='90%'>
-          <Box>
-            <Select
-              width={140}
-              size="sm"
-              options={options.map((i) => ({ label: i.name, value: i.name }))}
-              value={value || get(options, '[0].name', '')}
-              onChange={(v: number) => {
-                setValue(v)
-              }}
-            />
-          </Box>
-          <Button onClick={() => spotCallBack(value)} mr4>Sync spot orders</Button>
-          <Button ml2 onClick={onAddAsset}>Add code</Button>
-        </Box>
-      </Box>
-    </>
+    <Box flex toCenterY>
+      <Select
+        width={140}
+        size="sm"
+        options={options.map((i) => ({ label: i.name, value: i.name }))}
+        value={value || get(options, '[0].name', '')}
+        onChange={(v: number) => {
+          setValue(v)
+        }}
+      />
+      <Button onClick={() => spotCallBack(value)} ml4 mr4>Sync spot orders</Button>
+      <Button ml2 onClick={onAddAsset}>Add code</Button>
+    </Box>
   )
 }

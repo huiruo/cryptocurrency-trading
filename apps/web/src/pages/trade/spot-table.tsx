@@ -6,12 +6,12 @@ import { formatUnixTime } from '@/utils';
 import { Checkbox } from '@/common/checkbox';
 import { Button } from '@/common/button';
 import traderApi from '@/services/traderApi';
-import { SpotOrder } from '@/utils/types';
+import { SearchParmas, SpotOrder } from '@/utils/types';
 import { MergeStrategyModal } from '@/components/mergeStrategyModal';
 
 interface Props {
   data: SpotOrder[]
-  spotCallBack: (currentPage: number) => void
+  spotCallBack: (searchParmas: SearchParmas) => void
 }
 
 const strategyStatusMap = [
@@ -27,6 +27,7 @@ export function SpotTable(props: Props) {
   const { data, spotCallBack } = props
   const [selectRows, setSelectRows] = useState<number[]>([])
   const [selectRowData, setSelectRowData] = useState<SpotOrder[]>([])
+  const [currentPage, setCurrentPage] = useState(1)
 
   const onCreatStrategy = async () => {
     if (!selectRows.length) {
@@ -64,7 +65,12 @@ export function SpotTable(props: Props) {
     const res = await traderApi.creatStrategyApi(order)
     if (res.code === 200) {
       console.log('create success');
-      spotCallBack(1)
+      const params = {
+        currentPage: 1,
+        pageSize: 10,
+        symbol: ''
+      }
+      spotCallBack(params)
       setSelectRowData([])
       setSelectRows([])
     } else {
@@ -108,7 +114,12 @@ export function SpotTable(props: Props) {
     const res = await traderApi.resetSpotOrderStatus(item)
     if (res.code === 200) {
       console.log('ResetOrderStatus success');
-      spotCallBack(1)
+      const params = {
+        currentPage: 1,
+        pageSize: 10,
+        symbol: ''
+      }
+      spotCallBack(params)
       setSelectRowData([])
       setSelectRows([])
     } else {
@@ -178,9 +189,37 @@ export function SpotTable(props: Props) {
   }
 
   const spotTableCallBack = () => {
-    spotCallBack(1)
+    const params = {
+      currentPage: 1,
+      pageSize: 10,
+      symbol: ''
+    }
+    spotCallBack(params)
     setSelectRowData([])
     setSelectRows([])
+  }
+
+  const onNextPage = () => {
+    setCurrentPage(currentPage + 1)
+    const params = {
+      currentPage: currentPage + 1,
+      pageSize: 10,
+      symbol: ''
+    }
+    spotCallBack(params)
+    // spotCallBack(currentPage + 1)
+  }
+
+  const onPrePage = () => {
+    const params = {
+      currentPage: currentPage - 1,
+      pageSize: 10,
+      symbol: ''
+    }
+
+    spotCallBack(params)
+    setCurrentPage(currentPage - 1)
+    // spotCallBack(currentPage - 1)
   }
 
   const columns = [
@@ -274,16 +313,16 @@ export function SpotTable(props: Props) {
   return (
     <Box toCenterX>
       <Box className='table-box-container'>
-
         <Table columns={columns} data={data} className='table-box' />
-
         <Box mt-10>
           <Button onClick={() => onCreatStrategy()} mr4>Creat strategy</Button>
           <Button onClick={() => onMergeStrategy()} mr4>Merge strategy</Button>
           <Button onClick={() => onCloseStrategy()} mr4>Close strategy</Button>
         </Box>
-
         <MergeStrategyModal id='mergeStrategyModal' mergeOrders={selectRowData} spotTableCallBack={() => spotTableCallBack()} />
+        <Box mt='20px' mb='20px'>
+          <Button onClick={onPrePage}>上一页</Button>  当前页：{currentPage} <Button onClick={onNextPage}>下一页</Button>
+        </Box>
       </Box>
     </Box>
   );
