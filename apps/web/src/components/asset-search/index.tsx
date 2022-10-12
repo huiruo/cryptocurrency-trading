@@ -9,13 +9,14 @@ interface Props {
   // test: React.ReactNode
   options: AssetType[]
   spotCallBack: (searchParmas: SearchParmas) => void
+  selectCallback: (val: string) => void
 }
 
 /**
  * Code annotation
  */
 export function AssetSearch(props: Props) {
-  const { options, spotCallBack } = props
+  const { options, spotCallBack, selectCallback } = props
   const [value, setValue] = useState<string>('')
 
   const onSearch = () => {
@@ -29,10 +30,12 @@ export function AssetSearch(props: Props) {
     spotCallBack(params)
   }
 
+  /*
   useEffect(() => {
     const val = get(options, '[0].name', '')
     setValue(val)
   }, [options])
+  */
 
   return (
     <Box flex toCenterY mt='10px'>
@@ -43,6 +46,7 @@ export function AssetSearch(props: Props) {
         value={value}
         onChange={(v: string) => {
           setValue(v)
+          selectCallback(v)
         }}
       />
       <Button onClick={() => onSearch()} ml4 mr4>Search</Button>

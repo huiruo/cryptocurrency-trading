@@ -133,7 +133,7 @@ export interface AssetType {
 }
 
 export interface SearchParmas {
-  currentPage: number;
+  currentPage?: number;
   pageSize?: number;
-  symbol?: string;
+  symbol: string;
 }

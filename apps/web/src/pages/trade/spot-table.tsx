@@ -13,6 +13,7 @@ import { CloseStrategyModal } from '@/components/closeStrategyModal';
 interface Props {
   data: SpotOrder[]
   spotCallBack: (searchParmas: SearchParmas) => void
+  // spotCallBack: (symbol: string) => void
 }
 
 const strategyStatusMap = [
@@ -28,7 +29,6 @@ export function SpotTable(props: Props) {
   const { data, spotCallBack } = props
   const [selectRows, setSelectRows] = useState<number[]>([])
   const [selectRowData, setSelectRowData] = useState<SpotOrder[]>([])
-  const [currentPage, setCurrentPage] = useState(1)
 
   const onCreatStrategy = async () => {
     if (!selectRows.length) {
@@ -67,8 +67,6 @@ export function SpotTable(props: Props) {
     if (res.code === 200) {
       console.log('create success');
       const params = {
-        currentPage: 1,
-        pageSize: 10,
         symbol: ''
       }
       spotCallBack(params)
@@ -96,8 +94,6 @@ export function SpotTable(props: Props) {
     if (res.code === 200) {
       console.log('ResetOrderStatus success');
       const params = {
-        currentPage: 1,
-        pageSize: 10,
         symbol: ''
       }
       spotCallBack(params)
@@ -185,36 +181,13 @@ export function SpotTable(props: Props) {
 
   const spotTableCallBack = () => {
     const params = {
-      currentPage: 1,
-      pageSize: 10,
+      // currentPage: ,
+      // pageSize: 10,
       symbol: ''
     }
     spotCallBack(params)
     setSelectRowData([])
     setSelectRows([])
-  }
-
-  const onNextPage = () => {
-    setCurrentPage(currentPage + 1)
-    const params = {
-      currentPage: currentPage + 1,
-      pageSize: 10,
-      symbol: ''
-    }
-    spotCallBack(params)
-    // spotCallBack(currentPage + 1)
-  }
-
-  const onPrePage = () => {
-    const params = {
-      currentPage: currentPage - 1,
-      pageSize: 10,
-      symbol: ''
-    }
-
-    spotCallBack(params)
-    setCurrentPage(currentPage - 1)
-    // spotCallBack(currentPage - 1)
   }
 
   const columns = [
@@ -316,9 +289,6 @@ export function SpotTable(props: Props) {
         </Box>
         <MergeStrategyModal id='mergeStrategyModal' mergeOrders={selectRowData} spotTableCallBack={() => spotTableCallBack()} />
         <CloseStrategyModal id='closeStrategyModal' closeOrders={selectRowData} spotTableCallBack={() => spotTableCallBack()} />
-        <Box mt='20px' mb='20px'>
-          <Button onClick={onPrePage}>Previous page</Button>  Current Page：{currentPage} <Button onClick={onNextPage}>Next page</Button>
-        </Box>
       </Box>
     </Box>
   );

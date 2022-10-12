@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box } from '@fower/react';
 import { Select } from '@/common/select';
 import { Button } from '@/common/button';
@@ -24,13 +24,18 @@ export function AssetSelect(props: Props) {
     navigate('/trade/addAsset')
   }
 
+  useEffect(() => {
+    const val = get(options, '[0].name', '')
+    setValue(val)
+  }, [options])
+
   return (
     <Box flex toCenterY>
       <Select
         width={140}
         size="sm"
         options={options.map((i) => ({ label: i.name, value: i.name }))}
-        value={value || get(options, '[0].name', '')}
+        value={value}
         onChange={(v: number) => {
           setValue(v)
         }}
