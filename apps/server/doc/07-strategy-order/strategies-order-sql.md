@@ -15,6 +15,13 @@ CREATE TABLE `strategies_order`(
   `profitRate` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'profitRate',
   `realizedProfit` double(8,2) NULL DEFAULT NULL,
   `realizedProfitRate` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'realizedProfitRate',
+
+  `stopProfit` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'stopProfit',
+  `stopLoss` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'stopLoss',
+  `stopProfitPrice` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'stopProfitPrice',
+  `stopLossPrice` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'stopLossPrice',
+  `stopType` int(6) NOT NULL DEFAULT 0,
+
   `entryPrice` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'entryPrice',
   `sellingPrice` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'sellingPrice',
   `sellingTime` bigint(60) NULL DEFAULT NULL,

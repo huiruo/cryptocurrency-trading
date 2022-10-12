@@ -15,6 +15,13 @@ export class StrategiesOrder {
   @Column({ comment: 'profitRate', }) profitRate: string;
   @Column({ comment: 'entryPrice', }) entryPrice: string;
   @Column({ comment: 'sellingPrice', }) sellingPrice: string;
+
+  @Column({ comment: 'stopProfit', }) stopProfit: string;
+  @Column({ comment: 'stopLoss', }) stopLoss: string;
+  @Column({ comment: 'stopProfitPrice', }) stopProfitPrice: string;
+  @Column({ comment: 'stopLossPrice', }) stopLossPrice: string;
+  @Column({ comment: 'stopType', }) stopType: number;
+
   @Column({ comment: 'is_running', }) is_running: boolean;
   @Column('bigint', { comment: 'time', }) time: number;
   @Column({ comment: 'realizedProfit', }) realizedProfit: number;

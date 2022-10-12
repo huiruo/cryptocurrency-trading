@@ -742,6 +742,12 @@ export class DataCenterService {
       realizedProfit,
       realizedProfitRate,
       sellingTime: lastOrder.time,
+
+      stopProfit: '',
+      stopLoss: '',
+      stopProfitPrice: '',
+      stopLossPrice: '',
+      stopType: 0
     };
 
     const res = await this.updateCloseStrategyOrderUtil(strategiesOrder)
@@ -784,6 +790,12 @@ export class DataCenterService {
       realizedProfit: 0,
       realizedProfitRate: '',
       sellingTime: null,
+
+      stopProfit: '',
+      stopLoss: '',
+      stopProfitPrice: '',
+      stopLossPrice: '',
+      stopType: 0
     };
 
     await this.updateStrategyOrderUtil(strategiesOrder)
@@ -938,6 +950,12 @@ export class DataCenterService {
         realizedProfit: 0,
         realizedProfitRate: '',
         sellingTime: null,
+
+        stopProfit: '',
+        stopLoss: '',
+        stopProfitPrice: '',
+        stopLossPrice: '',
+        stopType: 0
       };
 
       this.createStrategyOrderIdUtil({ userId, strategyId, orderId });
