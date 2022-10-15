@@ -7,8 +7,8 @@ import { Checkbox } from '@/common/checkbox';
 import { Button } from '@/common/button';
 import traderApi from '@/services/traderApi';
 import { SearchParmas, SpotOrder } from '@/utils/types';
-import { MergeStrategyModal } from '@/components/mergeStrategyModal';
-import { CloseStrategyModal } from '@/components/closeStrategyModal';
+import { MergeStrategyModal } from '@/components/merge-strategy-modal';
+import { CloseStrategyModal } from '@/components/close-strategy-modal';
 
 interface Props {
   data: SpotOrder[]

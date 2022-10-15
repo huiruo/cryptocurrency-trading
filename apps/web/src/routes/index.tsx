@@ -14,11 +14,13 @@ import { SpotOrders } from '@/pages/trade/spot-orders';
 import { Strategies } from "@/pages/trade/strategies";
 import { AddAsset } from "@/pages/trade/add-asset";
 import CrytoIncreaseCalculator from "@/pages/calculator/cryto-increase-calculator";
+import StockIncreaseCalculator from "@/pages/calculator/stock-increase-calculator";
 
 const routesConfig = [
 	{
 		path: 'crytoCalculator',
-		element: <CrytoIncreaseCalculator />,
+		// element: <CrytoIncreaseCalculator />,
+		element: <StockIncreaseCalculator />,
 	},
 
 	// == coin start== 

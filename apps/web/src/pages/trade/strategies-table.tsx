@@ -31,6 +31,11 @@ export function StrategiesTable(props: Props) {
     }
   }
 
+  const onStopLostProfit = async (order: StrategiesOrder) => {
+    console.log('onStopLostProfit:', order);
+
+  }
+
   const onSyncPrice = async () => {
     if (!selectRows.length) {
       alert('select empty')
@@ -124,7 +129,12 @@ export function StrategiesTable(props: Props) {
     {
       id: 'action', title: 'Action', dataIndex: '', key: 'action', width: 100,
       render(item: StrategiesOrder) {
-        return <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => syncPriceUtil(item)}>Update</Box>
+        return (
+          <>
+            <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => syncPriceUtil(item)}>Update</Box>
+            <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => onStopLostProfit(item)}>Stopt Loss / Profit</Box>
+          </>
+        )
       },
     },
     {
