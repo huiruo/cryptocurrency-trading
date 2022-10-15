@@ -102,18 +102,11 @@ export function SpotOrders() {
     <>
       <Header />
       <Box pb='50px' mt='20px'>
-
         <Box toCenterX mb='20px'>
           <Box w='90%'>
             <AssetSelect options={asset} spotCallBack={onSyncSpotOrder} />
             <AssetSearch selectCallback={selectCallback} spotCallBack={getSpotOrders} options={asset} />
-          </Box>
-        </Box>
-
-        <SpotTable data={spotOrders} spotCallBack={getSpotOrders} />
-
-        <Box toCenterX>
-          <Box w='90%' >
+            <SpotTable data={spotOrders} spotCallBack={getSpotOrders} />
             <Pagination onChange={onPage} currentPage={currentPage} />
           </Box>
         </Box>

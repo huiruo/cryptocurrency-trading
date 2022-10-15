@@ -193,13 +193,11 @@ export function StrategiesTable(props: Props) {
   ]
 
   return (
-    <Box toCenterX>
-      <Box className='table-box-container'>
-        <Table columns={columns} data={data} className='table-box' />
+    <Box className='table-box-container'>
+      <Table columns={columns} data={data} className='table-box' />
 
-        <Box mt-10>
-          <Button onClick={() => onSyncPrice()} mr4>Sync price</Button>
-        </Box>
+      <Box mt-10>
+        <Button onClick={() => onSyncPrice()} mr4>Sync price</Button>
       </Box>
     </Box>
   );

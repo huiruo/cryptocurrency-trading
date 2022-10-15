@@ -5,6 +5,7 @@ import Header from '@/components/feader';
 import { Box } from '@fower/react';
 import { StrategiesTable } from './strategies-table';
 import { StrategiesOrder } from '@/utils/types';
+import { StrategieyFilter } from '@/components/strategiey-filter';
 
 /**
  * CODE ANNOTATION
@@ -32,6 +33,10 @@ export function Strategies() {
     getStrategies(1)
   }
 
+  const selectStatusCallback = () => {
+    console.log('selectStatusCallback');
+  }
+
   useEffect(() => {
     getStrategies(1)
   }, [])
@@ -40,15 +45,13 @@ export function Strategies() {
     <>
       <Header />
 
-      <Box pb='50px' mt='20px'>
-
-        <Box toCenterX mb='20px'>
-          {/* <Box w='90%'>
-            <Button onClick={() => onSyncFutureOrder()} mr4>Sync spot orders</Button>
-          </Box> */}
+      <Box toCenterX mb='20px'>
+        <Box w='90%'>
+          <Box pb='50px' mt='20px'>
+            <StrategieyFilter fiterStrategyOrderCallback={selectStatusCallback} />
+            <StrategiesTable data={strategies} syncCallBack={syncCallBack} />
+          </Box>
         </Box>
-
-        <StrategiesTable data={strategies} syncCallBack={syncCallBack} />
       </Box>
     </>
   );

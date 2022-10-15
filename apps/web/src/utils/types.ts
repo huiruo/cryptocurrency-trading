@@ -137,3 +137,8 @@ export interface SearchParmas {
   pageSize?: number;
   symbol: string;
 }
+
+export interface SelectType {
+  label: string
+  name: string
+}

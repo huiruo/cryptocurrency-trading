@@ -279,17 +279,15 @@ export function SpotTable(props: Props) {
   ]
 
   return (
-    <Box toCenterX>
-      <Box className='table-box-container'>
-        <Table columns={columns} data={data} className='table-box' />
-        <Box mt-10>
-          <Button onClick={() => onCreatStrategy()} mr4>Creat strategy</Button>
-          <Button onClick={() => onMergeStrategy()} mr4>Merge strategy</Button>
-          <Button onClick={() => onCloseStrategy()} mr4>Close strategy</Button>
-        </Box>
-        <MergeStrategyModal id='mergeStrategyModal' mergeOrders={selectRowData} spotTableCallBack={() => spotTableCallBack()} />
-        <CloseStrategyModal id='closeStrategyModal' closeOrders={selectRowData} spotTableCallBack={() => spotTableCallBack()} />
+    <Box className='table-box-container'>
+      <Table columns={columns} data={data} className='table-box' />
+      <Box mt-10>
+        <Button onClick={() => onCreatStrategy()} mr4>Creat strategy</Button>
+        <Button onClick={() => onMergeStrategy()} mr4>Merge strategy</Button>
+        <Button onClick={() => onCloseStrategy()} mr4>Close strategy</Button>
       </Box>
+      <MergeStrategyModal id='mergeStrategyModal' mergeOrders={selectRowData} spotTableCallBack={() => spotTableCallBack()} />
+      <CloseStrategyModal id='closeStrategyModal' closeOrders={selectRowData} spotTableCallBack={() => spotTableCallBack()} />
     </Box>
   );
 }
