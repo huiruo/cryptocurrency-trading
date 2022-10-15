@@ -140,5 +140,12 @@ export interface SearchParmas {
 
 export interface SelectType {
   label: string
-  name: string
+  name: string | number
+}
+
+export interface FiterStrategyOrderType {
+  is_running: string | number
+  symbol: string
+  currentPage?: number
+  pageSize?: number
 }

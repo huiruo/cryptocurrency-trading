@@ -2,22 +2,30 @@ import React, { useState } from 'react';
 import { Box } from '@fower/react';
 import { Button } from '@/common/button';
 import { Select } from '@/common/select';
-import { SelectType } from '@/utils/types';
+import { FiterStrategyOrderType, SelectType } from '@/utils/types';
+import { Asset } from '../asset';
 
 interface Props {
-  // test: React.ReactNode
-  fiterStrategyOrderCallback: (val: string) => void
+  selectStatusCallback: (val: string | number) => void
+  selectAssetCallback: (val: string) => void
+  fiterStrategyOrderCallback: (params: FiterStrategyOrderType) => void
+  selectStatus: string | number
+  selectAsset: string
 }
 
 
 const options: SelectType[] = [
   {
-    label: '',
+    label: 'All stg status',
     name: '',
   },
   {
-    label: '',
-    name: '',
+    label: 'Running',
+    name: 0,
+  },
+  {
+    name: 1,
+    label: 'Ended',
   }
 ]
 
@@ -25,26 +33,35 @@ const options: SelectType[] = [
  * Code annotation
  */
 export function StrategieyFilter(props: Props) {
-  const { fiterStrategyOrderCallback } = props
-  const [value, setValue] = useState<string>('')
+  const { selectStatus, selectAsset, fiterStrategyOrderCallback, selectStatusCallback, selectAssetCallback } = props
 
   const onFiterStrategyOrder = () => {
-    console.log('onFiterStrategyOrder');
+    const params = {
+      is_running: selectStatus,
+      symbol: ''
+    }
+    fiterStrategyOrderCallback(params)
+  }
+
+  const assetSelectCallback = (val: string) => {
+    selectAssetCallback(val)
   }
 
   return (
-    <>
-      <Select
-        width={140}
-        size="sm"
-        options={options.map((i) => ({ label: i.name, value: i.name }))}
-        value={value}
-        onChange={(v: string) => {
-          setValue(v)
-          // selectStatusCallback(v)
-        }}
-      />
-      <Button onClick={() => onFiterStrategyOrder()} mr4>Sync spot orders</Button>
-    </>
+    <Box toCenterY>
+      <Box mr-8px>
+        <Select
+          width={140}
+          size="sm"
+          options={options.map((i) => ({ label: i.label, value: i.name }))}
+          value={selectStatus}
+          onChange={(v: string) => {
+            selectStatusCallback(v)
+          }}
+        />
+      </Box>
+      <Asset onChange={assetSelectCallback} value={selectAsset} />
+      <Button onClick={() => onFiterStrategyOrder()} ml-8px>Filter strategies</Button>
+    </Box>
   );
 }
