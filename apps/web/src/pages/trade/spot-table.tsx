@@ -62,10 +62,8 @@ export function SpotTable(props: Props) {
   }
 
   const creatStrategyUtil = async (order: SpotOrder[]) => {
-    console.log('creatStrategyUtil:', order);
     const res = await traderApi.creatStrategyApi(order)
     if (res.code === 200) {
-      console.log('create success');
       const params = {
         symbol: ''
       }
@@ -73,7 +71,7 @@ export function SpotTable(props: Props) {
       setSelectRowData([])
       setSelectRows([])
     } else {
-      console.log("creatStrategys error")
+      alert("creatStrategys error")
     }
   }
 
@@ -92,7 +90,6 @@ export function SpotTable(props: Props) {
   const onResetOrderStatus = async (item: SpotOrder) => {
     const res = await traderApi.resetSpotOrderStatus(item)
     if (res.code === 200) {
-      console.log('ResetOrderStatus success');
       const params = {
         symbol: ''
       }
@@ -100,12 +97,11 @@ export function SpotTable(props: Props) {
       setSelectRowData([])
       setSelectRows([])
     } else {
-      console.log("ResetOrderStatus error")
+      alert("ResetOrderStatus error")
     }
   }
 
   const onMergeStrategy = () => {
-    console.log('onMergeStrategy selectRows', selectRows);
     if (!selectRows.length) {
       alert('select empty')
 
@@ -122,13 +118,11 @@ export function SpotTable(props: Props) {
       return Number(b.time) - Number(a.time);
     })
 
-    console.log('sorted:', selectRowData);
     NiceModal.show('mergeStrategyModal')
     /*
     NiceModal.show(MergeStrategyModal, selectRowData).then((selectRowData) => {
       // userModal.show(MergeStrategyModal,selectRowData).then((selectRowData) => {
       // setUsers([newUser, ...users]);
-      console.log('handleNewUser selectRowData:', selectRowData);
     });
     */
   }
@@ -174,9 +168,6 @@ export function SpotTable(props: Props) {
     }
     setSelectRows([...selectRows])
     setSelectRowData([...selectRowData])
-
-    console.log('se；', selectRows);
-    console.log('se；', selectRowData);
   }
 
   const spotTableCallBack = () => {

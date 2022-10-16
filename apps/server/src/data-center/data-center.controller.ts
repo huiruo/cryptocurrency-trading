@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 import { get } from 'lodash';
 // import { ConfigService } from '@nestjs/config';
 import { Result } from 'src/common/result.interface';
-import { AssetType, MergeSpotStrategyParams, SearchParmas, SymbolType, SyncSpotOrderParams } from 'src/common/types';
+import { AssetType, FiterStrategyOrderType, MergeSpotStrategyParams, SearchParmas, SymbolType, SyncSpotOrderParams } from 'src/common/types';
 import { DataCenterService } from './data-center.service';
 import { SpotOrder } from './spot-order.entity';
 import { StrategiesOrder } from './strategies-order.entity';
@@ -20,8 +20,6 @@ export class DataCenterController {
 
   @Post('addCode')
   async addCode(@Body() symbol: any): Promise<Result> {
-    console.log('addCode', symbol);
-
     const data = await this.DataCenterService.addCode(symbol);
     return data;
   }
@@ -87,7 +85,6 @@ export class DataCenterController {
 
   @Post('spotOrders')
   async getSpotOrder(@Body() searchParmas: SearchParmas): Promise<Result> {
-    // return await this.DataCenterService.getSpotOrder( page.currentPage, page.pageSize);
     return await this.DataCenterService.getSpotOrder(searchParmas);
   }
 
@@ -145,11 +142,8 @@ export class DataCenterController {
   }
 
   @Post('strategiesOrder')
-  async getStrategiesOrder(@Body() page: Page): Promise<Result> {
-    return await this.DataCenterService.getStrategiesOrder(
-      page.currentPage,
-      page.pageSize,
-    );
+  async getStrategiesOrder(@Body() fiterStrategyOrder: FiterStrategyOrderType): Promise<Result> {
+    return await this.DataCenterService.getStrategiesOrder(fiterStrategyOrder);
   }
 
   @Post('symbolPrice')

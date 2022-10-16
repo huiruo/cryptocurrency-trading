@@ -48,14 +48,6 @@ export const TradeModal = (props: ModalProps) => {
         }
     }, [isVisible])
 
-    /*
-    onEnter={onEnter}
-    const onEnter = () => {
-        console.log('---->onEnter');
-        // setIsVisible(true)
-    }
-     */
-
     if (!isVisible) {
         return null
     }

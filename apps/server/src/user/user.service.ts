@@ -68,8 +68,6 @@ export class UserService {
      * @param id ID
      */
     private async findOneById(id: number): Promise<User> {
-        console.log("根据ID查询单个信息:",id)
-        console.log("process.env",process.env.DATABASE_USER)
         const userInfo = await this.userRepo.findOne(id);
         if (!userInfo) {
             throw new HttpException(`指定 id=${id} 的用户不存在`, 404);

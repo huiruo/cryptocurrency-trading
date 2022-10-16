@@ -22,6 +22,7 @@ import {
   CalculateCloseStrategyOrderType,
   CalculateStrategiesOrderType,
   CreateOrdersStrategy,
+  FiterStrategyOrderType,
   SearchParmas,
   StrategyProfit,
   SyncSpotOrderParams,
@@ -78,7 +79,7 @@ export class DataCenterService {
       const baseServiceBinance = new BaseServiceBiance(apiKey, secretKey);
       this.client = baseServiceBinance;
     } else {
-      console.log('Api key do not exist');
+      console.log('=== Api key do not exist ===');
     }
   }
 
@@ -336,7 +337,7 @@ export class DataCenterService {
 
       const coinData = await this.findCoin(coinCode);
       if (isEmpty(coinData)) {
-        console.log('add-->');
+        console.log('=== add ===');
 
         /* insert dev members */
         const members: CoinDevMember[] = get(res, 'members', []).map((item) => {
@@ -354,12 +355,11 @@ export class DataCenterService {
         this.dayKlineRepo.insert(dayKline);
 
         /* insert coin */
-        // console.log('coin', coin);
         const createRes = await this.coninRepo.save(coin);
 
         return { code: 200, message: 'added successfully', data: createRes };
       } else {
-        console.log('update-->');
+        console.log('=== update ===');
         const updateRes = await this.coninRepo.update({ code: coinCode }, coin);
 
         return { code: 200, message: 'update completed', data: coin };
@@ -441,10 +441,10 @@ export class DataCenterService {
         item.userId = 1;
         const existFutureOrder = await this.findFutureOrderUtil(orderId);
         if (isEmpty(existFutureOrder)) {
-          console.log('== not exist FutureOrder,insert...');
+          console.log('=== not exist FutureOrder,insert... ===');
           await this.createfutureOrderUtil(item);
         } else {
-          console.log('== exist FutureOrder,skip... ==');
+          console.log('=== exist FutureOrder,skip... ===');
         }
       });
     }
@@ -539,11 +539,10 @@ export class DataCenterService {
       // symbol: 'BTCUSDT',
       // symbol: 'BTCBUSD',
       symbol: asset.name,
+      recvWindow: 59999,
       // endTime: 1664467199999,
       // startTime: 1662566400000,
     });
-
-    console.log('asset.name:', asset.name, '=== spot order ====', info.length);
 
     info.forEach(async (item) => {
       const { orderId } = item as any;
@@ -551,10 +550,10 @@ export class DataCenterService {
       item.userId = 1;
       const existSpotOrder = await this.findSpotOrderUtil(orderId);
       if (isEmpty(existSpotOrder)) {
-        console.log('== not exist spotOrder,insert...');
+        console.log('=== not exist spotOrder,insert... ===');
         this.savaSpotOrderUtil(item);
       } else {
-        console.log('== exist spotOrder,skip... ==');
+        console.log('=== exist spotOrder,skip... ===');
       }
     });
 
@@ -688,13 +687,28 @@ export class DataCenterService {
     return await this.strategiesOrderRepo.query(sql);
   }
 
-  async getStrategiesOrder(
-    currentPage: number,
-    pageSize: number,
-  ): Promise<Result> {
-    const sql = `select * from strategies_order order by createdAt desc limit ${(currentPage - 1) * pageSize
-      },${pageSize}`;
+  async getStrategiesOrder(fiterStrategyOrder: FiterStrategyOrderType): Promise<Result> {
+    const { currentPage, pageSize, symbol, is_running } = fiterStrategyOrder
+    let sql = '';
+    if (symbol) {
 
+      if (is_running !== '') {
+        sql = `select * from strategies_order where symbol ="${symbol}" and is_running=${is_running}  order by createdAt desc limit ${(currentPage - 1) * pageSize
+          },${pageSize}`;
+      } else {
+        sql = `select * from strategies_order where symbol ="${symbol}" order by createdAt desc limit ${(currentPage - 1) * pageSize
+          },${pageSize}`;
+      }
+    } else {
+
+      if (is_running !== '') {
+        sql = `select * from strategies_order where is_running ="${is_running}" order by createdAt desc limit ${(currentPage - 1) * pageSize
+          },${pageSize}`;
+      } else {
+        sql = `select * from strategies_order order by createdAt desc limit ${(currentPage - 1) * pageSize
+          },${pageSize}`;
+      }
+    }
     const res = await this.strategiesOrderRepo.query(sql);
     return { code: 200, message: 'ok', data: res };
   }
@@ -818,9 +832,11 @@ export class DataCenterService {
 
     spotOrders.forEach(item => {
       const { qty, quoteQty, symbol, isBuyer } = item
+      // /*
       if (targetSymbol !== symbol) {
         isTheSameSymbol = false
       }
+      // */
 
       if (side === isBuyer) {
         isTheSameSide = true
@@ -901,11 +917,6 @@ export class DataCenterService {
       }
     })
 
-    console.log('== calculateSpotStrategiesOrder ==');
-    console.log('== qtyTotal:', qtyTotal);
-    console.log('== quoteQtyTotal:', quoteQtyTotal);
-
-
     return {
       qty: qtyTotal.toString(),
       quoteQty: quoteQtyTotal.toString(),
@@ -919,7 +930,7 @@ export class DataCenterService {
     const { orderId, userId, time, symbol, isBuyer } = firstOrder
     const strategyOrderId = await this.findStrategyOrderIdUtil(orderId);
     if (isEmpty(strategyOrderId)) {
-      console.log('== not exist strategy,insert...');
+      console.log('=== not exist strategy,insert... ===');
       const strategyId = nanoid();
 
       const { qty, quoteQty, entryPrice, isTheSameSymbol } = this.calculateSpotStrategiesOrder(spotOrders, symbol)
@@ -966,7 +977,7 @@ export class DataCenterService {
         this.updateOrderStatus('spot', idUpdate, strategyId, running);
       })
     } else {
-      console.log('== exist strategyOrderId,update... ==');
+      console.log('=== exist strategyOrderId,update... ===');
     }
 
     return { code: 200, message: 'ok', data: null };

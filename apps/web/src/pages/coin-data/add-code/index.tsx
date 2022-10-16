@@ -30,11 +30,10 @@ export function AddCode() {
     }
     const res = await traderApi.addSimplifySymbol(data)
     if (res.code === 200) {
-      console.log('success');
       setSymbol('')
       setCode('')
     } else {
-      console.log(res.message)
+      alert(res.message)
     }
   }
 

@@ -361,8 +361,6 @@ export const Trade = (superclass) =>
    */
     myTrades(symbol, options = {}) {
       validateRequiredParameters({ symbol });
-      console.log('myTrades:', symbol);
-      console.log('myTrades:');
       return this.signRequest(
         'GET',
         '/api/v3/myTrades',

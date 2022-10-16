@@ -24,16 +24,12 @@ export function StrategiesTable(props: Props) {
     const res = await traderApi.syncStrategyPriceApi(order)
     if (res.code === 200) {
 
-      console.log('create success');
       syncCallBack()
-    } else {
-      console.log("creatStrategys error")
     }
   }
 
   const onStopLostProfit = async (order: StrategiesOrder) => {
-    console.log('onStopLostProfit:', order);
-
+    alert('onStopLostProfit:');
   }
 
   const onSyncPrice = async () => {
@@ -73,8 +69,6 @@ export function StrategiesTable(props: Props) {
       selectRows.push(index)
     }
     setSelectRows([...selectRows])
-
-    console.log('se；', selectRows);
   }
 
   const columns = [

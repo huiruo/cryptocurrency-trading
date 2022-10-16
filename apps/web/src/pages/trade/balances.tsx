@@ -23,17 +23,16 @@ export function Balances() {
 
       setBalances(res.data)
     } else {
-      console.log("get balances error")
+      alert("get balances error")
     }
   }
 
   const onSyncBalances = async () => {
     const res = await traderApi.syncBalancesApi()
     if (res.code === 200) {
-      console.log('success');
       getBalances()
     } else {
-      console.log("get balances error")
+      alert("get balances error")
     }
   }
 

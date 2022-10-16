@@ -27,7 +27,7 @@ export function AssetSync(props: Props) {
 
   return (
     <Box flex toCenterY>
-      <Asset onChange={assetSelectCallback} value={assetVal} defaultVal={'BTCUSDT'} />
+      <Asset onChange={assetSelectCallback} value={assetVal} />
       <Button onClick={() => spotCallBack(assetVal)} ml4 mr4>Sync spot orders</Button>
       <Button ml2 onClick={onAddAsset}>Add code</Button>
     </Box>

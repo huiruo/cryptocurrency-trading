@@ -5,7 +5,6 @@ import traderApi from '@/services/traderApi';
 
 interface Props {
   onChange: (val: any) => void
-  defaultVal?: string | number
   value: string | number
 }
 
@@ -13,8 +12,7 @@ interface Props {
  * Code annotation
  */
 export function Asset(props: Props) {
-  const { onChange, defaultVal = '', value } = props
-  // const [value, setValue] = useState<string | number>('')
+  const { onChange, value } = props
   const [options, setOptions] = useState<AssetType[]>([])
 
 
@@ -23,7 +21,7 @@ export function Asset(props: Props) {
     if (res.code === 200) {
       setOptions(res.data)
     } else {
-      console.log("Get asset oerror")
+      alert("Get asset oerror")
     }
   }
 

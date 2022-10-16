@@ -16,16 +16,16 @@ interface Props {
 
 const options: SelectType[] = [
   {
-    label: 'All stg status',
+    label: 'All status',
     name: '',
   },
   {
     label: 'Running',
-    name: 0,
+    name: 1,
   },
   {
-    name: 1,
     label: 'Ended',
+    name: 0,
   }
 ]
 

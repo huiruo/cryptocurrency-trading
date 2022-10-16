@@ -23,8 +23,6 @@ export function AddAsset() {
     "code":"bitcoin",
     }
     */
-    console.log('onAdd');
-
     const data = {
       name: tradeName,
       symbol,
@@ -32,12 +30,11 @@ export function AddAsset() {
     }
     const res = await traderApi.addAssetApi(data)
     if (res.code === 200) {
-      console.log('success');
       setSymbol('')
       setTradeName('')
       setCode('')
     } else {
-      console.log(res.message)
+      alert(res.message)
     }
   }
 

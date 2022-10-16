@@ -137,7 +137,6 @@ class HttpRequest {
       }
       */
       this.instance.request<any, T>(config).then((res) => {
-        // console.log("this.instance.request-----res:",res)
         /*
         if (config.interceptor?.resInterceptor) {  //可以删除，没有接口拦截器
           config = config.interceptor.resInterceptor(res)

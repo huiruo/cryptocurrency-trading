@@ -36,17 +36,13 @@ export const CloseStrategyModal = NiceModal.create((props: Props) => {
 
       setStrategies(res.data)
     } else {
-      console.log("get Strategies orders error")
+      alert("get Strategies orders error")
     }
   }
 
   const afterClose = () => {
     setSelectRows([])
   }
-
-  useEffect(() => {
-    console.log('useEffect-ModalMergeStrategy');
-  }, [])
 
   const onSelectChange = (index: number, checked: boolean, keySet?: any) => {
     const arrIndex = selectRows.findIndex(i => {
@@ -59,8 +55,6 @@ export const CloseStrategyModal = NiceModal.create((props: Props) => {
       selectRows.push(index)
     }
     setSelectRows([...selectRows])
-
-    console.log('se；', selectRows);
   }
 
   const onCloseStrategy = async () => {
@@ -85,9 +79,6 @@ export const CloseStrategyModal = NiceModal.create((props: Props) => {
     }
 
     const strategyOrder = { ...selectRow }
-
-    console.log('params:', strategyOrder);
-    console.log('closeOrders:', closeOrders);
     const params = {
       spotOrders: closeOrders,
       strategyOrder,
@@ -95,14 +86,11 @@ export const CloseStrategyModal = NiceModal.create((props: Props) => {
 
     const res = await traderApi.closeSpotStrategyApi(params)
     if (res.code === 200) {
-      console.log('Merge strategy success');
       hide()
       spotTableCallBack()
     } else {
-      console.log("Merge strategy error")
+      alert("Merge strategy error")
     }
-
-    // syncPriceUtil(params)
   }
 
   const columns = [

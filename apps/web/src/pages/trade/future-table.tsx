@@ -27,8 +27,6 @@ export function FutureTable(props: Props) {
       selectRows.push(index)
     }
     setSelectRows([...selectRows])
-
-    console.log('se；', selectRows);
   }
 
   const columns = [

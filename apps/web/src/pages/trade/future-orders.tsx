@@ -26,18 +26,16 @@ export function FutureOrders() {
 
       setFutureOrders(res.data)
     } else {
-      console.log("get future orders error")
+      alert("get future orders error")
     }
   }
 
   const onSyncFutureOrder = async () => {
     const res = await traderApi.syncFutureOrderApi()
     if (res.code === 200) {
-      console.log('success');
-
       getFutureOrders(1)
     } else {
-      console.log("get future orders error")
+      alert("get future orders error")
     }
   }
 

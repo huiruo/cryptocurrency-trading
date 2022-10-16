@@ -83,3 +83,10 @@ export interface SearchParmas {
   pageSize: number;
   symbol?: string;
 }
+
+export interface FiterStrategyOrderType {
+  is_running: string | number
+  symbol: string
+  currentPage?: number
+  pageSize?: number
+}

@@ -3,7 +3,6 @@ import { useCallback, useEffect, useRef } from 'react'
 /*
 use：
 const queryUtil = ()=>{
-  console.log('req:')
 }
 const handleClick = useThrottle((val)=>queryUtil(val),600)
 or:

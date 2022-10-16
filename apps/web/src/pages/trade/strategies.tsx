@@ -15,7 +15,7 @@ export function Strategies() {
   const [strategies, setStrategies] = useState<StrategiesOrder[]>([])
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [selectAssetValue, setSelectAssetValue] = useState<string>('')
-  const [selectStatusValue, setSelectStatusValue] = useState<string | number>('')
+  const [selectStatusValue, setSelectStatusValue] = useState<string | number>(1)
 
   useDocumentTitle("strategies");
 
@@ -27,33 +27,27 @@ export function Strategies() {
       is_running,
       symbol: selectAssetValue
     }
-
-    console.log('getStrategies:', paramsReq);
-
     const res = await traderApi.strategiesOrderApi(paramsReq)
     if (res.code === 200) {
 
       setStrategies(res.data)
-    } else {
-      console.log("get Strategies orders error")
     }
   }
 
   const syncCallBack = () => {
     const params = {
-      is_running: '',
-      currentPage: 1,
-      symbol: ''
+      is_running: selectStatusValue,
+      currentPage: currentPage,
+      symbol: selectAssetValue
     }
     getStrategies(params)
   }
 
   const onPage = (currentPage: number, pageSize: number) => {
     const params = {
-      currentPage,
-      pageSize,
-      is_running: '',
-      symbol: ''
+      is_running: selectStatusValue,
+      currentPage: currentPage,
+      symbol: selectAssetValue
     }
     setCurrentPage(currentPage)
     getStrategies(params)
@@ -65,9 +59,9 @@ export function Strategies() {
 
   useEffect(() => {
     const params = {
-      is_running: '',
-      currentPage: 1,
-      symbol: ''
+      is_running: selectStatusValue,
+      currentPage: currentPage,
+      symbol: selectAssetValue
     }
     getStrategies(params)
   }, [])

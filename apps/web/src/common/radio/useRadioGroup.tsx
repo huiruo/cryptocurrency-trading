@@ -20,7 +20,6 @@ export function useRadioGroup(props: RadioGroupProps): UseRadioGroupReturn {
   /** @example <RadioGroup onChange={...}></RadioGroup> */
   const onChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      console.log('e---:', e)
       // const nextValue = getNextCheckboxGroupValue(e, groupValue)
       // setValue(nextValue)
     },

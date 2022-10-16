@@ -29,17 +29,14 @@ export function CoinList() {
   useDocumentTitle("coin list");
 
   const onDetail = async (item: any) => {
-    console.log('onDetail', item);
     // push(`/coin/detail?code=${item.code}`)
   }
 
   const onSyncCoinInfo = async (item: any) => {
-    console.log('onSyncInfo', item);
     const data = {
       code: item.code
     }
     const res = await traderApi.syncCoinInfoApi(data)
-    console.log('success', res);
   }
 
   const onNextPage = () => {
@@ -88,21 +85,16 @@ export function CoinList() {
       pageSize: pageSize || 10
     }
     const res = await traderApi.getCoinApi(data)
-    console.log('success', res);
 
     setCoinData(res)
     if (res.code === 200) {
-      console.log('success', res);
     } else {
-      console.log("Sync failed")
+      alert("Sync failed")
     }
   }
 
   const onSearch = async () => {
-    console.log('onSearch');
-    // const res = await apiService.filterCoinlList({ symbol: searchSymbol })
-    // console.log('res', res);
-    // setCoinData(res)
+    alert('onSearch');
   }
 
   const onAddCode = () => {

@@ -37,9 +37,6 @@ export class gotUtils {
       }
       : null;
     try {
-      console.log('agent:', agent);
-      console.log('proxyUrl:', proxyUrl);
-      console.log('reqUrl:', reqUrl);
 
       const res: any = await got.post(reqUrl, {
         headers,
@@ -89,13 +86,6 @@ export class gotUtils {
         }
         : null;
 
-      /*
-      console.log('agent:', agent);
-      console.log('proxyUrl:', proxyUrl);
-      console.log('reqUrl:', reqUrl);
-      console.log('reqUrl-data:', paramOptions);
-      */
-
       const res: any = await got.post(reqUrl, {
         headers,
         agent,
@@ -109,7 +99,6 @@ export class gotUtils {
         response: res.response,
       };
     } catch (e) {
-      console.log('post_error:', e);
       const ret: gotResType = {};
       if (!isNull(e.response)) {
         ret.statusCode = e.response.statusCode;
@@ -145,10 +134,6 @@ export class gotUtils {
       }
       : null;
 
-    console.log('agent:', agent);
-    console.log('proxyUrl:', proxyUrl);
-    console.log('reqUrl:', reqUrl);
-
     try {
       const res = await got.get(reqUrl, {
         headers,
@@ -161,7 +146,6 @@ export class gotUtils {
         data: JSON.parse(res.body),
       };
     } catch (e) {
-      console.log('get_error', e);
 
       const ret: gotResType = {};
       if (!isNull(e.response)) {

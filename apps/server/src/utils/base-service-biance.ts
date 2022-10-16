@@ -10,7 +10,6 @@ export class BaseServiceBiance {
 
     try {
       this.client = Binance({ apiKey: apiKey, apiSecret: secretKey });
-      console.log('=== initBinanceApi success ===');
     } catch (error) {
       throw new Error('apiKey and secretKey are invalid');
     }
@@ -89,7 +88,6 @@ export class BaseServiceBiance {
         recvWindow: 59999,
       });
     } catch (error) {
-      console.log('error', error);
 
       throw new Error('futuresAllOrders error');
     }
@@ -99,7 +97,6 @@ export class BaseServiceBiance {
     try {
       return await this.client.futuresBatchOrders({ batchOrders: [] });
     } catch (error) {
-      console.log('error:', error);
       throw new Error('futuresBatchOrders error');
     }
   }

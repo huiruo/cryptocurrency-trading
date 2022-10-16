@@ -8,8 +8,6 @@ export class Exchange {
   private async futuresOrder(opt: any, side: 'BUY' | 'SELL') {
     const { quantity, price, clientOrderId } = opt
 
-    console.log('futuresOrder:', opt);
-
     // const symbol = opt.symbol || this.symbol
     const symbol = opt.symbol
 
@@ -37,17 +35,13 @@ export class Exchange {
     */
 
     const order = await this.binance.futuresOrder(params)
-    console.log('this.binance.futuresOrder:', order);
 
 
     // await this.createFuturesOrder(order as any, price)
-
     return order
   }
 
   async long(opt: any): Promise<any> {
-    console.log('exchange-long=======');
-
     try {
       return await this.futuresOrder(opt, 'BUY')
     } catch (error) {

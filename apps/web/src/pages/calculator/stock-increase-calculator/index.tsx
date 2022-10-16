@@ -27,8 +27,6 @@ const StockIncreaseCalculator = () => {
 
   const onInput = (e: any) => {
     const val = e.target.value
-
-    console.log('input:', e.target.value)
     setInputVal(e.target.value)
     calculatorUtil(val)
   }
@@ -57,7 +55,6 @@ const StockIncreaseCalculator = () => {
         });
       }
 
-      console.log('list:', items)
       setCalcultorList(items)
     }
   }

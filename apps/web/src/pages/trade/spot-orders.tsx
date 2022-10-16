@@ -33,7 +33,7 @@ export function SpotOrders() {
 
       setSpotOrders(res.data)
     } else {
-      console.log("get future orders error")
+      alert("get future orders error")
     }
   }
 
@@ -55,7 +55,7 @@ export function SpotOrders() {
       }
       getSpotOrders(params)
     } else {
-      console.log("get future orders error")
+      alert("get future orders error")
     }
   }
 

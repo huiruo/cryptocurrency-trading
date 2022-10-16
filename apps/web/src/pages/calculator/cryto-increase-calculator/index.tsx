@@ -7,9 +7,7 @@ const CrytoIncreaseCalculator = () => {
 
   const [inputVal, setInputVal] = useState<string>('100')
 
-  const queryUtil = (val: string) => {
-    console.log('分割线------>', 'query:', val)
-  }
+  const queryUtil = (val: string) => { }
 
   const delayQuery = useDebounce((val) => queryUtil(val), 1000)
   // const delayQuery = debounce((val)=>queryUtil(val),1000)
@@ -17,10 +15,7 @@ const CrytoIncreaseCalculator = () => {
 
   const onInput = (e: any) => {
     const val = e.target.value
-    console.log('input:', val)
-
     delayQuery(val)
-
     setInputVal(val)
   }
 

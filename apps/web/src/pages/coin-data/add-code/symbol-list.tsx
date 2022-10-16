@@ -20,24 +20,22 @@ function SymbolList(props: SymbolListProps) {
     const res = await traderApi.getSymbolList()
     const { data, code } = res
     if (code === 200) {
-      console.log('success', res);
       setSymbolList(data)
     } else {
-      console.log("同步失败")
+      alert("同步失败")
     }
   }
 
   const onSyncSymbolInfo = async (item: SymbolListType) => {
-    console.log('onSyncSymbolInfo', item);
     const req = {
       code: item.code
     }
     const res = await traderApi.syncCoinInfoApi(req)
     const { data, code } = res
     if (code === 200) {
-      console.log('sync success', data);
+      alert('sync success');
     } else {
-      console.log("同步失败")
+      alert("同步失败")
     }
   }
 
