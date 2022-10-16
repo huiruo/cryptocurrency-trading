@@ -32,7 +32,7 @@ export function SpotOrders() {
 
       setSpotOrders(res.data)
     } else {
-      alert("get future orders error")
+      alert("get spot orders error")
     }
   }
 
@@ -54,7 +54,7 @@ export function SpotOrders() {
       }
       getSpotOrders(params)
     } else {
-      alert("get future orders error")
+      alert("get spot orders error")
     }
   }
 
