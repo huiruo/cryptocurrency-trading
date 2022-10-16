@@ -6,8 +6,7 @@ import Header from '@/components/feader';
 import { Box } from '@fower/react';
 import { SpotTable } from './spot-table';
 import { AssetSync } from '@/components/asset-sync';
-import { AssetType, SearchParmas, SpotOrder } from '@/utils/types';
-import { get } from 'lodash';
+import { SearchParmas, SpotOrder } from '@/utils/types';
 import { Pagination } from '@/components/pagination';
 
 /**

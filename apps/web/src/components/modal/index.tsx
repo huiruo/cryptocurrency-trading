@@ -10,7 +10,7 @@ export const TradeModal = (props: ModalProps) => {
         children,
         maskClosable = false,
         header,
-        footer,
+        // footer,
         afterClose,
         onOpen,
         onClose,
@@ -19,7 +19,6 @@ export const TradeModal = (props: ModalProps) => {
         width,
         height,
         isVisible,
-        ...rest
     } = props
 
     const modalEl = useRef<any>('')

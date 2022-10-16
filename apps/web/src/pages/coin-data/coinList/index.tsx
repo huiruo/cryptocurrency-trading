@@ -36,7 +36,7 @@ export function CoinList() {
     const data = {
       code: item.code
     }
-    const res = await traderApi.syncCoinInfoApi(data)
+    await traderApi.syncCoinInfoApi(data)
   }
 
   const onNextPage = () => {

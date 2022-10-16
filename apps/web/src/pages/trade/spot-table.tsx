@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import NiceModal from '@ebay/nice-modal-react'
 import { Box } from '@fower/react';
 import { Table } from '@/common/table';
@@ -13,7 +13,6 @@ import { CloseStrategyModal } from '@/components/close-strategy-modal';
 interface Props {
   data: SpotOrder[]
   spotCallBack: (searchParmas: SearchParmas) => void
-  // spotCallBack: (symbol: string) => void
 }
 
 const strategyStatusMap = [

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Box } from '@fower/react';
 import { Button } from '@/common/button';
 import { Select } from '@/common/select';

@@ -31,7 +31,7 @@ function SymbolList(props: SymbolListProps) {
       code: item.code
     }
     const res = await traderApi.syncCoinInfoApi(req)
-    const { data, code } = res
+    const { code } = res
     if (code === 200) {
       alert('sync success');
     } else {
