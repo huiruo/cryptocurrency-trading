@@ -80,6 +80,8 @@ export interface StrategiesOrder {
   entryPrice: string;
   sellingPrice: string;
   is_running: boolean;
+  tradeUrl?: string;
+  klineShots?: string;
   time: number;
   sellingTime: number;
   updatedAt?: number;

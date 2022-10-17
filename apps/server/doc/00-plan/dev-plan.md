@@ -13,3 +13,19 @@
 是否 设定止损
 止损价格设定
 ```
+
+## 设置手续费扣除
+全局设置:
+tradingFree = 0.1%
+tradingFree = 0.075%
+```
+orderType number
+1 spot
+2 future
+
+note string
+这笔策略的反思
+
+leverage number
+杠杆数 如果是现货则为1
+```

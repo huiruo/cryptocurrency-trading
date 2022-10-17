@@ -5,6 +5,7 @@ export class TradeAsset {
   @Column({ comment: 'name', }) name: string;
   @Column({ comment: 'symbol', }) symbol: string;
   @Column({ comment: 'code', }) code: string;
+  @Column({ comment: 'tradeUrl', }) tradeUrl: string;
   @Column('bigint', { comment: 'updatedAt', }) updatedAt?: number;
   @Column('bigint', { comment: 'createdAt', }) createdAt?: number;
 }

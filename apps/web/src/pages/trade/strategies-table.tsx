@@ -32,6 +32,15 @@ export function StrategiesTable(props: Props) {
     alert('onStopLostProfit:');
   }
 
+  const onKline = async (order: StrategiesOrder) => {
+    if (order.tradeUrl) {
+      window.open(order.tradeUrl, '_blank')
+    } else {
+      alert('No link')
+    }
+  }
+
+
   const onSyncPrice = async () => {
     if (!selectRows.length) {
       alert('select empty')
@@ -128,6 +137,14 @@ export function StrategiesTable(props: Props) {
             <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => syncPriceUtil(item)}>Update</Box>
             <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => onStopLostProfit(item)}>Stopt Loss / Profit</Box>
           </>
+        )
+      },
+    },
+    {
+      id: 'analysis', title: 'analysis', dataIndex: '', key: 'analysis', width: 100,
+      render(item: StrategiesOrder) {
+        return (
+          <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => onKline(item)}>K line</Box>
         )
       },
     },

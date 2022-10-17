@@ -35,6 +35,8 @@ export interface AssetType {
   name: string
   symbol: string
   code?: string
+  // tradeUrl?: string
+  tradeUrl: string
 }
 
 export interface SyncSpotOrderParams {

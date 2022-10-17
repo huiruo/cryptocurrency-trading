@@ -26,6 +26,10 @@ CREATE TABLE `strategies_order`(
   `sellingPrice` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'sellingPrice',
   `sellingTime` bigint(60) NULL DEFAULT NULL,
   `is_running` tinyint(1) NOT NULL,
+
+  `tradeUrl` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `klineShots` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin default NULL,
+
   `time` bigint(60) NULL DEFAULT NULL,
   `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),

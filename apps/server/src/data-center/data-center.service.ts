@@ -21,7 +21,6 @@ import {
   AssetType,
   CalculateCloseStrategyOrderType,
   CalculateStrategiesOrderType,
-  CreateOrdersStrategy,
   FiterStrategyOrderType,
   SearchParmas,
   StrategyProfit,
@@ -500,7 +499,7 @@ export class DataCenterService {
     return get(futureOrder, '[0]', {});
   }
 
-  private async getAsset(name: string) {
+  private async getAsset(name: string): Promise<TradeAsset> {
     const sql = `select * from asset where name='${name}'`;
     const symbolData = await this.tradeAssetRepo.query(sql);
 
@@ -761,7 +760,8 @@ export class DataCenterService {
       stopLoss: '',
       stopProfitPrice: '',
       stopLossPrice: '',
-      stopType: 0
+      stopType: 0,
+      tradeUrl: ''
     };
 
     const res = await this.updateCloseStrategyOrderUtil(strategiesOrder)
@@ -809,7 +809,8 @@ export class DataCenterService {
       stopLoss: '',
       stopProfitPrice: '',
       stopLossPrice: '',
-      stopType: 0
+      stopType: 0,
+      tradeUrl: ''
     };
 
     await this.updateStrategyOrderUtil(strategiesOrder)
@@ -938,6 +939,8 @@ export class DataCenterService {
         return { code: 500, message: 'The selected order not the same Symbol', data: null };
       }
 
+      const { tradeUrl } = await this.getAsset(symbol)
+
       const strategiesOrder = {
         userId: userId,
         strategyId,
@@ -966,7 +969,8 @@ export class DataCenterService {
         stopLoss: '',
         stopProfitPrice: '',
         stopLossPrice: '',
-        stopType: 0
+        stopType: 0,
+        tradeUrl
       };
 
       this.createStrategyOrderIdUtil({ userId, strategyId, orderId });

@@ -26,6 +26,10 @@ export class StrategiesOrder {
   @Column('bigint', { comment: 'time', }) time: number;
   @Column({ comment: 'realizedProfit', }) realizedProfit: number;
   @Column({ comment: 'realizedProfitRate', }) realizedProfitRate: string;
+
+  @Column({ comment: 'tradeUrl', }) tradeUrl: string;
+  @Column({ comment: 'klineShots', }) klineShots?: string;
+
   @Column('bigint', { comment: 'sellingTime', }) sellingTime: number;
   @Column('bigint', { comment: 'updatedAt', }) updatedAt?: number;
   @Column('bigint', { comment: 'createdAt', }) createdAt?: number;
