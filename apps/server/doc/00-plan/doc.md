@@ -24,7 +24,10 @@ BNB市值折算逻辑是？
 
 ## 合约
 markerFree:0.015%
+0.00015
 takerFree:0.040%
+
+0.0004
 ```
 https://www.binance.com/zh-CN/support/faq/360033544231
 
