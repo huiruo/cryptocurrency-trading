@@ -21,8 +21,7 @@ export class StrategiesOrder {
   @Column({ comment: 'profitRate', }) profitRate: string;
   @Column({ comment: 'realizedProfit', }) realizedProfit: number;
   @Column({ comment: 'realizedProfitRate', }) realizedProfitRate: string;
-  @Column({ comment: '净利润', }) netProfit: number;
-  @Column({ comment: '净利润比例', }) netProfitRate: string;
+  @Column({ comment: '手续费', }) free: number;
 
   @Column({ comment: '止盈止损方式', }) stopType: number;
   @Column({ comment: 'stopProfit', }) stopProfit: string;

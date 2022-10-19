@@ -78,8 +78,9 @@ export interface StrategiesOrder {
   profitRate: string;
   realizedProfit: number;
   realizedProfitRate: string;
-  netProfit: string;
-  netProfitRate: string;
+  free: number;
+  // netProfit: string;
+  // netProfitRate: string;
 
   entryPrice: string;
   sellingPrice: string;

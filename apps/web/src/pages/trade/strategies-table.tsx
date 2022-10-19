@@ -155,10 +155,7 @@ export function StrategiesTable(props: Props) {
       },
     },
     {
-      id: 'netProfit', title: 'Net profit', dataIndex: '', key: 'netProfit', width: 100,
-      render(item: StrategiesOrder) {
-        return <span>{item.netProfit} {item.netProfitRate}</span>
-      },
+      id: 'free', title: 'Free', dataIndex: 'free', key: 'free', width: 100,
     },
     {
       id: 'realizedProfit', title: 'Final profit', dataIndex: '', key: 'profit', width: 100,

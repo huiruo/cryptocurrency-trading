@@ -589,27 +589,45 @@ export class DataCenterService {
     entryPrice: string,
     qty: string,
     quoteQty: string,
-    userId: number
+    userId: number,
+    realizedFree: number,
+    isUpdate = false
   ): Promise<StrategyProfit> {
     const currentPrice = Number(price);
     const costPriceInt = Number(entryPrice);
     const qtyInt = Number(qty);
     const quoteQtyInt = Number(quoteQty);
 
-    const { spotFree } = await this.getUserSpotFree(userId)
-
+    let free = 0
+    let netProfit = 0
+    let netProfitRate = ''
     // profit =（当天结算价－开仓价格）×持仓量×合约单位－手续费
-    const free = quoteQtyInt * spotFree
+    if (!isUpdate) {
+      const { spotFree } = await this.getUserSpotFree(userId)
+      free = quoteQtyInt * spotFree + realizedFree
+      netProfitRate = parseFloat(((netProfit / quoteQtyInt) * 100).toFixed(2)) + '%';
+      console.log('isUpdate 1');
+    }
+
     const profit = (currentPrice - costPriceInt) * qtyInt;
+
+    if (!isUpdate) {
+      netProfit = profit - free
+      console.log('isUpdate 2');
+
+    }
     const profitRate =
       parseFloat(((profit / quoteQtyInt) * 100).toFixed(2)) + '%';
 
-    const netProfit = profit - free
-    const netProfitRate = parseFloat(((netProfit / quoteQtyInt) * 100).toFixed(2)) + '%';
+
+    console.log('alculateStrategyProfit 1:', realizedFree);
+    console.log('alculateStrategyProfit 3:', profit, '-', profitRate);
+    console.log('alculateStrategyProfit 4:', netProfit, '-', netProfitRate);
 
     return {
       profit,
       profitRate,
+      free,
       netProfit,
       netProfitRate,
     };
@@ -695,10 +713,11 @@ export class DataCenterService {
       realizedProfit,
       realizedProfitRate,
       sellingTime,
+      free
     } = strategiesOrder
 
     const sql = `update strategies_order set sellingQty = "${sellingQty}",sellingQuoteQty = "${sellingQuoteQty}",sellingPrice="${sellingPrice}",
-    realizedProfit="${realizedProfit}",realizedProfitRate="${realizedProfitRate}",sellingTime="${sellingTime}",is_running=${is_running} WHERE strategyId = "${strategyId}"`;
+    realizedProfit="${realizedProfit}",realizedProfitRate="${realizedProfitRate}",free="${free}",sellingTime="${sellingTime}",is_running=${is_running} WHERE strategyId = "${strategyId}"`;
 
     return await this.strategiesOrderRepo.query(sql);
   }
@@ -741,8 +760,7 @@ export class DataCenterService {
       realizedProfitRate,
       isTheSameSymbol,
       isTheSameSide,
-      netProfit,
-      netProfitRate
+      free,
     } = await this.calculateSpotOrderCloseStrategy(spotOrders, strategyOrder)
     if (!isTheSameSymbol) {
       return { code: 500, message: 'The selected order not the same Symbol', data: null };
@@ -772,10 +790,9 @@ export class DataCenterService {
 
       profit: 0,
       profitRate: '',
-      realizedProfit: netProfit,
-      realizedProfitRate: netProfitRate,
-      netProfit: 0,
-      netProfitRate: '',
+      realizedProfit,
+      realizedProfitRate,
+      free,
 
       stopType: 0,
       stopProfit: '',
@@ -834,8 +851,7 @@ export class DataCenterService {
       profitRate: '',
       realizedProfit: 0,
       realizedProfitRate: '',
-      netProfit: 0,
-      netProfitRate: '',
+      free: 0,
 
       stopType: 0,
       stopProfit: '',
@@ -864,7 +880,7 @@ export class DataCenterService {
 
 
   private async calculateSpotOrderCloseStrategy(spotOrders: SpotOrder[], strategyOrder: StrategiesOrder): Promise<CalculateCloseStrategyOrderType> {
-    const { symbol, side, entryPrice, userId } = strategyOrder
+    const { symbol, side, entryPrice, userId, free: realizedFree } = strategyOrder
     let qtyTotal = 0
     let quoteQtyTotal = 0
     let isTheSameSymbol = true
@@ -891,18 +907,19 @@ export class DataCenterService {
     const sellingQty = qtyTotal.toString()
     const sellingQuoteQty = quoteQtyTotal.toString()
 
-    const { profit, profitRate, netProfit, netProfitRate } = await this.calculateStrategyProfit(sellingPrice, entryPrice, sellingQty, sellingQuoteQty, userId)
+    const { profit, profitRate, netProfit, netProfitRate, free } = await this.calculateStrategyProfit(sellingPrice, entryPrice, sellingQty, sellingQuoteQty, userId, realizedFree)
 
     return {
       sellingQty,
       sellingQuoteQty,
       sellingPrice,
-      realizedProfit: profit,
-      realizedProfitRate: profitRate,
+      realizedProfit: netProfit,
+      realizedProfitRate: netProfitRate,
       isTheSameSymbol,
       isTheSameSide,
-      netProfit,
-      netProfitRate
+      free,
+      // netProfit,
+      // netProfitRate
     }
   }
 
@@ -976,19 +993,33 @@ export class DataCenterService {
       console.log('=== not exist strategy,insert... ===');
       const strategyId = nanoid();
 
+      // get price from server
+      const spotPrice = await this.getSpotPrice(symbol);
+      const price = get(spotPrice, `${symbol}`, '');
+
       const { qty, quoteQty, entryPrice, isTheSameSymbol } = this.calculateSpotStrategiesOrder(spotOrders, symbol)
       if (!isTheSameSymbol) {
         return { code: 500, message: 'The selected order not the same Symbol', data: null };
       }
 
+      const realizedFree = 0
+      const { profit, profitRate, free } = await this.calculateStrategyProfit(
+        price,
+        entryPrice,
+        qty,
+        quoteQty,
+        userId,
+        realizedFree
+      );
+
       const { tradeUrl } = await this.getAsset(symbol)
 
       const strategiesOrder = {
         symbol,
-        price: '',
+        price,
         side: isBuyer,
-        orderType: 0,
-        leverage: 0,
+        orderType: 1,
+        leverage: 1,
 
         entryPrice,
         sellingPrice: '',
@@ -999,12 +1030,11 @@ export class DataCenterService {
         sellingQty: '',
         sellingQuoteQty: '',
 
-        profit: 0,
-        profitRate: '',
+        profit,
+        profitRate,
         realizedProfit: 0,
         realizedProfitRate: '',
-        netProfit: 0,
-        netProfitRate: '',
+        free,
 
         stopType: 0,
         stopProfit: '',
@@ -1047,21 +1077,25 @@ export class DataCenterService {
     const { symbol, entryPrice, quoteQty, qty, strategyId, userId } = strategiesOrder;
     const spotPrice = await this.getSpotPrice(symbol);
     const price = get(spotPrice, `${symbol}`, '');
+    const realizedFree = 0
 
     if (!price) {
       return { code: 500, message: 'error', data: null };
     }
 
-    const { profit, profitRate, netProfit, netProfitRate } = await this.calculateStrategyProfit(
+    const isUpdate = true
+    const { profit, profitRate } = await this.calculateStrategyProfit(
       price,
       entryPrice,
       qty,
       quoteQty,
-      userId
+      userId,
+      realizedFree,
+      isUpdate
     );
 
     const sql = `update strategies_order set price = "${price}",profitRate = "${profitRate}",
-    profit = "${profit}",netProfit=${netProfit},netProfitRate="${netProfitRate}" WHERE strategyId = "${strategyId}"`;
+    profit = "${profit}" WHERE strategyId = "${strategyId}"`;
 
     const result = await this.strategiesOrderRepo.query(sql);
 

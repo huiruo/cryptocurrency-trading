@@ -21,8 +21,9 @@ CREATE TABLE `strategies_order`(
   `profitRate` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'profitRate',
   `realizedProfit` double(8,2) NULL DEFAULT NULL,
   `realizedProfitRate` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'realizedProfitRate',
-  `netProfit` double(8,2) NULL DEFAULT NULL COMMENT '净利润',
-  `netProfitRate` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '净利润比例',
+  `free` double(8,2) NULL DEFAULT NULL,
+  -- `netProfit` double(8,2) NULL DEFAULT NULL COMMENT '净利润',
+  -- `netProfitRate` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '净利润比例',
 
   `stopType` int(6) NOT NULL DEFAULT 0 COMMENT '止盈止损方式',
   `stopProfit` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'stopProfit',

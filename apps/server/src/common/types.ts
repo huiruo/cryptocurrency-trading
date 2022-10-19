@@ -30,6 +30,7 @@ export interface StrategyProfit {
   profit: number;
   profitRate: string;
   netProfit: number;
+  free: number
   netProfitRate: string;
 }
 
@@ -75,8 +76,9 @@ export interface CalculateCloseStrategyOrderType {
   realizedProfitRate: string
   isTheSameSymbol: boolean
   isTheSameSide: boolean
-  netProfit: number
-  netProfitRate: string
+  free: number
+  // netProfit: number
+  // netProfitRate: string
 }
 
 export interface MergeSpotStrategyParams {
