@@ -141,7 +141,7 @@ export function StrategiesTable(props: Props) {
       },
     },
     {
-      id: 'analysis', title: 'analysis', dataIndex: '', key: 'analysis', width: 100,
+      id: 'analysis', title: 'Analysis', dataIndex: '', key: 'analysis', width: 100,
       render(item: StrategiesOrder) {
         return (
           <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => onKline(item)}>K line</Box>
@@ -152,6 +152,12 @@ export function StrategiesTable(props: Props) {
       id: 'profit', title: 'Profit', dataIndex: '', key: 'profit', width: 100,
       render(item: StrategiesOrder) {
         return <span>{item.profit} {item.profitRate}</span>
+      },
+    },
+    {
+      id: 'netProfit', title: 'Net profit', dataIndex: '', key: 'netProfit', width: 100,
+      render(item: StrategiesOrder) {
+        return <span>{item.netProfit} {item.netProfitRate}</span>
       },
     },
     {

@@ -21,12 +21,17 @@ https://www.binance.com/zh-CN/support/faq/e85d6e703b874674840122196b89780a
 BNB市值折算逻辑是？
 若应收交易手续费为BUSD，则根据市场BUSD与BNB兑换比例进行折算，取BUSD/BTC和BNB/BTC市场最新价，BUSD/BNB的兑换比例=(BUSD/BTC)市场最新价/(BNB/BTC)市场最新价。
 ```
+## 现货
+spotFree = 0.1%
+0.001
+spotFree = 0.075%
+0.00075
 
 ## 合约
 markerFree:0.015%
 0.00015
-takerFree:0.040%
 
+takerFree:0.040%
 0.0004
 ```
 https://www.binance.com/zh-CN/support/faq/360033544231

@@ -27,8 +27,10 @@ export interface cryptoWalletType {
 }
 
 export interface StrategyProfit {
-  profit: number
-  profitRate: string
+  profit: number;
+  profitRate: string;
+  netProfit: number;
+  netProfitRate: string;
 }
 
 export interface AssetType {
@@ -70,9 +72,11 @@ export interface CalculateCloseStrategyOrderType {
   sellingQuoteQty: string
   sellingPrice: string
   realizedProfit: number,
-  realizedProfitRate: string,
+  realizedProfitRate: string
   isTheSameSymbol: boolean
   isTheSameSide: boolean
+  netProfit: number
+  netProfitRate: string
 }
 
 export interface MergeSpotStrategyParams {
