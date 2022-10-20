@@ -2,7 +2,14 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 import { get } from 'lodash';
 // import { ConfigService } from '@nestjs/config';
 import { Result } from 'src/common/result.interface';
-import { AssetType, FiterStrategyOrderType, MergeSpotStrategyParams, SearchParmas, SymbolType, SyncSpotOrderParams } from 'src/common/types';
+import {
+  AssetType,
+  FiterStrategyOrderType,
+  MergeSpotStrategyParams,
+  SearchParmas,
+  SymbolType,
+  SyncSpotOrderParams,
+} from 'src/common/types';
 import { DataCenterService } from './data-center.service';
 import { SpotOrder } from './spot-order.entity';
 import { StrategiesOrder } from './strategies-order.entity';
@@ -16,7 +23,7 @@ export interface Page {
 export class DataCenterController {
   constructor(
     private readonly DataCenterService: DataCenterService, // private configService: ConfigService,
-  ) { }
+  ) {}
 
   @Post('addCode')
   async addCode(@Body() symbol: any): Promise<Result> {
@@ -122,8 +129,10 @@ export class DataCenterController {
   }
 
   @Post('mergeSpotStrategy')
-  async mergeSpotStrategy(@Body() params: MergeSpotStrategyParams): Promise<Result> {
-    const { spotOrders, strategyOrder } = params
+  async mergeSpotStrategy(
+    @Body() params: MergeSpotStrategyParams,
+  ): Promise<Result> {
+    const { spotOrders, strategyOrder } = params;
 
     return await this.DataCenterService.mergeSpotStrategy(
       spotOrders,
@@ -132,8 +141,10 @@ export class DataCenterController {
   }
 
   @Post('closeSpotStrategy')
-  async closeSpotStrategy(@Body() params: MergeSpotStrategyParams): Promise<Result> {
-    const { spotOrders, strategyOrder } = params
+  async closeSpotStrategy(
+    @Body() params: MergeSpotStrategyParams,
+  ): Promise<Result> {
+    const { spotOrders, strategyOrder } = params;
 
     return await this.DataCenterService.closeSpotStrategy(
       spotOrders,
@@ -142,7 +153,9 @@ export class DataCenterController {
   }
 
   @Post('strategiesOrder')
-  async getStrategiesOrder(@Body() fiterStrategyOrder: FiterStrategyOrderType): Promise<Result> {
+  async getStrategiesOrder(
+    @Body() fiterStrategyOrder: FiterStrategyOrderType,
+  ): Promise<Result> {
     return await this.DataCenterService.getStrategiesOrder(fiterStrategyOrder);
   }
 
