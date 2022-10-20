@@ -7,6 +7,7 @@ import { StrategiesTable } from './strategies-table';
 import { FiterStrategyOrderType, StrategiesOrder } from '@/utils/types';
 import { StrategieyFilter } from '@/components/strategiey-filter';
 import { Pagination } from '@/components/pagination';
+import { toast } from '@/common/toast';
 
 /**
  * CODE ANNOTATION
@@ -19,7 +20,7 @@ export function Strategies() {
 
   useDocumentTitle("strategies");
 
-  const getStrategies = async (params: FiterStrategyOrderType) => {
+  const getStrategies = async (params: FiterStrategyOrderType, isUpdate = false) => {
     const { currentPage, pageSize, is_running } = params
     const paramsReq = {
       currentPage: currentPage || 1,
@@ -29,8 +30,12 @@ export function Strategies() {
     }
     const res = await traderApi.strategiesOrderApi(paramsReq)
     if (res.code === 200) {
-
+      if (isUpdate) {
+        toast.success('Get orders succeeded')
+      }
       setStrategies(res.data)
+    } else {
+      toast.error('Failed to get orders')
     }
   }
 

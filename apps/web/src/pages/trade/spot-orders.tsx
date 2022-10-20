@@ -8,6 +8,9 @@ import { SpotTable } from './spot-table';
 import { AssetSync } from '@/components/asset-sync';
 import { SearchParmas, SpotOrder } from '@/utils/types';
 import { Pagination } from '@/components/pagination';
+import { toast } from '@/common/toast';
+import { useLocation } from "react-router-dom";
+import _, { get, isEmpty } from 'lodash'
 
 /**
  * CODE ANNOTATION
@@ -16,10 +19,11 @@ export function SpotOrders() {
   const [spotOrders, setSpotOrders] = useState<SpotOrder[]>([])
   const [selectAssetValue, setSelectAssetValue] = useState<string>('')
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const location = useLocation();
 
   useDocumentTitle("spot order");
 
-  const getSpotOrders = async (params: SearchParmas) => {
+  const getSpotOrders = async (params: SearchParmas, isUpdate = false) => {
     const { symbol, currentPage: current, pageSize: size } = params
     const data = {
       currentPage: current || currentPage,
@@ -29,14 +33,17 @@ export function SpotOrders() {
 
     const res = await traderApi.spotOrdersApi(data)
     if (res.code === 200) {
-
+      if (isUpdate) {
+        toast.success('Get orders succeeded')
+      }
       setSpotOrders(res.data)
     } else {
-      alert("get spot orders error")
+      toast.error('Failed to get orders')
     }
   }
 
-  const onSyncSpotOrder = async (value: string | number) => {
+  const onSyncSpotOrder = async (value: string) => {
+    const toaster = toast.loading('Sync spot order...', { showLayer: true })
     let assetName = value
     if (!value) {
       assetName = 'BTCUSDT'
@@ -45,16 +52,27 @@ export function SpotOrders() {
     const params = {
       name: assetName
     }
+
     const res = await traderApi.syncSpotOrderApi(params)
     if (res.code === 200) {
       const params = {
         currentPage: 1,
         pageSize: 10,
-        symbol: selectAssetValue
+        // symbol: selectAssetValue
+        symbol: assetName
       }
+      setCurrentPage(1)
+      setSelectAssetValue(assetName)
       getSpotOrders(params)
+
+      toaster.update('Sync spot order succeeded', {
+        type: 'success',
+        duration: 1000,
+      })
     } else {
-      alert("get spot orders error")
+      toaster.update("Failed to sync spot orders", {
+        type: 'error',
+      })
     }
   }
 
@@ -79,6 +97,12 @@ export function SpotOrders() {
       symbol: ''
     }
     getSpotOrders(params)
+
+    const isEmptyState = isEmpty(location.state)
+    if (!isEmptyState) {
+      const asset = get(location.state, `asset`, '') as string
+      setSelectAssetValue(asset)
+    }
   }, [])
 
   return (

@@ -8,6 +8,7 @@ import NiceModal, { useModal } from '@ebay/nice-modal-react';
 import { TradeModal } from '../modal';
 import { StrategieyModalTable } from '../strategiey-modal-table';
 import { Pagination } from '../pagination';
+import { toast } from '@/common/toast';
 
 
 interface Props {
@@ -60,6 +61,8 @@ export const CloseStrategyModal = NiceModal.create((props: Props) => {
       return
     }
 
+    const toaster = toast.loading('Close Strategy...', { showLayer: true })
+
     const index = get(selectRows, '[0]', 0)
     const selectRow = get(strategies, `${[index]}`, 0)
     if (!selectRow.is_running) {
@@ -77,8 +80,15 @@ export const CloseStrategyModal = NiceModal.create((props: Props) => {
     if (res.code === 200) {
       hide()
       spotTableCallBack()
+
+      toaster.update('Close Strategy succeeded', {
+        type: 'success',
+        duration: 1000,
+      })
     } else {
-      alert("Close strategy error")
+      toaster.update("Failed to close strategy", {
+        type: 'error',
+      })
     }
   }
 

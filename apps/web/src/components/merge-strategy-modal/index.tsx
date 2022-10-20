@@ -8,6 +8,7 @@ import NiceModal, { useModal } from '@ebay/nice-modal-react';
 import { TradeModal } from '../modal';
 import { StrategieyModalTable } from '../strategiey-modal-table';
 import { Pagination } from '../pagination';
+import { toast } from '@/common/toast';
 
 
 interface Props {
@@ -38,7 +39,7 @@ export const MergeStrategyModal = NiceModal.create((props: Props) => {
     if (res.code === 200) {
       setStrategies(res.data)
     } else {
-      alert("get Strategies orders error")
+      toast.error('Failed to get Strategies orders')
     }
   }
 
@@ -49,13 +50,13 @@ export const MergeStrategyModal = NiceModal.create((props: Props) => {
 
   const onMergeStrategy = async () => {
     if (!selectRows.length) {
-      alert('select empty')
+      toast.warning('Select empty')
 
       return
     }
 
     if (selectRows.length >= 2) {
-      alert('select Greater than 2')
+      toast.warning('select Greater than 2')
 
       return
     }
@@ -63,10 +64,13 @@ export const MergeStrategyModal = NiceModal.create((props: Props) => {
     const index = get(selectRows, '[0]', 0)
     const selectRow = get(strategies, `${[index]}`, 0)
     if (!selectRow.is_running) {
-      alert('This strategy was closed and cannot be updated')
+      toast.warning('This strategy was closed and cannot be updated')
 
       return
     }
+
+
+    const toaster = toast.loading('Sync spot order...', { showLayer: true })
 
     const strategyOrder = { ...selectRow }
     const params = {
@@ -76,10 +80,16 @@ export const MergeStrategyModal = NiceModal.create((props: Props) => {
 
     const res = await traderApi.mergeSpotStrategy(params)
     if (res.code === 200) {
+      toaster.update('Merge spot strategy succeeded', {
+        type: 'success',
+        duration: 1000,
+      })
       hide()
       spotTableCallBack()
     } else {
-      alert("Merge strategy error")
+      toaster.update("Failed to merge strategy error", {
+        type: 'error',
+      })
     }
   }
 

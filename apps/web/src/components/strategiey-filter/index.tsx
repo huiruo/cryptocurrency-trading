@@ -8,7 +8,7 @@ import { Asset } from '../asset';
 interface Props {
   selectStatusCallback: (val: string | number) => void
   selectAssetCallback: (val: string) => void
-  fiterStrategyOrderCallback: (params: FiterStrategyOrderType) => void
+  fiterStrategyOrderCallback: (params: FiterStrategyOrderType, isUpdate: boolean) => void
   selectStatus: string | number
   selectAsset: string
 }
@@ -40,7 +40,7 @@ export function StrategieyFilter(props: Props) {
       is_running: selectStatus,
       symbol: ''
     }
-    fiterStrategyOrderCallback(params)
+    fiterStrategyOrderCallback(params, true)
   }
 
   const assetSelectCallback = (val: string) => {

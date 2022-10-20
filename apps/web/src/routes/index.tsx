@@ -13,7 +13,7 @@ import { FutureOrders } from '@/pages/trade/future-orders';
 import { SpotOrders } from '@/pages/trade/spot-orders';
 import { Strategies } from "@/pages/trade/strategies";
 import { AddAsset } from "@/pages/trade/add-asset";
-import CrytoIncreaseCalculator from "@/pages/calculator/cryto-increase-calculator";
+// import CrytoIncreaseCalculator from "@/pages/calculator/cryto-increase-calculator";
 import StockIncreaseCalculator from "@/pages/calculator/stock-increase-calculator";
 
 const routesConfig = [

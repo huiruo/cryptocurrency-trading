@@ -4,6 +4,8 @@ import { Input } from '@/common/input';
 import { Button } from '@/common/button';
 import traderApi from '@/services/traderApi';
 import { useDocumentTitle } from '@/utils/useDocumentTitle';
+import { toast } from '@/common/toast';
+import { useNavigate } from 'react-router-dom';
 
 /**
  * Add asset
@@ -14,9 +16,11 @@ export function AddAsset() {
   const [tradeUrl, setTradeUrl] = useState('')
   const [code, setCode] = useState('')
 
+  const navigate = useNavigate();
   useDocumentTitle("Add asset");
 
   const onAdd = async () => {
+    const toaster = toast.loading('Add asset...', { showLayer: true })
     /*
     {
     "name":"BTCUSDT",
@@ -36,8 +40,12 @@ export function AddAsset() {
       setTradeName('')
       setTradeUrl('')
       setCode('')
+      toaster.dismiss()
+      navigate('/trade/spot/order', { state: { asset: tradeName } })
     } else {
-      alert(res.message)
+      toaster.update("Failed to add asset", {
+        type: 'error',
+      })
     }
   }
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { AssetType } from '@/utils/types';
 import { Select } from '@/common/select';
 import traderApi from '@/services/traderApi';
+import { toast } from '@/common/toast';
 
 interface Props {
   onChange: (val: any) => void
@@ -21,7 +22,7 @@ export function Asset(props: Props) {
     if (res.code === 200) {
       setOptions(res.data)
     } else {
-      alert("Get asset oerror")
+      toast.error('Failed to get asset')
     }
   }
 

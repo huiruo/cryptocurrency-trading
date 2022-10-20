@@ -9,6 +9,7 @@ import traderApi from '@/services/traderApi';
 import { SearchParmas, SpotOrder } from '@/utils/types';
 import { MergeStrategyModal } from '@/components/merge-strategy-modal';
 import { CloseStrategyModal } from '@/components/close-strategy-modal';
+import { toast } from '@/common/toast';
 
 interface Props {
   data: SpotOrder[]
@@ -61,6 +62,9 @@ export function SpotTable(props: Props) {
   }
 
   const creatStrategyUtil = async (order: SpotOrder[]) => {
+
+    const toaster = toast.loading('creat Strategy...', { showLayer: true })
+
     const res = await traderApi.creatStrategyApi(order)
     if (res.code === 200) {
       const params = {
@@ -69,8 +73,16 @@ export function SpotTable(props: Props) {
       spotCallBack(params)
       setSelectRowData([])
       setSelectRows([])
+
+      toaster.update('Creat Strategy succeeded', {
+        type: 'success',
+        duration: 1000,
+      })
+
     } else {
-      alert("creatStrategys error")
+      toaster.update("Failed to Creat Strategy", {
+        type: 'error',
+      })
     }
   }
 
@@ -87,6 +99,9 @@ export function SpotTable(props: Props) {
   }
 
   const onResetOrderStatus = async (item: SpotOrder) => {
+
+    const toaster = toast.loading('Reset order...', { showLayer: true })
+
     const res = await traderApi.resetSpotOrderStatus(item)
     if (res.code === 200) {
       const params = {
@@ -95,8 +110,15 @@ export function SpotTable(props: Props) {
       spotCallBack(params)
       setSelectRowData([])
       setSelectRows([])
+
+      toaster.update('Reset order succeeded', {
+        type: 'success',
+        duration: 1000,
+      })
     } else {
-      alert("ResetOrderStatus error")
+      toaster.update("Failed to reset order", {
+        type: 'error',
+      })
     }
   }
 
@@ -171,8 +193,6 @@ export function SpotTable(props: Props) {
 
   const spotTableCallBack = () => {
     const params = {
-      // currentPage: ,
-      // pageSize: 10,
       symbol: ''
     }
     spotCallBack(params)
@@ -193,7 +213,6 @@ export function SpotTable(props: Props) {
         */
         const checked = selectRows.includes(index)
         return (
-          // <Checkbox checked={checked} onChange={() => onSelectChange(index, checked, keySet)} />
           <Checkbox checked={checked} onChange={() => onSelectChange(index, checked, item)} />
         )
       },

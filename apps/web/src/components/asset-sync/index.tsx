@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Asset } from '../asset';
 
 interface Props {
-  spotCallBack: (value: string | number) => void
+  spotCallBack: (value: string) => void
 }
 
 /**
@@ -14,14 +14,14 @@ interface Props {
 export function AssetSync(props: Props) {
 
   const { spotCallBack } = props
-  const [assetVal, setAssetVal] = useState<number | string>('BTCUSDT')
+  const [assetVal, setAssetVal] = useState<string>('BTCUSDT')
   const navigate = useNavigate();
 
   const onAddAsset = () => {
     navigate('/trade/addAsset')
   }
 
-  const assetSelectCallback = (val: string | number) => {
+  const assetSelectCallback = (val: string) => {
     setAssetVal(val)
   }
 

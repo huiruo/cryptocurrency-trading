@@ -7,6 +7,7 @@ import { Button } from '@/common/button';
 import traderApi from '@/services/traderApi';
 import { get } from 'lodash';
 import { StrategiesOrder } from '@/utils/types';
+import { toast } from '@/common/toast';
 
 interface Props {
   data: StrategiesOrder[]
@@ -21,10 +22,17 @@ export function StrategiesTable(props: Props) {
   const [selectRows, setSelectRows] = useState<number[]>([])
 
   const syncPriceUtil = async (order: StrategiesOrder) => {
+
+    const toaster = toast.loading('Sync price...', { showLayer: true })
+
     const res = await traderApi.syncStrategyPriceApi(order)
     if (res.code === 200) {
-
+      toaster.dismiss()
       syncCallBack()
+    } else {
+      toaster.update("Failed to Sync price", {
+        type: 'error',
+      })
     }
   }
 
@@ -133,10 +141,7 @@ export function StrategiesTable(props: Props) {
       id: 'action', title: 'Action', dataIndex: '', key: 'action', width: 100,
       render(item: StrategiesOrder) {
         return (
-          <>
-            <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => syncPriceUtil(item)}>Update</Box>
-            <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => onStopLostProfit(item)}>Stopt Loss / Profit</Box>
-          </>
+          <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => syncPriceUtil(item)}>Update</Box>
         )
       },
     },
@@ -149,9 +154,13 @@ export function StrategiesTable(props: Props) {
       },
     },
     {
-      id: 'profit', title: 'Profit', dataIndex: '', key: 'profit', width: 100,
+      id: 'profit', title: 'Profit', dataIndex: '', key: 'profit', width: 200,
       render(item: StrategiesOrder) {
-        return <span>{item.profit} {item.profitRate}</span>
+        return (
+          <>
+            <Box as='span' mr='8px'>{item.profit} {item.profitRate}</Box>
+          </>
+        )
       },
     },
     {
@@ -200,6 +209,16 @@ export function StrategiesTable(props: Props) {
             </>
           }
         </Box>
+      },
+    },
+    {
+      id: 'trade', title: 'Trade', dataIndex: '', key: 'trade', width: 200,
+      render(item: StrategiesOrder) {
+        return (
+          <Box w='80px'>
+            <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => onStopLostProfit(item)}>Trade plan</Box>
+          </Box>
+        )
       },
     },
     { id: 'strategyId', title: 'StrategyId', dataIndex: 'strategyId', key: 'strategyId', width: 100 },
