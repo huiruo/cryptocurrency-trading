@@ -6,6 +6,8 @@ import { Asset } from '../asset';
 
 interface Props {
   spotCallBack: (value: string) => void
+  assetSyncValue: string
+  assetSyncValueCallback: (value: string) => void
 }
 
 /**
@@ -13,8 +15,8 @@ interface Props {
  */
 export function AssetSync(props: Props) {
 
-  const { spotCallBack } = props
-  const [assetVal, setAssetVal] = useState<string>('BTCUSDT')
+  const { spotCallBack, assetSyncValue, assetSyncValueCallback } = props
+  // const [assetSyncValue, setAssetSyncValue] = useState<string>('BTCUSDT')
   const navigate = useNavigate();
 
   const onAddAsset = () => {
@@ -22,13 +24,13 @@ export function AssetSync(props: Props) {
   }
 
   const assetSelectCallback = (val: string) => {
-    setAssetVal(val)
+    assetSyncValueCallback(val)
   }
 
   return (
     <Box flex toCenterY>
-      <Asset onChange={assetSelectCallback} value={assetVal} />
-      <Button onClick={() => spotCallBack(assetVal)} ml4 mr4>Sync spot orders</Button>
+      <Asset onChange={assetSelectCallback} value={assetSyncValue} />
+      <Button onClick={() => spotCallBack(assetSyncValue)} ml4 mr4>Sync spot orders</Button>
       <Button ml2 onClick={onAddAsset}>Add code</Button>
     </Box>
   )

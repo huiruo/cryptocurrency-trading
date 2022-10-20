@@ -18,6 +18,7 @@ import _, { get, isEmpty } from 'lodash'
 export function SpotOrders() {
   const [spotOrders, setSpotOrders] = useState<SpotOrder[]>([])
   const [selectAssetValue, setSelectAssetValue] = useState<string>('')
+  const [assetSyncValue, setAssetSyncValue] = useState<string>('BTCUSDT')
   const [currentPage, setCurrentPage] = useState<number>(1);
   const location = useLocation();
 
@@ -102,6 +103,7 @@ export function SpotOrders() {
     if (!isEmptyState) {
       const asset = get(location.state, `asset`, '') as string
       setSelectAssetValue(asset)
+      setAssetSyncValue(asset)
     }
   }, [])
 
@@ -111,7 +113,7 @@ export function SpotOrders() {
       <Box pb='50px' mt='20px'>
         <Box toCenterX mb='20px'>
           <Box w='90%'>
-            <AssetSync spotCallBack={onSyncSpotOrder} />
+            <AssetSync assetSyncValue={assetSyncValue} assetSyncValueCallback={setAssetSyncValue} spotCallBack={onSyncSpotOrder} />
             <SpotOrderFilter selectAssetValue={selectAssetValue} selectCallback={selectCallback} spotCallBack={getSpotOrders} />
             <SpotTable data={spotOrders} spotCallBack={getSpotOrders} />
             <Pagination onChange={onPage} currentPage={currentPage} />

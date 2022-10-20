@@ -63,7 +63,7 @@ export function SpotTable(props: Props) {
 
   const creatStrategyUtil = async (order: SpotOrder[]) => {
 
-    const toaster = toast.loading('creat Strategy...', { showLayer: true })
+    const toaster = toast.loading('Creat strategy...', { showLayer: true })
 
     const res = await traderApi.creatStrategyApi(order)
     if (res.code === 200) {
