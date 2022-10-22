@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NiceModal from '@ebay/nice-modal-react'
 import { Box } from '@fower/react';
 import { Table } from '@/common/table';
@@ -10,6 +10,7 @@ import { SearchParmas, SpotOrder } from '@/utils/types';
 import { MergeStrategyModal } from '@/components/merge-strategy-modal';
 import { CloseStrategyModal } from '@/components/close-strategy-modal';
 import { toast } from '@/common/toast';
+import { isEmpty } from 'lodash';
 
 interface Props {
   data: SpotOrder[]
@@ -30,16 +31,16 @@ export function SpotTable(props: Props) {
   const [selectRows, setSelectRows] = useState<number[]>([])
   const [selectRowData, setSelectRowData] = useState<SpotOrder[]>([])
 
-  const onCreatStrategy = async () => {
+  const oncreateStrategy = async () => {
     if (!selectRows.length) {
-      alert('select empty')
+      toast.warning('select empty')
 
       return
     }
 
     /*
     if (selectRows.length >= 2) {
-      alert('select Greater than 2')
+      toast.warning('select Greater than 2')
 
       return
     }
@@ -55,17 +56,19 @@ export function SpotTable(props: Props) {
     */
     const isStrategyRelatedOrder = isStrategyRelatedOrderUtil(selectRowData)
     if (isStrategyRelatedOrder) {
-      alert('Can not select strategy related order')
+      toast.warning('Can not select closed order to create')
+
       return
     }
-    creatStrategyUtil(selectRowData)
+
+    createStrategyUtil(selectRowData)
   }
 
-  const creatStrategyUtil = async (order: SpotOrder[]) => {
+  const createStrategyUtil = async (order: SpotOrder[]) => {
 
-    const toaster = toast.loading('Creat strategy...', { showLayer: true })
+    const toaster = toast.loading('create strategy...', { showLayer: true })
 
-    const res = await traderApi.creatStrategyApi(order)
+    const res = await traderApi.createStrategyApi(order)
     if (res.code === 200) {
       const params = {
         symbol: ''
@@ -74,13 +77,13 @@ export function SpotTable(props: Props) {
       setSelectRowData([])
       setSelectRows([])
 
-      toaster.update('Creat Strategy succeeded', {
+      toaster.update('create Strategy succeeded', {
         type: 'success',
         duration: 1000,
       })
 
     } else {
-      toaster.update("Failed to Creat Strategy", {
+      toaster.update("Failed to create Strategy", {
         type: 'error',
       })
     }
@@ -124,14 +127,14 @@ export function SpotTable(props: Props) {
 
   const onMergeStrategy = () => {
     if (!selectRows.length) {
-      alert('select empty')
+      toast.warning('select empty')
 
       return
     }
 
     const isStrategyRelatedOrder = isStrategyRelatedOrderUtil(selectRowData)
     if (isStrategyRelatedOrder) {
-      alert('Can not select strategy related order')
+      toast.warning('Can not select closed order to merge')
       return
     }
 
@@ -150,8 +153,14 @@ export function SpotTable(props: Props) {
 
   const onCloseStrategy = async () => {
     if (!selectRows.length) {
-      alert('select empty')
+      toast.warning('select empty')
 
+      return
+    }
+
+    const isStrategyRelatedOrder = isStrategyRelatedOrderUtil(selectRowData)
+    if (isStrategyRelatedOrder) {
+      toast.warning('Can not select closed order to close')
       return
     }
 
@@ -248,7 +257,7 @@ export function SpotTable(props: Props) {
         return <>
           {item.strategyStatus !== 0 ?
             <Box as='button' cursor='pointer' color='#fff' bg='#ff7875' rounded-4px onClick={() => onResetOrderStatus(item)}>Reset</Box> :
-            <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => creatStrategyUtil([item])}>Create</Box>
+            <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => createStrategyUtil([item])}>createe</Box>
           }
         </>
       },
@@ -287,11 +296,19 @@ export function SpotTable(props: Props) {
     },
   ]
 
+  useEffect(() => {
+    if (!isEmpty(selectRows)) {
+      console.log('useEffect-createe', data);
+      setSelectRows([])
+      setSelectRowData([])
+    }
+  }, [data])
+
   return (
     <Box className='table-box-container' mt-10px>
       <Table columns={columns} data={data} className='table-box' />
       <Box mt-10>
-        <Button onClick={() => onCreatStrategy()} mr4>Creat strategy</Button>
+        <Button onClick={() => oncreateStrategy()} mr4>create strategy</Button>
         <Button onClick={() => onMergeStrategy()} mr4>Merge strategy</Button>
         <Button onClick={() => onCloseStrategy()} mr4>Close strategy</Button>
       </Box>

@@ -10,7 +10,7 @@ import { SearchParmas, SpotOrder } from '@/utils/types';
 import { Pagination } from '@/components/pagination';
 import { toast } from '@/common/toast';
 import { useLocation } from "react-router-dom";
-import _, { get, isEmpty } from 'lodash'
+import { get, isEmpty } from 'lodash'
 
 /**
  * CODE ANNOTATION
@@ -20,6 +20,7 @@ export function SpotOrders() {
   const [selectAssetValue, setSelectAssetValue] = useState<string>('')
   const [assetSyncValue, setAssetSyncValue] = useState<string>('BTCUSDT')
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
   const location = useLocation();
 
   useDocumentTitle("spot order");
@@ -28,7 +29,7 @@ export function SpotOrders() {
     const { symbol, currentPage: current, pageSize: size } = params
     const data = {
       currentPage: current || currentPage,
-      pageSize: size || 10,
+      pageSize: size || pageSize,
       symbol: symbol || selectAssetValue
     }
 
@@ -41,6 +42,11 @@ export function SpotOrders() {
     } else {
       toast.error('Failed to get orders')
     }
+  }
+
+  const onFilterSpotOrder = (params: SearchParmas) => {
+    setCurrentPage(1)
+    getSpotOrders(params)
   }
 
   const onSyncSpotOrder = async (value: string) => {
@@ -94,7 +100,7 @@ export function SpotOrders() {
   useEffect(() => {
     const params = {
       currentPage: 1,
-      pageSize: 10,
+      pageSize: pageSize,
       symbol: ''
     }
     getSpotOrders(params)
@@ -114,9 +120,9 @@ export function SpotOrders() {
         <Box toCenterX mb='20px'>
           <Box w='90%'>
             <AssetSync assetSyncValue={assetSyncValue} assetSyncValueCallback={setAssetSyncValue} spotCallBack={onSyncSpotOrder} />
-            <SpotOrderFilter selectAssetValue={selectAssetValue} selectCallback={selectCallback} spotCallBack={getSpotOrders} />
+            <SpotOrderFilter selectAssetValue={selectAssetValue} selectCallback={selectCallback} spotCallBack={onFilterSpotOrder} />
             <SpotTable data={spotOrders} spotCallBack={getSpotOrders} />
-            <Pagination onChange={onPage} currentPage={currentPage} />
+            <Pagination onChange={onPage} currentPage={currentPage} showPageSelect={true} pageSize={pageSize} onChangePageSize={setPageSize} />
           </Box>
         </Box>
       </Box>

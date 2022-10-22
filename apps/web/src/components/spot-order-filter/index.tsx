@@ -19,7 +19,6 @@ export function SpotOrderFilter(props: Props) {
   const onSearch = () => {
     const params = {
       currentPage: 1,
-      pageSize: 10,
       symbol: ''
     }
 

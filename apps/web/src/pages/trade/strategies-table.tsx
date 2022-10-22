@@ -141,15 +141,10 @@ export function StrategiesTable(props: Props) {
       id: 'action', title: 'Action', dataIndex: '', key: 'action', width: 100,
       render(item: StrategiesOrder) {
         return (
-          <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => syncPriceUtil(item)}>Update</Box>
-        )
-      },
-    },
-    {
-      id: 'analysis', title: 'Analysis', dataIndex: '', key: 'analysis', width: 100,
-      render(item: StrategiesOrder) {
-        return (
-          <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => onKline(item)}>K line</Box>
+          <Box w-120>
+            <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' mr-10 rounded-4px onClick={() => syncPriceUtil(item)}>Update</Box>
+            <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => onKline(item)}>K line</Box>
+          </Box>
         )
       },
     },

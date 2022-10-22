@@ -62,6 +62,11 @@ export function Strategies() {
     setSelectStatusValue(val)
   }
 
+  const onFiterStrategyOrder = (params: FiterStrategyOrderType) => {
+    setCurrentPage(1)
+    getStrategies(params)
+  }
+
   useEffect(() => {
     const params = {
       is_running: selectStatusValue,
@@ -83,7 +88,7 @@ export function Strategies() {
               selectAsset={selectAssetValue}
               selectStatusCallback={selectStatusCallback}
               selectAssetCallback={setSelectAssetValue}
-              fiterStrategyOrderCallback={getStrategies}
+              fiterStrategyOrderCallback={onFiterStrategyOrder}
             />
             <StrategiesTable data={strategies} syncCallBack={syncCallBack} />
             <Pagination onChange={onPage} currentPage={currentPage} />

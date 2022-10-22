@@ -3,7 +3,7 @@ import { Button } from '@/common/button';
 import traderApi from '@/services/traderApi';
 import { FiterStrategyOrderType, SpotOrder, StrategiesOrder } from '@/utils/types';
 import { Box } from '@fower/react';
-import { get } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import NiceModal, { useModal } from '@ebay/nice-modal-react';
 import { TradeModal } from '../modal';
 import { StrategieyModalTable } from '../strategiey-modal-table';
@@ -97,6 +97,10 @@ export const CloseStrategyModal = NiceModal.create((props: Props) => {
       currentPage,
       pageSize,
       is_running: defaultRunning
+    }
+
+    if (!isEmpty(selectRows)) {
+      setSelectRows([])
     }
     setCurrentPage(currentPage)
     getStrategies(params)

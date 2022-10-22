@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Box } from '@fower/react';
 import { Button } from '@/common/button';
 import { useNavigate } from 'react-router-dom';
@@ -16,7 +16,6 @@ interface Props {
 export function AssetSync(props: Props) {
 
   const { spotCallBack, assetSyncValue, assetSyncValueCallback } = props
-  // const [assetSyncValue, setAssetSyncValue] = useState<string>('BTCUSDT')
   const navigate = useNavigate();
 
   const onAddAsset = () => {

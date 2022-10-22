@@ -89,7 +89,7 @@ const traderApi = {
 	// =========== Spot Order end ===========
 
 	// =========== Strategies Order start ===========
-	creatStrategyApi(data: any) {
+	createStrategyApi(data: any) {
 		const url: string = `${traderApiUrl}/data/center/createStrategy`;
 		return http.post<resType>(data, url);
 	},
