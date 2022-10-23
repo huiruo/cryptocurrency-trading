@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, PropsWithChildren } from 'react'
+import React, { FC, ReactNode } from 'react'
 import { forwardRef } from '../utils'
 import { FowerHTMLProps } from '@fower/core'
 import { Box } from '@fower/react'

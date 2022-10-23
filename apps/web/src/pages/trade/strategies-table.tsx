@@ -5,7 +5,6 @@ import { formatUnixTime } from '@/utils';
 import { Checkbox } from '@/common/checkbox';
 import { Button } from '@/common/button';
 import traderApi from '@/services/traderApi';
-import { get } from 'lodash';
 import { StrategiesOrder } from '@/utils/types';
 import { toast } from '@/common/toast';
 
@@ -50,29 +49,17 @@ export function StrategiesTable(props: Props) {
 
 
   const onSyncPrice = async () => {
-    if (!selectRows.length) {
-      alert('select empty')
+    const toaster = toast.loading('Sync all Strategies price...', { showLayer: true })
 
-      return
+    const res = await traderApi.syncAllStrategiesPriceApi(data)
+    if (res.code === 200) {
+      toaster.dismiss()
+      syncCallBack()
+    } else {
+      toaster.update("Failed to Sync price", {
+        type: 'error',
+      })
     }
-
-    if (selectRows.length >= 2) {
-      alert('select Greater than 2')
-
-      return
-    }
-
-    const index = get(selectRows, '[0]', 0)
-    const selectRow = get(data, `${[index]}`, 0)
-    if (!selectRow.is_running) {
-      alert('This strategy was closed and cannot be updated')
-
-      return
-    }
-
-    const params = { ...selectRow }
-
-    syncPriceUtil(params)
   }
 
   const onSelectChange = (index: number, checked: boolean, keySet?: any) => {
@@ -106,7 +93,7 @@ export function StrategiesTable(props: Props) {
       render(item: StrategiesOrder) {
         return <Box w='200px'>
           <Box>begin:{formatUnixTime(Number(item.time))}</Box>
-          {item.is_running ? <Box>update:{formatUnixTime(item.updatedAt)}</Box> : <Box>ended:{formatUnixTime(Number(item.sellingTime))}</Box>}
+          {item.is_running ? <Box>update:{formatUnixTime(Number(item.updatedAt))}</Box> : <Box>ended:{formatUnixTime(Number(item.sellingTime))}</Box>}
         </Box>
       },
     },

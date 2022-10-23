@@ -49,7 +49,7 @@ export function StrategieyModalTable(props: Props) {
       render(item: StrategiesOrder) {
         return <Box w='200px'>
           <Box>begin:{formatUnixTime(Number(item.time))}</Box>
-          {item.is_running ? <Box>update:{formatUnixTime(item.updatedAt)}</Box> : <Box>ended:{formatUnixTime(Number(item.sellingTime))}</Box>}
+          {item.is_running ? <Box>update:{formatUnixTime(Number(item.updatedAt))}</Box> : <Box>ended:{formatUnixTime(Number(item.sellingTime))}</Box>}
         </Box>
       },
     },

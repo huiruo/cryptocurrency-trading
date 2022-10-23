@@ -23,7 +23,7 @@ export interface Page {
 export class DataCenterController {
   constructor(
     private readonly DataCenterService: DataCenterService, // private configService: ConfigService,
-  ) {}
+  ) { }
 
   @Post('addCode')
   async addCode(@Body() symbol: any): Promise<Result> {
@@ -167,6 +167,11 @@ export class DataCenterController {
   @Post('strategyPrice')
   async syncStrategyPrice(@Body() params: StrategiesOrder): Promise<any> {
     return await this.DataCenterService.syncStrategyPrice(params);
+  }
+
+  @Post('allStrategiesPrice')
+  async syncAllStrategiesPrice(@Body() params: StrategiesOrder[]): Promise<any> {
+    return await this.DataCenterService.syncAllStrategiesPrice(params);
   }
   // =========== Strategies Order end ===========
 }

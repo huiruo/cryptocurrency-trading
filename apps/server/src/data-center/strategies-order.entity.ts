@@ -37,6 +37,6 @@ export class StrategiesOrder {
   @Column({ comment: 'userId', }) userId: number;
   @Column({ comment: 'strategyId', }) strategyId: string;
   @Column('bigint', { comment: 'time', }) time: number;
-  @Column('bigint', { comment: 'updatedAt', }) updatedAt?: number;
+  @Column('bigint', { comment: 'updatedAt', }) updatedAt: number;
   @Column('bigint', { comment: 'createdAt', }) createdAt?: number;
 }

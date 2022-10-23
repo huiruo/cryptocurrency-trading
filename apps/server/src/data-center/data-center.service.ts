@@ -605,7 +605,6 @@ export class DataCenterService {
     if (!isUpdate) {
       const { spotFree } = await this.getUserSpotFree(userId);
       free = quoteQtyInt * spotFree + realizedFree;
-      console.log('isUpdate 1');
     }
 
     const profit = (currentPrice - costPriceInt) * qtyInt;
@@ -614,14 +613,15 @@ export class DataCenterService {
       netProfit = profit - free;
       netProfitRate =
         parseFloat(((netProfit / quoteQtyInt) * 100).toFixed(2)) + '%';
-      console.log('isUpdate 2');
     }
     const profitRate =
       parseFloat(((profit / quoteQtyInt) * 100).toFixed(2)) + '%';
 
+    /*
     console.log('alculateStrategyProfit 1:', realizedFree);
     console.log('alculateStrategyProfit 3:', profit, '-', profitRate);
     console.log('alculateStrategyProfit 4:', netProfit, '-', netProfitRate);
+    */
 
     return {
       profit,
@@ -694,9 +694,9 @@ export class DataCenterService {
   }
 
   private async updateStrategyOrderUtil(strategiesOrder: StrategiesOrder) {
-    const { strategyId, qty, quoteQty, entryPrice } = strategiesOrder;
+    const { strategyId, qty, quoteQty, entryPrice, updatedAt } = strategiesOrder;
 
-    const sql = `update strategies_order set qty = "${qty}",quoteQty = "${quoteQty}",entryPrice="${entryPrice}" WHERE strategyId = "${strategyId}"`;
+    const sql = `update strategies_order set qty = "${qty}",quoteQty = "${quoteQty}",entryPrice="${entryPrice}",updatedAt="${updatedAt}" WHERE strategyId = "${strategyId}"`;
     return await this.strategiesOrderRepo.query(sql);
   }
 
@@ -711,10 +711,11 @@ export class DataCenterService {
       realizedProfitRate,
       sellingTime,
       free,
+      updatedAt
     } = strategiesOrder;
 
     const sql = `update strategies_order set sellingQty = "${sellingQty}",sellingQuoteQty = "${sellingQuoteQty}",sellingPrice="${sellingPrice}",
-    realizedProfit="${realizedProfit}",realizedProfitRate="${realizedProfitRate}",free="${free}",sellingTime="${sellingTime}",is_running=${is_running} WHERE strategyId = "${strategyId}"`;
+    realizedProfit="${realizedProfit}",realizedProfitRate="${realizedProfitRate}",free="${free}",sellingTime="${sellingTime}",is_running=${is_running},updatedAt="${updatedAt}" WHERE strategyId = "${strategyId}"`;
 
     return await this.strategiesOrderRepo.query(sql);
   }
@@ -816,6 +817,7 @@ export class DataCenterService {
       userId,
       strategyId,
       time,
+      updatedAt: new Date().getTime()
     };
 
     const res = await this.updateCloseStrategyOrderUtil(strategiesOrder);
@@ -881,6 +883,7 @@ export class DataCenterService {
 
       is_running: true,
       time,
+      updatedAt: new Date().getTime(),
       userId,
       strategyId,
     };
@@ -1092,6 +1095,7 @@ export class DataCenterService {
         is_running: true,
         userId: userId,
         strategyId,
+        updatedAt: new Date().getTime(),
         time,
       };
 
@@ -1128,6 +1132,7 @@ export class DataCenterService {
     }
 
     const isUpdate = true;
+    const updatedAt = new Date().getTime()
     const { profit, profitRate } = await this.calculateStrategyProfit(
       price,
       entryPrice,
@@ -1139,11 +1144,54 @@ export class DataCenterService {
     );
 
     const sql = `update strategies_order set price = "${price}",profitRate = "${profitRate}",
-    profit = "${profit}" WHERE strategyId = "${strategyId}"`;
-
+    profit = "${profit}",updatedAt="${updatedAt}" WHERE strategyId = "${strategyId}"`;
     const result = await this.strategiesOrderRepo.query(sql);
 
     return { code: 200, message: 'ok', data: result };
+  }
+
+  private async loopUpdateStrategiesPrice(strategiesOrders: StrategiesOrder[]) {
+    const updatedAt = new Date().getTime()
+    try {
+      for (let index = 0; index < strategiesOrders.length; index++) {
+        const item = strategiesOrders[index];
+
+        const { symbol, entryPrice, quoteQty, qty, strategyId, userId } =
+          item;
+        const spotPrice = await this.getSpotPrice(symbol);
+
+        const price = get(spotPrice, `${symbol}`, '');
+        const realizedFree = 0;
+        if (!price) {
+          return { code: 500, message: 'error', data: null };
+        }
+
+        const isUpdate = true;
+        const { profit, profitRate } = await this.calculateStrategyProfit(
+          price,
+          entryPrice,
+          qty,
+          quoteQty,
+          userId,
+          realizedFree,
+          isUpdate,
+        );
+
+        const sql = `update strategies_order set price = "${price}",profitRate = "${profitRate}",
+    profit = "${profit}",updatedAt="${updatedAt}" WHERE strategyId = "${strategyId}"`;
+
+        const result = await this.strategiesOrderRepo.query(sql);
+      }
+
+      return { code: 200, message: 'Update succeeded', data: null };
+    } catch (error) {
+      return { code: 500, message: 'update error', data: null };
+    }
+  }
+
+  async syncAllStrategiesPrice(strategiesOrders: StrategiesOrder[]): Promise<Result> {
+    const res = await this.loopUpdateStrategiesPrice(strategiesOrders)
+    return res
   }
   // =========== Strategies Order end ===========
 }

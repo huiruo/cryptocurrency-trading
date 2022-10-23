@@ -104,6 +104,10 @@ const traderApi = {
 	syncStrategyPriceApi(data: any) {
 		const url: string = `${traderApiUrl}/data/center/strategyPrice`;
 		return http.post<resType>(data, url);
+	},
+	syncAllStrategiesPriceApi(data: any) {
+		const url: string = `${traderApiUrl}/data/center/allStrategiesPrice`;
+		return http.post<resType>(data, url);
 	}
 	// =========== Strategies Order end ===========
 }
