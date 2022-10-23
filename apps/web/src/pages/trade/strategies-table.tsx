@@ -7,6 +7,8 @@ import { Button } from '@/common/button';
 import traderApi from '@/services/traderApi';
 import { StrategiesOrder } from '@/utils/types';
 import { toast } from '@/common/toast';
+import { TradePlanModal } from '@/components/trade-plan-modal';
+import NiceModal from '@ebay/nice-modal-react';
 
 interface Props {
   data: StrategiesOrder[]
@@ -36,7 +38,7 @@ export function StrategiesTable(props: Props) {
   }
 
   const onStopLostProfit = async (order: StrategiesOrder) => {
-    alert('onStopLostProfit:');
+    NiceModal.show('tradePlanModal')
   }
 
   const onKline = async (order: StrategiesOrder) => {
@@ -210,6 +212,8 @@ export function StrategiesTable(props: Props) {
   return (
     <Box className='table-box-container' mt-10px>
       <Table columns={columns} data={data} className='table-box' />
+
+      <TradePlanModal id='tradePlanModal' />
 
       <Box mt-10>
         <Button onClick={() => onSyncPrice()} mr4>Sync price</Button>
