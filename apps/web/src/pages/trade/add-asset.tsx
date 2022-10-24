@@ -55,7 +55,7 @@ export function AddAsset() {
       <div className='container symbol-container' style={{ paddingTop: '20px' }} >
         <div className='add-symbol'>
           <div className='custom-input'>
-            <Input onChange={(e) => { setTradeName(e.target.value) }} value={tradeName} placeholder="Please enter asset" />
+            <Input onChange={(e) => { setTradeName(e.target.value) }} value={tradeName} placeholder="Please enter asset,like XXXUSDT" />
           </div>
 
           <div className='custom-input'>

@@ -132,7 +132,7 @@ export function StrategiesTable(props: Props) {
         return (
           <Box w-120>
             <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' mr-10 rounded-4px onClick={() => syncPriceUtil(item)}>Update</Box>
-            <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => onKline(item)}>K line</Box>
+            <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => onKline(item)}>Kline</Box>
           </Box>
         )
       },

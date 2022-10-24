@@ -257,7 +257,7 @@ export function SpotTable(props: Props) {
         return <>
           {item.strategyStatus !== 0 ?
             <Box as='button' cursor='pointer' color='#fff' bg='#ff7875' rounded-4px onClick={() => onResetOrderStatus(item)}>Reset</Box> :
-            <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => createStrategyUtil([item])}>createe</Box>
+            <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => createStrategyUtil([item])}>Create</Box>
           }
         </>
       },
@@ -298,7 +298,6 @@ export function SpotTable(props: Props) {
 
   useEffect(() => {
     if (!isEmpty(selectRows)) {
-      console.log('useEffect-createe', data);
       setSelectRows([])
       setSelectRowData([])
     }
