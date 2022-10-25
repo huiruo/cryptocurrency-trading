@@ -108,8 +108,14 @@ const traderApi = {
 	syncAllStrategiesPriceApi(data: any) {
 		const url: string = `${traderApiUrl}/data/center/allStrategiesPrice`;
 		return http.post<resType>(data, url);
-	}
+	},
 	// =========== Strategies Order end ===========
+	// =========== Count start ===========
+	syncAmountApi(data: any) {
+		const url: string = `${traderApiUrl}/data/center/syncAmount`;
+		return http.post<resType>(data, url);
+	},
+	// =========== Count start end ===========
 }
 
 export default traderApi;

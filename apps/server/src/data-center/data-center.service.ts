@@ -103,8 +103,9 @@ export class DataCenterService {
   }
 
   async getCoin(currentPage: number, pageSize: number): Promise<Result> {
-    const sql = `select * from coin order by ranked asc limit ${(currentPage - 1) * pageSize
-      },${pageSize}`;
+    const sql = `select * from coin order by ranked asc limit ${
+      (currentPage - 1) * pageSize
+    },${pageSize}`;
 
     return await this.coninRepo.query(sql);
   }
@@ -427,8 +428,9 @@ export class DataCenterService {
     currentPage: number,
     pageSize: number,
   ): Promise<Result> {
-    const sql = `select * from futures_order order by updateTime desc limit ${(currentPage - 1) * pageSize
-      },${pageSize}`;
+    const sql = `select * from futures_order order by updateTime desc limit ${
+      (currentPage - 1) * pageSize
+    },${pageSize}`;
 
     const res = await this.futuresOrderRepo.query(sql);
     return { code: 200, message: 'ok', data: res };
@@ -525,11 +527,13 @@ export class DataCenterService {
     const { currentPage, pageSize, symbol } = searchParmas;
     let sql = '';
     if (symbol) {
-      sql = `select * from spot_order where symbol ="${symbol}" order by time desc limit ${(currentPage - 1) * pageSize
-        },${pageSize}`;
+      sql = `select * from spot_order where symbol ="${symbol}" order by time desc limit ${
+        (currentPage - 1) * pageSize
+      },${pageSize}`;
     } else {
-      sql = `select * from spot_order order by time desc limit ${(currentPage - 1) * pageSize
-        },${pageSize}`;
+      sql = `select * from spot_order order by time desc limit ${
+        (currentPage - 1) * pageSize
+      },${pageSize}`;
     }
 
     const res = await this.spotOrderRepo.query(sql);
@@ -694,7 +698,8 @@ export class DataCenterService {
   }
 
   private async updateStrategyOrderUtil(strategiesOrder: StrategiesOrder) {
-    const { strategyId, qty, quoteQty, entryPrice, updatedAt } = strategiesOrder;
+    const { strategyId, qty, quoteQty, entryPrice, updatedAt } =
+      strategiesOrder;
 
     const sql = `update strategies_order set qty = "${qty}",quoteQty = "${quoteQty}",entryPrice="${entryPrice}",updatedAt="${updatedAt}" WHERE strategyId = "${strategyId}"`;
     return await this.strategiesOrderRepo.query(sql);
@@ -711,7 +716,7 @@ export class DataCenterService {
       realizedProfitRate,
       sellingTime,
       free,
-      updatedAt
+      updatedAt,
     } = strategiesOrder;
 
     const sql = `update strategies_order set sellingQty = "${sellingQty}",sellingQuoteQty = "${sellingQuoteQty}",sellingPrice="${sellingPrice}",
@@ -727,19 +732,23 @@ export class DataCenterService {
     let sql = '';
     if (symbol) {
       if (is_running !== '') {
-        sql = `select * from strategies_order where symbol ="${symbol}" and is_running=${is_running}  order by createdAt desc limit ${(currentPage - 1) * pageSize
-          },${pageSize}`;
+        sql = `select * from strategies_order where symbol ="${symbol}" and is_running=${is_running}  order by createdAt desc limit ${
+          (currentPage - 1) * pageSize
+        },${pageSize}`;
       } else {
-        sql = `select * from strategies_order where symbol ="${symbol}" order by createdAt desc limit ${(currentPage - 1) * pageSize
-          },${pageSize}`;
+        sql = `select * from strategies_order where symbol ="${symbol}" order by createdAt desc limit ${
+          (currentPage - 1) * pageSize
+        },${pageSize}`;
       }
     } else {
       if (is_running !== '') {
-        sql = `select * from strategies_order where is_running ="${is_running}" order by createdAt desc limit ${(currentPage - 1) * pageSize
-          },${pageSize}`;
+        sql = `select * from strategies_order where is_running ="${is_running}" order by createdAt desc limit ${
+          (currentPage - 1) * pageSize
+        },${pageSize}`;
       } else {
-        sql = `select * from strategies_order order by createdAt desc limit ${(currentPage - 1) * pageSize
-          },${pageSize}`;
+        sql = `select * from strategies_order order by createdAt desc limit ${
+          (currentPage - 1) * pageSize
+        },${pageSize}`;
       }
     }
     const res = await this.strategiesOrderRepo.query(sql);
@@ -817,7 +826,7 @@ export class DataCenterService {
       userId,
       strategyId,
       time,
-      updatedAt: new Date().getTime()
+      updatedAt: new Date().getTime(),
     };
 
     const res = await this.updateCloseStrategyOrderUtil(strategiesOrder);
@@ -1132,7 +1141,7 @@ export class DataCenterService {
     }
 
     const isUpdate = true;
-    const updatedAt = new Date().getTime()
+    const updatedAt = new Date().getTime();
     const { profit, profitRate } = await this.calculateStrategyProfit(
       price,
       entryPrice,
@@ -1151,13 +1160,12 @@ export class DataCenterService {
   }
 
   private async loopUpdateStrategiesPrice(strategiesOrders: StrategiesOrder[]) {
-    const updatedAt = new Date().getTime()
+    const updatedAt = new Date().getTime();
     try {
       for (let index = 0; index < strategiesOrders.length; index++) {
         const item = strategiesOrders[index];
 
-        const { symbol, entryPrice, quoteQty, qty, strategyId, userId } =
-          item;
+        const { symbol, entryPrice, quoteQty, qty, strategyId, userId } = item;
         const spotPrice = await this.getSpotPrice(symbol);
 
         const price = get(spotPrice, `${symbol}`, '');
@@ -1189,9 +1197,19 @@ export class DataCenterService {
     }
   }
 
-  async syncAllStrategiesPrice(strategiesOrders: StrategiesOrder[]): Promise<Result> {
-    const res = await this.loopUpdateStrategiesPrice(strategiesOrders)
-    return res
+  async syncAllStrategiesPrice(
+    strategiesOrders: StrategiesOrder[],
+  ): Promise<Result> {
+    const res = await this.loopUpdateStrategiesPrice(strategiesOrders);
+    return res;
   }
   // =========== Strategies Order end ===========
+
+  // =========== Count start ===========
+  async syncAmount(): Promise<Result> {
+    console.log('syncAmount');
+
+    return { code: 200, message: 'sync amount', data: null };
+  }
+  // =========== Count end ===========
 }

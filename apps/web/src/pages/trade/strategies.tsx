@@ -8,6 +8,7 @@ import { FiterStrategyOrderType, StrategiesOrder } from '@/utils/types';
 import { StrategieyFilter } from '@/components/strategiey-filter';
 import { Pagination } from '@/components/pagination';
 import { toast } from '@/common/toast';
+import TradeCount from '@/components/trade-count';
 
 /**
  * CODE ANNOTATION
@@ -92,6 +93,7 @@ export function Strategies() {
             />
             <StrategiesTable data={strategies} syncCallBack={syncCallBack} />
             <Pagination onChange={onPage} currentPage={currentPage} />
+            <TradeCount />
           </Box>
         </Box>
       </Box>
