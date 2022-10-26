@@ -28,7 +28,7 @@ import {
 } from 'src/common/types';
 import { TradeAsset } from './asset.entity';
 import { TraderApi } from './api.entity';
-import { TradeCount } from './trade.count.entity';
+import { DailyProfit } from './daily.profit.entity';
 import { formatTimestamp } from 'src/utils/utils';
 
 @Injectable()
@@ -73,8 +73,8 @@ export class DataCenterService {
     @InjectRepository(TraderApi)
     private readonly traderApiRepo: Repository<TraderApi>,
 
-    @InjectRepository(TradeCount)
-    private readonly tradeCountRepo: Repository<TradeCount>,
+    @InjectRepository(DailyProfit)
+    private readonly dailyProfitRepo: Repository<DailyProfit>,
   ) {
     this.initBinanceApi();
   }
@@ -706,7 +706,7 @@ export class DataCenterService {
     return await this.strategiesOrderRepo.query(sql);
   }
 
-  private async updateCloseStrategyOrderUtil(strategiesOrder: StrategiesOrder) {
+  private async updateCloseStrategyOrderUtil(strategiesOrder: StrategiesOrder): Promise<Result> {
     const {
       strategyId,
       is_running,
@@ -722,8 +722,13 @@ export class DataCenterService {
 
     const sql = `update strategies_order set sellingQty = "${sellingQty}",sellingQuoteQty = "${sellingQuoteQty}",sellingPrice="${sellingPrice}",
     realizedProfit="${realizedProfit}",realizedProfitRate="${realizedProfitRate}",free="${free}",sellingTime="${sellingTime}",is_running=${is_running},updatedAt="${updatedAt}" WHERE strategyId = "${strategyId}"`;
-
-    return await this.strategiesOrderRepo.query(sql);
+    try {
+      const res = await this.strategiesOrderRepo.query(sql);
+      return { code: 200, message: 'Calculate amount update succeeded', data: res };
+    } catch (error) {
+      console.log('error:', error);
+      return { code: 500, message: 'updateCloseStrategyOrder error' };
+    }
   }
 
   async getStrategiesOrder(
@@ -786,7 +791,7 @@ export class DataCenterService {
     }
 
     const { userId, strategyId, symbol, time } = strategyOrder;
-
+    const sellingTime = Number(lastOrder.time)
     const strategiesOrder = {
       symbol,
       price: '',
@@ -796,7 +801,7 @@ export class DataCenterService {
 
       entryPrice: '',
       sellingPrice,
-      sellingTime: lastOrder.time,
+      sellingTime,
 
       qty: null,
       quoteQty: null,
@@ -826,17 +831,32 @@ export class DataCenterService {
       updatedAt: new Date().getTime(),
     };
 
+    // update daily profit start
+    const calculateRes = await this.calculateAmountByClose(sellingTime, realizedProfit, userId)
+    if (calculateRes.code !== 200) {
+      return { code: 500, message: calculateRes.message };
+    }
+    // update daily profit end
+
     const res = await this.updateCloseStrategyOrderUtil(strategiesOrder);
+    if (calculateRes.code !== 200) {
+      return { code: 500, message: res.message };
+    }
+
+    // update order spot order strategyStatus
     const ended = 2;
+    const sql = `update spot_order set strategyStatus = ${ended} WHERE strategyId = "${strategyId}"`;
+    await this.spotOrderRepo.query(sql);
+    // end
+
     // update close spot order
     spotOrders.forEach((item) => {
       const { id: idUpdate } = item;
       this.updateOrderStatus('spot', idUpdate, strategyId, ended);
     });
-    // update order spot order strategyStatus
-    const sql = `update spot_order set strategyStatus = ${ended}  WHERE strategyId = "${strategyId}"`;
-    await this.spotOrderRepo.query(sql);
-    return { code: 200, message: 'ok', data: res };
+    // end
+
+    return { code: 200, message: 'ok', data: res.data };
   }
 
   async mergeSpotStrategy(
@@ -1204,9 +1224,59 @@ export class DataCenterService {
 
   // =========== Count start ===========
   private async getTradeCountByDay(day: string, userId: number) {
-    const sql = `SELECT * FROM trade_count WHERE userId=${userId} AND DATE_FORMAT(time, '%Y-%m-%d') = '${day}'`
-    const tradeCount = await this.tradeCountRepo.query(sql);
+    const sql = `SELECT * FROM daily_profit WHERE userId=${userId} AND DATE_FORMAT(time, '%Y-%m-%d') = '${day}'`
+    const tradeCount = await this.dailyProfitRepo.query(sql);
     return tradeCount
+  }
+
+  private async calculateAmountByClose(time: number, profit: number, userId: number): Promise<Result> {
+    const res = await this.client.getAccountInfo();
+    const balances = get(res, 'balances', [])
+    for (let index = 0; index < balances.length; index++) {
+      const element = balances[index];
+      if (element.asset === 'USDT') {
+        const dayStr = formatTimestamp(time, false)
+        const timeStr = formatTimestamp(time)
+        const tradeCountList = await this.getTradeCountByDay(dayStr, userId)
+        const amount = element.free
+        if (isEmpty(tradeCountList)) {
+          const calAmount = Number(amount) + profit
+          const profitRate =
+            parseFloat(((profit / calAmount) * 100).toFixed(2)) + '%';
+          const tradeCount = {
+            userId,
+            profit: profit,
+            profitRate,
+            amount,
+            time: timeStr
+          }
+
+          try {
+            await this.dailyProfitRepo.save(tradeCount);
+            return { code: 200, message: 'Calculate amount succeeded' };
+          } catch (error) {
+            console.log('error:', error);
+            return { code: 500, message: 'calculate amount error' };
+          }
+        } else {
+          const { profit: itemProfit, id } = tradeCountList[0]
+          const calProfit = profit + itemProfit
+          const calAmount = Number(amount) + calProfit
+          console.log('update:', profit, '-', itemProfit, '', calProfit, '-', calAmount);
+          const profitRate =
+            parseFloat(((calProfit / calAmount) * 100).toFixed(2)) + '%';
+          const sql = `update daily_profit set profit = ${calProfit},profitRate = '${profitRate}',time='${timeStr}' WHERE id = ${id}`;
+          try {
+            await this.spotOrderRepo.query(sql);
+            return { code: 200, message: 'Calculate amount update succeeded' };
+          } catch (error) {
+            console.log('error:', error);
+            return { code: 500, message: 'calculate amount update error' };
+          }
+        }
+        // break
+      }
+    }
   }
 
   async syncAmount(): Promise<Result> {
@@ -1217,9 +1287,9 @@ export class DataCenterService {
       if (element.asset === 'USDT') {
         /*
         { asset: 'USDT', free: '3848.07452924', locked: '0.00000000' }  
-        select * from trade_count where time = to_days(now());
-        select * from trade_count where userId = 1;
-        SELECT * FROM trade_count WHERE DATE_FORMAT(createdAt, '%Y-%m-%d') = '2022-10-26'
+        select * from daily_profit where time = to_days(now());
+        select * from daily_profit where userId = 1;
+        SELECT * FROM daily_profit WHERE DATE_FORMAT(createdAt, '%Y-%m-%d') = '2022-10-26'
         */
         // const date = new Date()
         // const date = new Date("2022-3-15")
@@ -1232,13 +1302,13 @@ export class DataCenterService {
         if (isEmpty(tradeCountList)) {
           const tradeCount = {
             userId: 1,
-            totalProfit: 0,
+            profit: 0,
             profitRate: '',
-            totalAmount: element.free,
+            amount: element.free,
             time: timeStr
           }
 
-          await this.tradeCountRepo.save(tradeCount);
+          await this.dailyProfitRepo.save(tradeCount);
         } else {
           console.log('update');
         }
