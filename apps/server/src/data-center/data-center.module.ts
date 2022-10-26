@@ -14,6 +14,7 @@ import { StrategiesOrder } from './strategies-order.entity';
 import { StrategyOrderId } from './strategy-orderid.entity';
 import { TradeAsset } from './asset.entity';
 import { TraderApi } from './api.entity';
+import { TradeCount } from './trade.count.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature(
@@ -29,7 +30,8 @@ import { TraderApi } from './api.entity';
       StrategiesOrder,
       StrategyOrderId,
       TradeAsset,
-      TraderApi
+      TraderApi,
+      TradeCount
     ])],
   controllers: [DataCenterController],
   providers: [DataCenterService],

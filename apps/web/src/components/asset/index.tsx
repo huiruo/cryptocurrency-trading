@@ -31,15 +31,9 @@ export function Asset(props: Props) {
     onChange(value)
   }, [])
 
-  /*
-  useEffect(() => {
-    const val = get(options, '[0].name', '')
-    setValue(val)
-  }, [options])
-  */
-
   return (
     <Select
+      renderSearch={true}
       width={140}
       size="sm"
       options={options.map((i) => ({ label: i.name, value: i.name }))}

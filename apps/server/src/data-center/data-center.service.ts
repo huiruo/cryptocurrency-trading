@@ -28,6 +28,8 @@ import {
 } from 'src/common/types';
 import { TradeAsset } from './asset.entity';
 import { TraderApi } from './api.entity';
+import { TradeCount } from './trade.count.entity';
+import { formatTimestamp } from 'src/utils/utils';
 
 @Injectable()
 export class DataCenterService {
@@ -70,6 +72,9 @@ export class DataCenterService {
 
     @InjectRepository(TraderApi)
     private readonly traderApiRepo: Repository<TraderApi>,
+
+    @InjectRepository(TradeCount)
+    private readonly tradeCountRepo: Repository<TradeCount>,
   ) {
     this.initBinanceApi();
   }
@@ -103,9 +108,8 @@ export class DataCenterService {
   }
 
   async getCoin(currentPage: number, pageSize: number): Promise<Result> {
-    const sql = `select * from coin order by ranked asc limit ${
-      (currentPage - 1) * pageSize
-    },${pageSize}`;
+    const sql = `select * from coin order by ranked asc limit ${(currentPage - 1) * pageSize
+      },${pageSize}`;
 
     return await this.coninRepo.query(sql);
   }
@@ -428,9 +432,8 @@ export class DataCenterService {
     currentPage: number,
     pageSize: number,
   ): Promise<Result> {
-    const sql = `select * from futures_order order by updateTime desc limit ${
-      (currentPage - 1) * pageSize
-    },${pageSize}`;
+    const sql = `select * from futures_order order by updateTime desc limit ${(currentPage - 1) * pageSize
+      },${pageSize}`;
 
     const res = await this.futuresOrderRepo.query(sql);
     return { code: 200, message: 'ok', data: res };
@@ -527,13 +530,11 @@ export class DataCenterService {
     const { currentPage, pageSize, symbol } = searchParmas;
     let sql = '';
     if (symbol) {
-      sql = `select * from spot_order where symbol ="${symbol}" order by time desc limit ${
-        (currentPage - 1) * pageSize
-      },${pageSize}`;
+      sql = `select * from spot_order where symbol ="${symbol}" order by time desc limit ${(currentPage - 1) * pageSize
+        },${pageSize}`;
     } else {
-      sql = `select * from spot_order order by time desc limit ${
-        (currentPage - 1) * pageSize
-      },${pageSize}`;
+      sql = `select * from spot_order order by time desc limit ${(currentPage - 1) * pageSize
+        },${pageSize}`;
     }
 
     const res = await this.spotOrderRepo.query(sql);
@@ -732,23 +733,19 @@ export class DataCenterService {
     let sql = '';
     if (symbol) {
       if (is_running !== '') {
-        sql = `select * from strategies_order where symbol ="${symbol}" and is_running=${is_running}  order by createdAt desc limit ${
-          (currentPage - 1) * pageSize
-        },${pageSize}`;
+        sql = `select * from strategies_order where symbol ="${symbol}" and is_running=${is_running}  order by createdAt desc limit ${(currentPage - 1) * pageSize
+          },${pageSize}`;
       } else {
-        sql = `select * from strategies_order where symbol ="${symbol}" order by createdAt desc limit ${
-          (currentPage - 1) * pageSize
-        },${pageSize}`;
+        sql = `select * from strategies_order where symbol ="${symbol}" order by createdAt desc limit ${(currentPage - 1) * pageSize
+          },${pageSize}`;
       }
     } else {
       if (is_running !== '') {
-        sql = `select * from strategies_order where is_running ="${is_running}" order by createdAt desc limit ${
-          (currentPage - 1) * pageSize
-        },${pageSize}`;
+        sql = `select * from strategies_order where is_running ="${is_running}" order by createdAt desc limit ${(currentPage - 1) * pageSize
+          },${pageSize}`;
       } else {
-        sql = `select * from strategies_order order by createdAt desc limit ${
-          (currentPage - 1) * pageSize
-        },${pageSize}`;
+        sql = `select * from strategies_order order by createdAt desc limit ${(currentPage - 1) * pageSize
+          },${pageSize}`;
       }
     }
     const res = await this.strategiesOrderRepo.query(sql);
@@ -1206,8 +1203,48 @@ export class DataCenterService {
   // =========== Strategies Order end ===========
 
   // =========== Count start ===========
+  private async getTradeCountByDay(day: string, userId: number) {
+    const sql = `SELECT * FROM trade_count WHERE userId=${userId} AND DATE_FORMAT(time, '%Y-%m-%d') = '${day}'`
+    const tradeCount = await this.tradeCountRepo.query(sql);
+    return tradeCount
+  }
+
   async syncAmount(): Promise<Result> {
-    console.log('syncAmount');
+    const res = await this.client.getAccountInfo();
+    const balances = get(res, 'balances', [])
+    for (let index = 0; index < balances.length; index++) {
+      const element = balances[index];
+      if (element.asset === 'USDT') {
+        /*
+        { asset: 'USDT', free: '3848.07452924', locked: '0.00000000' }  
+        select * from trade_count where time = to_days(now());
+        select * from trade_count where userId = 1;
+        SELECT * FROM trade_count WHERE DATE_FORMAT(createdAt, '%Y-%m-%d') = '2022-10-26'
+        */
+        // const date = new Date()
+        // const date = new Date("2022-3-15")
+        const dayStr = formatTimestamp(new Date().getTime(), false)
+        const timeStr = formatTimestamp(new Date().getTime())
+        const userId = 1
+        const tradeCountList = await this.getTradeCountByDay(dayStr, userId)
+        console.log('tradeCountList:', tradeCountList);
+
+        if (isEmpty(tradeCountList)) {
+          const tradeCount = {
+            userId: 1,
+            totalProfit: 0,
+            profitRate: '',
+            totalAmount: element.free,
+            time: timeStr
+          }
+
+          await this.tradeCountRepo.save(tradeCount);
+        } else {
+          console.log('update');
+        }
+        break
+      }
+    }
 
     return { code: 200, message: 'sync amount', data: null };
   }
