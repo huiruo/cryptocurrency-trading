@@ -10,7 +10,7 @@ import { CoinDevMember } from '../entity/coin.member.entity';
 import { Balances } from '../entity/balances.entity';
 import { FuturesOrder } from '../entity/futures-order.entity';
 import { SpotOrder } from '../entity/spot-order.entity';
-import { StrategiesOrder } from '../entity/strategies-order.entity';
+import { StrategyOrder } from '../entity/strategy-order.entity';
 import { StrategyOrderId } from '../entity/strategy-orderid.entity';
 import { TradeAsset } from '../entity/asset.entity';
 import { TraderApi } from '../entity/api.entity';
@@ -27,7 +27,7 @@ import { DailyProfit } from '../entity/daily.profit.entity';
       Balances,
       FuturesOrder,
       SpotOrder,
-      StrategiesOrder,
+      StrategyOrder,
       StrategyOrderId,
       TradeAsset,
       TraderApi,

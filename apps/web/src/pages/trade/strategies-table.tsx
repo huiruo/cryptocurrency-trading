@@ -36,9 +36,9 @@ export const StrategiesTable = forwardRef((props: Props, ref) => {
     }
   }));
 
-  const syncPriceUtil = async (order: StrategiesOrder) => {
+  const syncPriceUtil = async (order: StrategiesOrder[]) => {
     const toaster = toast.loading('Sync price...', { showLayer: true })
-    const res = await traderApi.syncStrategyPriceApi(order)
+    const res = await traderApi.syncAllStrategiesPriceApi(order)
     if (res.code === 200) {
       toaster.dismiss()
       getStrategies({
@@ -127,7 +127,7 @@ export const StrategiesTable = forwardRef((props: Props, ref) => {
       render(item: StrategiesOrder) {
         return (
           <Box w-120>
-            <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' mr-10 rounded-4px onClick={() => syncPriceUtil(item)}>Update</Box>
+            <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' mr-10 rounded-4px onClick={() => syncPriceUtil([item])}>Update</Box>
             <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => onKline(item)}>Kline</Box>
           </Box>
         )

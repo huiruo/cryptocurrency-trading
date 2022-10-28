@@ -67,7 +67,7 @@ export const SpotTable = forwardRef((props: Props, ref) => {
 
     const toaster = toast.loading('create strategy...', { showLayer: true })
 
-    const res = await traderApi.createStrategyApi(order)
+    const res = await traderApi.createSpotStrategyApi(order)
     if (res.code === 200) {
       const params = {
         symbol: ''

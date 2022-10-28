@@ -1,5 +1,5 @@
 import { SpotOrder } from "src/entity/spot-order.entity";
-import { StrategiesOrder } from "src/entity/strategies-order.entity";
+import { StrategyOrder } from "src/entity/strategy-order.entity";
 
 export interface balancesType {
   id?: string;
@@ -83,7 +83,7 @@ export interface CalculateCloseStrategyOrderType {
 
 export interface MergeSpotStrategyParams {
   spotOrders: SpotOrder[]
-  strategyOrder: StrategiesOrder
+  strategyOrder: StrategyOrder
 }
 
 export interface SearchParmas {

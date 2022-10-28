@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-@Entity('strategies_order')
-export class StrategiesOrder {
+@Entity('strategy_order')
+export class StrategyOrder {
   @PrimaryGeneratedColumn({ comment: 'ID', }) id?: number;
   @Column({ comment: 'symbol', }) symbol: string;
   @Column({ comment: 'price', }) price: string;

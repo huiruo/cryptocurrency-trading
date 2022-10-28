@@ -2,14 +2,7 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 import { Result } from 'src/common/result.interface';
 import {
   AssetType,
-  FiterStrategyOrderType,
-  MergeSpotStrategyParams,
-  SearchParmas,
-  SymbolType,
-  SyncSpotOrderParams,
 } from 'src/common/types';
-import { SpotOrder } from 'src/entity/spot-order.entity';
-import { StrategiesOrder } from 'src/entity/strategies-order.entity';
 import { DataCenterService } from './data-center.service';
 
 export interface Page {
@@ -61,124 +54,13 @@ export class DataCenterController {
   }
   // =========== Balances end ===========
 
-  // =========== future start ===========
-  @Get('syncFutureOrder')
-  async futuresAllOrders(): Promise<Result> {
-    return await this.DataCenterService.futuresAllOrders();
-  }
-
-  @Post('futureOrders')
-  async getFuturesOrders(@Body() page: Page): Promise<Result> {
-    return await this.DataCenterService.getFutureOrders(
-      page.currentPage,
-      page.pageSize,
-    );
-  }
-
-  @Get('futuresBatchOrders')
-  async futuresBatchOrders(): Promise<Result> {
-    return await this.DataCenterService.futuresBatchOrders();
-  }
-  // =========== future end ===========
-
-  // =========== spot start ===========
-  // =========== spot start ===========
   @Get('asset')
   async getAssets(): Promise<Result> {
     return await this.DataCenterService.getAssetList();
-  }
-
-  @Post('spotOrders')
-  async getSpotOrder(@Body() searchParmas: SearchParmas): Promise<Result> {
-    return await this.DataCenterService.getSpotOrder(searchParmas);
   }
 
   @Post('addAsset')
   async addAsset(@Body() asset: AssetType): Promise<Result> {
     return await this.DataCenterService.addAsset(asset);
   }
-
-  @Post('syncSpotOrder')
-  async syncSpotOrder(@Body() asset: SyncSpotOrderParams): Promise<Result> {
-    return await this.DataCenterService.syncSpotOrder(asset);
-  }
-
-  @Get('spotOpenOrders')
-  async getSpotOpenOrders(): Promise<Result> {
-    return await this.DataCenterService.getSpotOpenOrders();
-  }
-
-  @Get('spotAllOrders')
-  async getSpotAllOrders(): Promise<Result> {
-    return await this.DataCenterService.getSpotAllOrders();
-  }
-
-  @Post('resetSpotOrderStatus')
-  async resetSpotOrderStatus(@Body() spotOrder: SpotOrder): Promise<Result> {
-    return await this.DataCenterService.resetSpotOrderStatus(spotOrder);
-  }
-  // =========== spot end ===========
-  // =========== spot end ===========
-
-  // =========== Strategies Order start ===========
-  @Post('createStrategy')
-  async createStrategy(@Body() spotOrder: SpotOrder[]): Promise<Result> {
-    return await this.DataCenterService.createStrategy(spotOrder);
-  }
-
-  @Post('mergeSpotStrategy')
-  async mergeSpotStrategy(
-    @Body() params: MergeSpotStrategyParams,
-  ): Promise<Result> {
-    const { spotOrders, strategyOrder } = params;
-
-    return await this.DataCenterService.mergeSpotStrategy(
-      spotOrders,
-      strategyOrder,
-    );
-  }
-
-  @Post('closeSpotStrategy')
-  async closeSpotStrategy(
-    @Body() params: MergeSpotStrategyParams,
-  ): Promise<Result> {
-    const { spotOrders, strategyOrder } = params;
-
-    return await this.DataCenterService.closeSpotStrategy(
-      spotOrders,
-      strategyOrder,
-    );
-  }
-
-  @Post('strategiesOrder')
-  async getStrategiesOrder(
-    @Body() fiterStrategyOrder: FiterStrategyOrderType,
-  ): Promise<Result> {
-    return await this.DataCenterService.getStrategiesOrder(fiterStrategyOrder);
-  }
-
-  @Post('symbolPrice')
-  async getSymbolPrice(@Body() params: SymbolType): Promise<any> {
-    return await this.DataCenterService.getSpotPrice(params.symbol);
-  }
-
-  @Post('strategyPrice')
-  async syncStrategyPrice(@Body() params: StrategiesOrder): Promise<any> {
-    return await this.DataCenterService.syncStrategyPrice(params);
-  }
-
-  @Post('allStrategiesPrice')
-  async syncAllStrategiesPrice(
-    @Body() params: StrategiesOrder[],
-  ): Promise<any> {
-    return await this.DataCenterService.syncAllStrategiesPrice(params);
-  }
-  // =========== Strategies Order end ===========
-
-  // =========== Count start ===========
-  @Post('syncAmount')
-  async syncAmount(@Body() params: any): Promise<any> {
-    return await this.DataCenterService.syncAmount();
-  }
-  // =========== Count end ===========
 }

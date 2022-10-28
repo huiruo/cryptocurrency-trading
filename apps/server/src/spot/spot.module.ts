@@ -4,7 +4,7 @@ import { TraderApi } from 'src/entity/api.entity';
 import { TradeAsset } from 'src/entity/asset.entity';
 import { DailyProfit } from 'src/entity/daily.profit.entity';
 import { SpotOrder } from 'src/entity/spot-order.entity';
-import { StrategiesOrder } from 'src/entity/strategies-order.entity';
+import { StrategyOrder } from 'src/entity/strategy-order.entity';
 import { StrategyOrderId } from 'src/entity/strategy-orderid.entity';
 import { SpotController } from './spot.controller';
 import { SpotService } from './spot.service';
@@ -14,7 +14,7 @@ import { SpotService } from './spot.service';
     [
       // FuturesOrder,
       SpotOrder,
-      StrategiesOrder,
+      StrategyOrder,
       StrategyOrderId,
       TradeAsset,
       TraderApi,
@@ -23,4 +23,5 @@ import { SpotService } from './spot.service';
   controllers: [SpotController],
   providers: [SpotService],
 })
+
 export class SpotModule { }

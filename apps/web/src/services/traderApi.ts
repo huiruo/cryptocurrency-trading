@@ -67,19 +67,15 @@ const traderApi = {
 
 	// =========== Spot Order start ===========
 	syncSpotOrderApi(data: any) {
-		const url: string = `${traderApiUrl}/data/center/syncSpotOrder`;
+		const url: string = `${traderApiUrl}/spot/syncOrder`;
 		return http.post<resType>(data, url);
 	},
 	spotOrdersApi(data: any) {
-		const url: string = `${traderApiUrl}/data/center/spotOrders`;
+		const url: string = `${traderApiUrl}/spot/orders`;
 		return http.post<resType>(data, url);
 	},
 	resetSpotOrderStatus(data: any) {
-		const url: string = `${traderApiUrl}/data/center/resetSpotOrderStatus`;
-		return http.post<resType>(data, url);
-	},
-	closeSpotStrategyApi(data: any) {
-		const url: string = `${traderApiUrl}/data/center/closeSpotStrategy`;
+		const url: string = `${traderApiUrl}/spot/resetOrderStatus`;
 		return http.post<resType>(data, url);
 	},
 	addAssetApi(data: any) {
@@ -89,30 +85,30 @@ const traderApi = {
 	// =========== Spot Order end ===========
 
 	// =========== Strategies Order start ===========
-	createStrategyApi(data: any) {
-		const url: string = `${traderApiUrl}/data/center/createStrategy`;
+	createSpotStrategyApi(data: any) {
+		const url: string = `${traderApiUrl}/strategy/order/createSpot`;
 		return http.post<resType>(data, url);
 	},
 	strategiesOrderApi(data: any) {
-		const url: string = `${traderApiUrl}/data/center/strategiesOrder`;
+		const url: string = `${traderApiUrl}/strategy/order/getOrder`;
 		return http.post<resType>(data, url);
 	},
 	mergeSpotStrategy(data: any) {
-		const url: string = `${traderApiUrl}/data/center/mergeSpotStrategy`;
+		const url: string = `${traderApiUrl}/strategy/order/mergeSpot`;
 		return http.post<resType>(data, url);
 	},
-	syncStrategyPriceApi(data: any) {
-		const url: string = `${traderApiUrl}/data/center/strategyPrice`;
+	closeSpotStrategyApi(data: any) {
+		const url: string = `${traderApiUrl}/strategy/order/closeSpot`;
 		return http.post<resType>(data, url);
 	},
 	syncAllStrategiesPriceApi(data: any) {
-		const url: string = `${traderApiUrl}/data/center/allStrategiesPrice`;
+		const url: string = `${traderApiUrl}/strategy/order/syncPrice`;
 		return http.post<resType>(data, url);
 	},
 	// =========== Strategies Order end ===========
 	// =========== Count start ===========
 	syncAmountApi(data: any) {
-		const url: string = `${traderApiUrl}/data/center/syncAmount`;
+		const url: string = `${traderApiUrl}/strategy/order/syncAmount`;
 		return http.post<resType>(data, url);
 	},
 	// =========== Count start end ===========

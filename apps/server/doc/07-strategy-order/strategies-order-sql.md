@@ -1,6 +1,6 @@
-## strategies_order
+## strategy_order
 ```sql
-CREATE TABLE `strategies_order`(
+CREATE TABLE `strategy_order`(
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `symbol` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'symbol',
   `price` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'price',
