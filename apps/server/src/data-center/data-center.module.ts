@@ -2,19 +2,19 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataCenterController } from './data-center.controller';
 import { CoinCode } from './data-center.entity';
-import { Coin } from './coin.entity';
+import { Coin } from '../entity/coin.entity';
 import { DataCenterService } from './data-center.service';
-import { CoinAddition } from './coin.addition.entity';
-import { DayKline } from './day.kline.entity';
-import { CoinDevMember } from './coin.member.entity';
-import { Balances } from './balances.entity';
-import { FuturesOrder } from './futures-order.entity';
-import { SpotOrder } from './spot-order.entity';
-import { StrategiesOrder } from './strategies-order.entity';
-import { StrategyOrderId } from './strategy-orderid.entity';
-import { TradeAsset } from './asset.entity';
-import { TraderApi } from './api.entity';
-import { DailyProfit } from './daily.profit.entity';
+import { CoinAddition } from '../entity/coin.addition.entity';
+import { DayKline } from '../entity/day.kline.entity';
+import { CoinDevMember } from '../entity/coin.member.entity';
+import { Balances } from '../entity/balances.entity';
+import { FuturesOrder } from '../entity/futures-order.entity';
+import { SpotOrder } from '../entity/spot-order.entity';
+import { StrategiesOrder } from '../entity/strategies-order.entity';
+import { StrategyOrderId } from '../entity/strategy-orderid.entity';
+import { TradeAsset } from '../entity/asset.entity';
+import { TraderApi } from '../entity/api.entity';
+import { DailyProfit } from '../entity/daily.profit.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature(

@@ -1,6 +1,4 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { get } from 'lodash';
-// import { ConfigService } from '@nestjs/config';
 import { Result } from 'src/common/result.interface';
 import {
   AssetType,
@@ -10,9 +8,9 @@ import {
   SymbolType,
   SyncSpotOrderParams,
 } from 'src/common/types';
+import { SpotOrder } from 'src/entity/spot-order.entity';
+import { StrategiesOrder } from 'src/entity/strategies-order.entity';
 import { DataCenterService } from './data-center.service';
-import { SpotOrder } from './spot-order.entity';
-import { StrategiesOrder } from './strategies-order.entity';
 
 export interface Page {
   currentPage: number;
@@ -23,7 +21,7 @@ export interface Page {
 export class DataCenterController {
   constructor(
     private readonly DataCenterService: DataCenterService, // private configService: ConfigService,
-  ) {}
+  ) { }
 
   @Post('addCode')
   async addCode(@Body() symbol: any): Promise<Result> {

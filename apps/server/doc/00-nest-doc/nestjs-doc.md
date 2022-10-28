@@ -11,3 +11,30 @@ nest g controller dataCenter data-center
 
 nest g module dataCenter data-center
 ```
+
+### spot
+```
+nest g service spot spot 
+
+nest g controller spot spot
+
+nest g module spot spot
+```
+
+### future
+```
+nest g service future future 
+
+nest g controller future future
+
+nest g module future future
+```
+
+### future
+```
+nest g service strategyOrder strategyOrder
+
+nest g controller strategyOrder strategyOrder
+
+nest g module strategyOrder strategyOrder
+```

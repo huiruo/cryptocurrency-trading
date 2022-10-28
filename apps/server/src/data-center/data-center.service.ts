@@ -6,17 +6,17 @@ import { Result } from 'src/common/result.interface';
 import { createRequest } from 'src/common/binance-connector/helpers/utils';
 import { ConfigService } from '@nestjs/config';
 import { CoinCode } from './data-center.entity';
-import { Coin } from './coin.entity';
-import { CoinAddition } from './coin.addition.entity';
-import { DayKline } from './day.kline.entity';
-import { CoinDevMember } from './coin.member.entity';
+import { Coin } from '../entity/coin.entity';
+import { CoinAddition } from '../entity/coin.addition.entity';
+import { DayKline } from '../entity/day.kline.entity';
+import { CoinDevMember } from '../entity/coin.member.entity';
 import { BaseServiceBiance } from 'src/utils/base-service-biance';
-import { Balances } from './balances.entity';
-import { FuturesOrder } from './futures-order.entity';
-import { SpotOrder } from './spot-order.entity';
-import { StrategiesOrder } from './strategies-order.entity';
+import { Balances } from '../entity/balances.entity';
+import { FuturesOrder } from '../entity/futures-order.entity';
+import { SpotOrder } from '../entity/spot-order.entity';
+import { StrategiesOrder } from '../entity/strategies-order.entity';
 import { nanoid } from 'nanoid';
-import { StrategyOrderId } from './strategy-orderid.entity';
+import { StrategyOrderId } from '../entity/strategy-orderid.entity';
 import {
   AssetType,
   CalculateCloseStrategyOrderType,
@@ -26,9 +26,9 @@ import {
   StrategyProfit,
   SyncSpotOrderParams,
 } from 'src/common/types';
-import { TradeAsset } from './asset.entity';
-import { TraderApi } from './api.entity';
-import { DailyProfit } from './daily.profit.entity';
+import { TradeAsset } from '../entity/asset.entity';
+import { TraderApi } from '../entity/api.entity';
+import { DailyProfit } from '../entity/daily.profit.entity';
 import { formatTimestamp } from 'src/utils/utils';
 
 @Injectable()

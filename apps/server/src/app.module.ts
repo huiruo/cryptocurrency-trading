@@ -8,6 +8,15 @@ import dbConfig from '../config/db'
 import { getDirFilenames } from './utils/getDirFilenames';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { SpotService } from './spot/spot.service';
+import { SpotController } from './spot/spot.controller';
+import { SpotModule } from './spot/spot.module';
+import { FutureService } from './future/future.service';
+import { FutureController } from './future/future.controller';
+import { FutureModule } from './future/future.module';
+import { StrategyOrderModule } from './strategy-order/strategy-order.module';
+import { StrategyOrderController } from './strategy-order/strategy-order.controller';
+import { StrategyOrderService } from './strategy-order/strategy-order.service';
 import { DataCenterModule } from './data-center/data-center.module';
 
 @Module({
@@ -38,6 +47,9 @@ import { DataCenterModule } from './data-center/data-center.module';
     UserModule,
     TypeOrmModule.forRoot(dbConfig),
     DataCenterModule,
+    SpotModule,
+    FutureModule,
+    StrategyOrderModule,
   ],
   // controllers: [AppController, CryptoWalletController],
   controllers: [AppController],

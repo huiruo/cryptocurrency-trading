@@ -1,5 +1,5 @@
-import { SpotOrder } from "src/data-center/spot-order.entity";
-import { StrategiesOrder } from "src/data-center/strategies-order.entity";
+import { SpotOrder } from "src/entity/spot-order.entity";
+import { StrategiesOrder } from "src/entity/strategies-order.entity";
 
 export interface balancesType {
   id?: string;
