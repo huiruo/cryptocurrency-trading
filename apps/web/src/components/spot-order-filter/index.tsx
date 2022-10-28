@@ -5,7 +5,7 @@ import { Box } from '@fower/react';
 import { Asset } from '../asset';
 
 interface Props {
-  spotCallBack: (searchParmas: SearchParmas, isUpdate: boolean) => void
+  spotCallBack: (symbolAsset: string, isUpdate: boolean) => void
   selectCallback: (val: any) => void
   selectAssetValue: string
 }
@@ -17,12 +17,7 @@ export function SpotOrderFilter(props: Props) {
   const { spotCallBack, selectCallback, selectAssetValue } = props
 
   const onSearch = () => {
-    const params = {
-      currentPage: 1,
-      symbol: ''
-    }
-
-    spotCallBack(params, true)
+    spotCallBack(selectAssetValue, true)
   }
 
   const assetSelectCallback = (val: string | number) => {

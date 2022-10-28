@@ -1,35 +1,52 @@
-import React, { useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { Box } from '@fower/react';
-import { Table } from '@/common/table';
 import { formatUnixTime } from '@/utils';
-import { Checkbox } from '@/common/checkbox';
 import { Button } from '@/common/button';
 import traderApi from '@/services/traderApi';
-import { StrategiesOrder } from '@/utils/types';
+import { FiterStrategyOrderType, StrategiesOrder } from '@/utils/types';
 import { toast } from '@/common/toast';
 import { TradePlanModal } from '@/components/trade-plan-modal';
 import NiceModal from '@ebay/nice-modal-react';
+import { Pagination, Table as AntTable } from 'antd';
 
 interface Props {
-  data: StrategiesOrder[]
+  selectAssetValue: string
+  selectStatusValue: number
   syncCallBack: () => void
 }
 
 /**
  * Code annotation
  */
-export function StrategiesTable(props: Props) {
-  const { data, syncCallBack } = props
-  const [selectRows, setSelectRows] = useState<number[]>([])
+export const StrategiesTable = forwardRef((props: Props, ref) => {
+  const { syncCallBack, selectAssetValue, selectStatusValue } = props
+
+  const [strategies, setStrategies] = useState<StrategiesOrder[]>([])
+
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [selectRowData, setSelectRowData] = useState<StrategiesOrder[]>([])
+  const [total, setTotal] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  useImperativeHandle(ref, () => ({
+    getStrategies: (params: FiterStrategyOrderType, isUpdate: boolean) => {
+      console.log('getOrder', params, isUpdate);
+      getStrategies(params)
+    }
+  }));
 
   const syncPriceUtil = async (order: StrategiesOrder) => {
-
     const toaster = toast.loading('Sync price...', { showLayer: true })
-
     const res = await traderApi.syncStrategyPriceApi(order)
     if (res.code === 200) {
       toaster.dismiss()
-      syncCallBack()
+      getStrategies({
+        is_running: selectStatusValue,
+        symbol: selectAssetValue,
+        pageSize,
+        currentPage,
+      })
     } else {
       toaster.update("Failed to Sync price", {
         type: 'error',
@@ -49,14 +66,18 @@ export function StrategiesTable(props: Props) {
     }
   }
 
-
   const onSyncPrice = async () => {
     const toaster = toast.loading('Sync all Strategies price...', { showLayer: true })
 
-    const res = await traderApi.syncAllStrategiesPriceApi(data)
+    const res = await traderApi.syncAllStrategiesPriceApi(strategies)
     if (res.code === 200) {
       toaster.dismiss()
-      syncCallBack()
+      getStrategies({
+        is_running: selectStatusValue,
+        symbol: selectAssetValue,
+        pageSize,
+        currentPage,
+      })
     } else {
       toaster.update("Failed to Sync price", {
         type: 'error',
@@ -64,32 +85,7 @@ export function StrategiesTable(props: Props) {
     }
   }
 
-  const onSelectChange = (index: number, checked: boolean, keySet?: any) => {
-    const arrIndex = selectRows.findIndex(i => {
-      return i === index;
-    });
-
-    if (checked) {
-      selectRows.splice(arrIndex, 1)
-    } else {
-      selectRows.push(index)
-    }
-    setSelectRows([...selectRows])
-  }
-
   const columns = [
-    {
-      title: '',
-      dataIndex: '',
-      key: '',
-      width: 200,
-      render(_item: any, _e: any, index: number) {
-        const checked = selectRows.includes(index)
-        return (
-          <Checkbox checked={checked} onChange={() => onSelectChange(index, checked)} />
-        )
-      },
-    },
     {
       id: 'time', title: 'Date', dataIndex: '', key: 'time', width: 100,
       render(item: StrategiesOrder) {
@@ -209,15 +205,88 @@ export function StrategiesTable(props: Props) {
     { id: 'userId', title: 'UserId', dataIndex: 'userId', key: 'userId', width: 100 },
   ]
 
+
+  const getStrategies = async (params: FiterStrategyOrderType, isUpdate = false) => {
+    const { currentPage, pageSize: size, is_running: isrunning } = params
+    const data = {
+      currentPage: currentPage || 1,
+      pageSize: pageSize || size,
+      is_running: isrunning,
+      symbol: selectAssetValue
+    }
+
+    const res = await traderApi.strategiesOrderApi(data)
+    if (res.code === 200) {
+      if (isUpdate) {
+        toast.success('Get orders succeeded')
+      }
+      setTotal(res.data.total)
+      setCurrentPage(data.currentPage)
+      setStrategies(res.data.res)
+    } else {
+      toast.error('Failed to get orders')
+    }
+  }
+
+  const onShowSizeChange = (page: number, pageSize: number) => {
+    setPageSize(pageSize)
+    setCurrentPage(page)
+  }
+
+  const onChangePage = (page: number, pageSize: number) => {
+    const params = {
+      currentPage: page,
+      pageSize: pageSize,
+      symbol: '',
+      is_running: selectStatusValue
+    }
+    setCurrentPage(currentPage)
+    getStrategies(params)
+  }
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: (selectedRowKeys: React.Key[], selectedRows: StrategiesOrder[]) => {
+      // console.log(`${selectedRowKeys}`, '--', 'selectedRows: ', selectedRows);
+      setSelectedRowKeys(selectedRowKeys);
+      setSelectRowData(selectedRows)
+    },
+  };
+
+  useEffect(() => {
+    const params = {
+      is_running: selectStatusValue,
+      currentPage: currentPage,
+      pageSize,
+      symbol: selectAssetValue,
+    }
+    getStrategies(params)
+  }, [])
+
   return (
     <Box className='table-box-container' mt-10px>
-      <Table columns={columns} data={data} className='table-box' />
+      <AntTable
+        rowSelection={rowSelection}
+        rowKey="id"
+        columns={columns} dataSource={strategies} className='table-box'
+        pagination={false}
+      />
 
       <TradePlanModal id='tradePlanModal' />
 
-      <Box mt-10>
+      <Box mt-10 mb-10>
         <Button onClick={() => onSyncPrice()} mr4>Sync price</Button>
       </Box>
+
+      <Pagination
+        current={currentPage}
+        total={total}
+        pageSizeOptions={["10", "20", "40"]}
+        showTotal={total => `Total:${total}`}
+        showSizeChanger={true}
+        onChange={onChangePage}
+        onShowSizeChange={onShowSizeChange}
+      />
     </Box>
   );
-}
+})

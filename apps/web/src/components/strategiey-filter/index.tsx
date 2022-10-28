@@ -6,10 +6,10 @@ import { FiterStrategyOrderType, SelectType } from '@/utils/types';
 import { Asset } from '../asset';
 
 interface Props {
-  selectStatusCallback: (val: string | number) => void
+  selectStatusCallback: (val: number) => void
   selectAssetCallback: (val: string) => void
   fiterStrategyOrderCallback: (params: FiterStrategyOrderType, isUpdate: boolean) => void
-  selectStatus: string | number
+  selectStatus: number
   selectAsset: string
 }
 
@@ -17,7 +17,7 @@ interface Props {
 const options: SelectType[] = [
   {
     label: 'All status',
-    name: '',
+    name: 2,
   },
   {
     label: 'Running',
@@ -37,8 +37,8 @@ export function StrategieyFilter(props: Props) {
 
   const onFiterStrategyOrder = () => {
     const params = {
-      is_running: selectStatus,
-      symbol: ''
+      symbol: selectAsset,
+      is_running: selectStatus
     }
     fiterStrategyOrderCallback(params, true)
   }
@@ -55,7 +55,7 @@ export function StrategieyFilter(props: Props) {
           size="sm"
           options={options.map((i) => ({ label: i.label, value: i.name }))}
           value={selectStatus}
-          onChange={(v: string) => {
+          onChange={(v: number) => {
             selectStatusCallback(v)
           }}
         />

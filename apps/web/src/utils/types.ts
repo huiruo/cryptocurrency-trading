@@ -151,7 +151,7 @@ export interface SelectType {
 }
 
 export interface FiterStrategyOrderType {
-  is_running: string | number
+  is_running: number
   symbol?: string
   currentPage?: number
   pageSize?: number

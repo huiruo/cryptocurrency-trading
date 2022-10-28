@@ -529,16 +529,28 @@ export class DataCenterService {
   async getSpotOrder(searchParmas: SearchParmas): Promise<Result> {
     const { currentPage, pageSize, symbol } = searchParmas;
     let sql = '';
+    let pageSql = ''
     if (symbol) {
       sql = `select * from spot_order where symbol ="${symbol}" order by time desc limit ${(currentPage - 1) * pageSize
         },${pageSize}`;
+      pageSql = `select count(1) as total from spot_order where symbol ="${symbol}"`;
     } else {
+      pageSql = 'select count(1) as total from spot_order;'
       sql = `select * from spot_order order by time desc limit ${(currentPage - 1) * pageSize
         },${pageSize}`;
     }
 
+
     const res = await this.spotOrderRepo.query(sql);
-    return { code: 200, message: 'ok', data: res };
+    const pageRes = await this.spotOrderRepo.query(pageSql);
+
+    return {
+      code: 200, message: 'ok', data:
+      {
+        total: Number(get(pageRes, '[0].total', 0)),
+        res: res
+      }
+    };
   }
 
   async syncSpotOrder(asset: SyncSpotOrderParams): Promise<Result> {
@@ -736,25 +748,42 @@ export class DataCenterService {
   ): Promise<Result> {
     const { currentPage, pageSize, symbol, is_running } = fiterStrategyOrder;
     let sql = '';
+    let pageSql = ''
     if (symbol) {
       if (is_running !== '') {
         sql = `select * from strategies_order where symbol ="${symbol}" and is_running=${is_running}  order by createdAt desc limit ${(currentPage - 1) * pageSize
           },${pageSize}`;
+
+        pageSql = `select count(1) as total from strategies_order where symbol ="${symbol}" and is_running=${is_running}`;
       } else {
         sql = `select * from strategies_order where symbol ="${symbol}" order by createdAt desc limit ${(currentPage - 1) * pageSize
           },${pageSize}`;
+
+        pageSql = `select count(1) as total from strategies_order where symbol ="${symbol}"`;
       }
     } else {
-      if (is_running !== '') {
+      if (is_running !== 3) {
         sql = `select * from strategies_order where is_running ="${is_running}" order by createdAt desc limit ${(currentPage - 1) * pageSize
           },${pageSize}`;
+
+        pageSql = `select count(1) as total from strategies_order where is_running ="${is_running}"`;
       } else {
         sql = `select * from strategies_order order by createdAt desc limit ${(currentPage - 1) * pageSize
           },${pageSize}`;
+
+        pageSql = 'select count(1) as total from strategies_order;'
       }
     }
     const res = await this.strategiesOrderRepo.query(sql);
-    return { code: 200, message: 'ok', data: res };
+    const pageRes = await this.spotOrderRepo.query(pageSql);
+
+    return {
+      code: 200, message: 'ok', data:
+      {
+        total: Number(get(pageRes, '[0].total', 0)),
+        res: res
+      }
+    };
   }
 
   async closeSpotStrategy(

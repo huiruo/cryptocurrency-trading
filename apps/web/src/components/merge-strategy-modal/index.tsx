@@ -3,11 +3,10 @@ import { Button } from '@/common/button';
 import traderApi from '@/services/traderApi';
 import { FiterStrategyOrderType, SpotOrder, StrategiesOrder } from '@/utils/types';
 import { Box } from '@fower/react';
-import { get, isEmpty } from 'lodash';
+import { get } from 'lodash';
 import NiceModal, { useModal } from '@ebay/nice-modal-react';
 import { TradeModal } from '../modal';
 import { StrategieyModalTable } from '../strategiey-modal-table';
-import { Pagination } from '../pagination';
 import { toast } from '@/common/toast';
 
 
@@ -16,7 +15,8 @@ interface Props {
   spotTableCallBack(): void
 }
 
-const defaultRunning = 1
+// const defaultRunning = 1
+const defaultRunning = 0
 
 /**
  * Code annotation
@@ -25,8 +25,10 @@ export const MergeStrategyModal = NiceModal.create((props: Props) => {
   const { visible, hide } = useModal()
   const { mergeOrders, spotTableCallBack } = props
   const [strategies, setStrategies] = useState<StrategiesOrder[]>([])
-  const [selectRows, setSelectRows] = useState<number[]>([])
-  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [selectRowData, setSelectRowData] = useState<StrategiesOrder[]>([])
+  const [total, setTotal] = useState<number>(1);
 
   const getStrategies = async (params: FiterStrategyOrderType) => {
     const { currentPage, pageSize, is_running } = params
@@ -37,45 +39,44 @@ export const MergeStrategyModal = NiceModal.create((props: Props) => {
     }
     const res = await traderApi.strategiesOrderApi(data)
     if (res.code === 200) {
-      setStrategies(res.data)
+      setTotal(res.data.total)
+      setStrategies(res.data.res)
     } else {
       toast.error('Failed to get Strategies orders')
     }
   }
 
   const afterClose = () => {
-    setSelectRows([])
-    setCurrentPage(1)
+    setSelectedRowKeys([])
+    setSelectRowData([])
   }
 
   const onMergeStrategy = async () => {
-    if (!selectRows.length) {
+    if (!selectedRowKeys.length) {
       toast.warning('Select empty')
 
       return
     }
 
-    if (selectRows.length >= 2) {
+    if (selectedRowKeys.length >= 2) {
       toast.warning('select Greater than 2')
 
       return
     }
 
-    const index = get(selectRows, '[0]', 0)
-    const selectRow = get(strategies, `${[index]}`, 0)
+
+    const selectRow = get(selectRowData, `[0]`, {})
     if (!selectRow.is_running) {
       toast.warning('This strategy was closed and cannot be updated')
 
       return
     }
 
-
     const toaster = toast.loading('Sync spot order...', { showLayer: true })
 
-    const strategyOrder = { ...selectRow }
     const params = {
       spotOrders: mergeOrders,
-      strategyOrder,
+      strategyOrder: selectRow,
     }
 
     const res = await traderApi.mergeSpotStrategy(params)
@@ -93,18 +94,14 @@ export const MergeStrategyModal = NiceModal.create((props: Props) => {
     }
   }
 
-  const onPage = (currentPage: number, pageSize: number) => {
-    const params = {
-      currentPage,
-      pageSize,
-      is_running: defaultRunning
-    }
-
-    if (!isEmpty(selectRows)) {
-      setSelectRows([])
-    }
-    setCurrentPage(currentPage)
+  const modalCallback = (params: any) => {
+    params.is_running = defaultRunning
     getStrategies(params)
+  }
+
+  const onChangeCallback = (selectedRowKeys: React.Key[], selectedRows: StrategiesOrder[]) => {
+    setSelectedRowKeys(selectedRowKeys);
+    setSelectRowData(selectedRows)
   }
 
   return (
@@ -125,13 +122,13 @@ export const MergeStrategyModal = NiceModal.create((props: Props) => {
       afterClose={() => afterClose()}
     >
       <Box position='relative' h='560px'>
-        <StrategieyModalTable data={strategies}
-          onChangeCallback={setSelectRows}
-          selectRows={selectRows}
+        <StrategieyModalTable
+          data={strategies}
+          modalCallback={modalCallback}
+          onChangeCallback={onChangeCallback}
+          selectedRowKeys={selectedRowKeys}
+          total={total}
         />
-        <Box flex mb-8px>
-          <Pagination onChange={onPage} currentPage={currentPage} />
-        </Box>
         <Box mt-10 position='absolute' bottom0>
           <Button onClick={() => onMergeStrategy()} mr4>Merge strategy</Button>
         </Box>

@@ -1,49 +1,27 @@
-import React from 'react';
-import { Checkbox } from '@/common/checkbox';
-import { Table } from '@/common/table';
+import React, { useState } from 'react';
 import { formatUnixTime } from '@/utils';
 import { StrategiesOrder } from '@/utils/types';
 import { Box } from '@fower/react';
+import { Pagination, Table as AntTable } from 'antd';
 
 interface Props {
   data: StrategiesOrder[]
-  selectRows: number[]
-  onChangeCallback: (selectRows: number[]) => void
+  selectedRowKeys: React.Key[]
+  total: number
+  onChangeCallback: (selectedRowKeys: React.Key[], selectedRows: StrategiesOrder[]) => void
+  modalCallback: (params: any) => void
 }
 
 /**
  * Code annotation
  */
 export function StrategieyModalTable(props: Props) {
-  const { data, selectRows, onChangeCallback } = props
+  const { data, selectedRowKeys, onChangeCallback, total, modalCallback } = props
 
-
-  const onSelectChange = (index: number, checked: boolean, keySet?: any) => {
-    const arrIndex = selectRows.findIndex(i => {
-      return i === index;
-    });
-
-    if (checked) {
-      selectRows.splice(arrIndex, 1)
-    } else {
-      selectRows.push(index)
-    }
-    onChangeCallback([...selectRows])
-  }
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   const columns = [
-    {
-      title: '',
-      dataIndex: '',
-      key: '',
-      width: 200,
-      render(_item: any, _e: any, index: number) {
-        const checked = selectRows.includes(index)
-        return (
-          <Checkbox checked={checked} onChange={() => onSelectChange(index, checked)} />
-        )
-      },
-    },
     {
       id: 'time', title: 'Date', dataIndex: '', key: 'time', width: 100,
       render(item: StrategiesOrder) {
@@ -107,7 +85,55 @@ export function StrategieyModalTable(props: Props) {
     },
     { id: 'userId', title: 'UserId', dataIndex: 'userId', key: 'userId', width: 100 },
   ]
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: (selectedRowKeys: React.Key[], selectedRows: StrategiesOrder[]) => {
+      console.log(`${selectedRowKeys}`, '--', 'selectedRows: ', selectedRows);
+      onChangeCallback(selectedRowKeys, selectedRows)
+    },
+  };
+
+  const onShowSizeChange = (page: number, pageSize: number) => {
+    setPageSize(pageSize)
+    setCurrentPage(page)
+  }
+
+  const onChangePage = (page: number, pageSize: number) => {
+    const params = {
+      currentPage: page,
+      pageSize: pageSize,
+      symbol: ''
+    }
+    setCurrentPage(page)
+    setPageSize(pageSize)
+    onChangeCallback([], [])
+    modalCallback(params)
+  }
+
   return (
-    <Table columns={columns} data={data} className='table-box modal-stg-table' />
+    <>
+      <AntTable
+        rowSelection={{
+          type: 'radio',
+          ...rowSelection
+        }}
+        rowKey="id"
+        columns={columns}
+        dataSource={data} className='table-box modal-stg-table'
+        pagination={false}
+      />
+      <Box flex mt-10px>
+        <Pagination
+          current={currentPage}
+          total={total}
+          pageSizeOptions={["10", "20", "40"]}
+          showTotal={total => `Total:${total}`}
+          showSizeChanger={true}
+          onChange={onChangePage}
+          onShowSizeChange={onShowSizeChange}
+        />
+      </Box>
+    </>
   );
 }

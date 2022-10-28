@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import NiceModal from '@ebay/nice-modal-react'
 import { Box } from '@fower/react';
-import { Table } from '@/common/table';
 import { formatUnixTime } from '@/utils';
-import { Checkbox } from '@/common/checkbox';
 import { Button } from '@/common/button';
 import traderApi from '@/services/traderApi';
 import { SearchParmas, SpotOrder } from '@/utils/types';
@@ -11,9 +9,10 @@ import { MergeStrategyModal } from '@/components/merge-strategy-modal';
 import { CloseStrategyModal } from '@/components/close-strategy-modal';
 import { toast } from '@/common/toast';
 import { isEmpty } from 'lodash';
+import { Pagination, Table as AntTable } from 'antd';
 
 interface Props {
-  data: SpotOrder[]
+  selectAssetValue: string
   spotCallBack: (searchParmas: SearchParmas) => void
 }
 
@@ -26,34 +25,34 @@ const strategyStatusMap = [
 /**
  * Code annotation
  */
-export function SpotTable(props: Props) {
-  const { data, spotCallBack } = props
-  const [selectRows, setSelectRows] = useState<number[]>([])
+export const SpotTable = forwardRef((props: Props, ref) => {
+  const { spotCallBack, selectAssetValue } = props
+  const [spotOrders, setSpotOrders] = useState<SpotOrder[]>([])
+
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [selectRowData, setSelectRowData] = useState<SpotOrder[]>([])
+  const [total, setTotal] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  useImperativeHandle(ref, () => ({
+    getOrders: (params: SearchParmas, isUpdate: boolean) => {
+      console.log('getOrder', params, isUpdate);
+      getSpotOrders(params, isUpdate)
+    }
+  }));
 
   const oncreateStrategy = async () => {
-    if (!selectRows.length) {
+    if (!selectedRowKeys.length) {
       toast.warning('select empty')
 
       return
     }
 
-    /*
-    if (selectRows.length >= 2) {
-      toast.warning('select Greater than 2')
-
-      return
-    }
-    */
     selectRowData.sort((a: SpotOrder, b: SpotOrder) => {
       return Number(a.time) - Number(b.time);
     })
 
-    /*
-    const index = get(selectRows, '[0]', 0)
-    const selectRow = get(data, `${[index]}`, 0)
-    const params = { ...selectRow }
-    */
     const isStrategyRelatedOrder = isStrategyRelatedOrderUtil(selectRowData)
     if (isStrategyRelatedOrder) {
       toast.warning('Can not select closed order to create')
@@ -73,9 +72,10 @@ export function SpotTable(props: Props) {
       const params = {
         symbol: ''
       }
-      spotCallBack(params)
+      // spotCallBack(params)
+      getSpotOrders(params)
       setSelectRowData([])
-      setSelectRows([])
+      setSelectedRowKeys([])
 
       toaster.update('create Strategy succeeded', {
         type: 'success',
@@ -110,9 +110,9 @@ export function SpotTable(props: Props) {
       const params = {
         symbol: ''
       }
-      spotCallBack(params)
+      getSpotOrders(params)
       setSelectRowData([])
-      setSelectRows([])
+      setSelectedRowKeys([])
 
       toaster.update('Reset order succeeded', {
         type: 'success',
@@ -126,7 +126,7 @@ export function SpotTable(props: Props) {
   }
 
   const onMergeStrategy = () => {
-    if (!selectRows.length) {
+    if (!selectedRowKeys.length) {
       toast.warning('select empty')
 
       return
@@ -152,7 +152,7 @@ export function SpotTable(props: Props) {
   }
 
   const onCloseStrategy = async () => {
-    if (!selectRows.length) {
+    if (!selectedRowKeys.length) {
       toast.warning('select empty')
 
       return
@@ -171,61 +171,16 @@ export function SpotTable(props: Props) {
     NiceModal.show('closeStrategyModal')
   }
 
-  const onSelectChange = (index: number, checked: boolean, item: SpotOrder) => {
-    /*
-    if (checked) {
-      keySet.delete(index);
-      setSelectRows(Array.from(keySet))
-    } else {
-      keySet.add(index);
-      setSelectRows(Array.from(keySet))
-    }
-    */
-
-    if (checked) {
-      const { strategyId } = item
-      const arrIndex = selectRows.findIndex(i => {
-        return i === index;
-      });
-      const arrDataIndex = selectRowData.findIndex(item => {
-        return item.strategyId === strategyId;
-      });
-      selectRows.splice(arrIndex, 1)
-      selectRowData.splice(arrDataIndex, 1)
-    } else {
-      selectRows.push(index)
-      selectRowData.push(item)
-    }
-    setSelectRows([...selectRows])
-    setSelectRowData([...selectRowData])
-  }
-
   const spotTableCallBack = () => {
     const params = {
       symbol: ''
     }
-    spotCallBack(params)
+    getSpotOrders(params)
     setSelectRowData([])
-    setSelectRows([])
+    setSelectedRowKeys([])
   }
 
   const columns = [
-    {
-      title: '',
-      dataIndex: '',
-      key: '',
-      width: 200,
-      render(item: SpotOrder, _e: any, index: number) {
-        /*
-        const keySet = new Set(selectRows);
-        const checked = keySet.has(index);
-        */
-        const checked = selectRows.includes(index)
-        return (
-          <Checkbox checked={checked} onChange={() => onSelectChange(index, checked, item)} />
-        )
-      },
-    },
     {
       id: 'time', title: 'Date', dataIndex: '', key: 'time', width: 100,
       render(item: SpotOrder) {
@@ -272,8 +227,6 @@ export function SpotTable(props: Props) {
         </Box>
       },
     },
-    // { id: 'qty', title: 'qty', dataIndex: 'qty', key: 'qty', width: 100 },
-    // { id: 'quoteQty', title: 'quoteQty', dataIndex: 'quoteQty', key: 'quoteQty', width: 100 },
     { id: 'orderId', title: 'OrderId', dataIndex: 'orderId', key: 'orderId', width: 100 },
     {
       id: 'strategyId', title: 'StrategyId', dataIndex: '', key: 'strategyId', width: 100,
@@ -296,23 +249,103 @@ export function SpotTable(props: Props) {
     },
   ]
 
-  useEffect(() => {
-    if (!isEmpty(selectRows)) {
-      setSelectRows([])
-      setSelectRowData([])
+  const onChangePage = (page: number, pageSize: number) => {
+    const params = {
+      currentPage: page,
+      pageSize: pageSize,
+      symbol: ''
     }
-  }, [data])
+    setCurrentPage(currentPage)
+    getSpotOrders(params)
+  }
+
+  const onShowSizeChange = (page: number, pageSize: number) => {
+    setPageSize(pageSize)
+    setCurrentPage(page)
+  }
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: (selectedRowKeys: React.Key[], selectedRows: SpotOrder[]) => {
+      // console.log(`${selectedRowKeys}`, '--', 'selectedRows: ', selectedRows);
+      setSelectedRowKeys(selectedRowKeys);
+      setSelectRowData(selectedRows)
+    },
+    /*
+    getCheckboxProps: (record: SpotOrder) => (
+      {
+      disabled: record.name === 'Disabled User', // Column configuration not to be checked
+      name: record.name,
+    }
+    ),
+    */
+  };
+
+  const getSpotOrders = async (params: SearchParmas, isUpdate = false) => {
+    const { symbol, currentPage: current, pageSize: size } = params
+    const data = {
+      currentPage: current || currentPage,
+      pageSize: size || pageSize,
+      symbol: symbol || selectAssetValue
+    }
+
+    // console.log('params', params);
+    // console.log('data', data);
+
+    const res = await traderApi.spotOrdersApi(data)
+    if (res.code === 200) {
+      if (isUpdate) {
+        toast.success('Get orders succeeded')
+      }
+
+      setTotal(res.data.total)
+      setCurrentPage(data.currentPage)
+      setSpotOrders(res.data.res)
+    } else {
+      toast.error('Failed to get orders')
+    }
+  }
+
+  useEffect(() => {
+    if (!isEmpty(selectedRowKeys)) {
+      console.log('clear selected');
+      setSelectedRowKeys([]);
+    }
+  }, [spotOrders])
+
+  useEffect(() => {
+    const params = {
+      currentPage: 1,
+      pageSize: pageSize,
+      symbol: ''
+    }
+    getSpotOrders(params)
+  }, [])
 
   return (
     <Box className='table-box-container' mt-10px>
-      <Table columns={columns} data={data} className='table-box' />
-      <Box mt-10>
-        <Button onClick={() => oncreateStrategy()} mr4>create strategy</Button>
+      <AntTable
+        rowSelection={rowSelection}
+        rowKey="id"
+        columns={columns} dataSource={spotOrders} className='table-box'
+        pagination={false}
+      />
+      <Box mt-10 mb-10>
+        <Button onClick={() => oncreateStrategy()} mr4>Create strategy</Button>
         <Button onClick={() => onMergeStrategy()} mr4>Merge strategy</Button>
         <Button onClick={() => onCloseStrategy()} mr4>Close strategy</Button>
       </Box>
       <MergeStrategyModal id='mergeStrategyModal' mergeOrders={selectRowData} spotTableCallBack={() => spotTableCallBack()} />
       <CloseStrategyModal id='closeStrategyModal' closeOrders={selectRowData} spotTableCallBack={() => spotTableCallBack()} />
+      <Pagination
+        current={currentPage}
+        total={total}
+        pageSizeOptions={["10", "20", "40"]}
+        showTotal={total => `Total:${total}`}
+        showSizeChanger={true}
+        onChange={onChangePage}
+        onShowSizeChange={onShowSizeChange}
+      />
     </Box>
   );
-}
+})

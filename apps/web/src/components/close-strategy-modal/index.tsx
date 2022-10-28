@@ -3,20 +3,20 @@ import { Button } from '@/common/button';
 import traderApi from '@/services/traderApi';
 import { FiterStrategyOrderType, SpotOrder, StrategiesOrder } from '@/utils/types';
 import { Box } from '@fower/react';
-import { get, isEmpty } from 'lodash';
+import { get } from 'lodash';
 import NiceModal, { useModal } from '@ebay/nice-modal-react';
 import { TradeModal } from '../modal';
 import { StrategieyModalTable } from '../strategiey-modal-table';
-import { Pagination } from '../pagination';
 import { toast } from '@/common/toast';
-
+// import { Pagination } from '../pagination';
 
 interface Props {
   closeOrders: SpotOrder[]
   spotTableCallBack(): void
 }
 
-const defaultRunning = 1
+// const defaultRunning = 1
+const defaultRunning = 0
 
 /**
  * Code annotation
@@ -25,8 +25,10 @@ export const CloseStrategyModal = NiceModal.create((props: Props) => {
   const { visible, hide } = useModal()
   const { closeOrders, spotTableCallBack } = props
   const [strategies, setStrategies] = useState<StrategiesOrder[]>([])
-  const [selectRows, setSelectRows] = useState<number[]>([])
-  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
+  const [selectRowData, setSelectRowData] = useState<StrategiesOrder[]>([])
+  const [total, setTotal] = useState<number>(1);
 
   const getStrategies = async (params: FiterStrategyOrderType) => {
     const { currentPage, pageSize, is_running } = params
@@ -37,45 +39,45 @@ export const CloseStrategyModal = NiceModal.create((props: Props) => {
     }
     const res = await traderApi.strategiesOrderApi(data)
     if (res.code === 200) {
-      setStrategies(res.data)
+      setTotal(res.data.total)
+      setStrategies(res.data.res)
     } else {
       alert("get Strategies orders error")
     }
   }
 
   const afterClose = () => {
-    setSelectRows([])
-    setCurrentPage(1)
+    setSelectedRowKeys([])
+    setSelectRowData([])
   }
 
   const onCloseStrategy = async () => {
-    if (!selectRows.length) {
-      alert('select empty')
+    if (!selectedRowKeys.length) {
+      toast.warning('Select empty')
 
       return
     }
 
-    if (selectRows.length >= 2) {
-      alert('select Greater than 2')
+    if (selectedRowKeys.length >= 2) {
+      toast.warning('select Greater than 2')
 
       return
     }
 
     const toaster = toast.loading('Close Strategy...', { showLayer: true })
 
-    const index = get(selectRows, '[0]', 0)
-    const selectRow = get(strategies, `${[index]}`, 0)
+    const selectRow = get(selectRowData, `[0]`, {})
     if (!selectRow.is_running) {
       alert('This strategy was closed and cannot be updated')
 
       return
     }
 
-    const strategyOrder = { ...selectRow }
     const params = {
       spotOrders: closeOrders,
-      strategyOrder,
+      strategyOrder: selectRow,
     }
+
     const res = await traderApi.closeSpotStrategyApi(params)
     if (res.code === 200) {
       hide()
@@ -92,18 +94,14 @@ export const CloseStrategyModal = NiceModal.create((props: Props) => {
     }
   }
 
-  const onPage = (currentPage: number, pageSize: number) => {
-    const params = {
-      currentPage,
-      pageSize,
-      is_running: defaultRunning
-    }
-
-    if (!isEmpty(selectRows)) {
-      setSelectRows([])
-    }
-    setCurrentPage(currentPage)
+  const modalCallback = (params: any) => {
+    params.is_running = defaultRunning
     getStrategies(params)
+  }
+
+  const onChangeCallback = (selectedRowKeys: React.Key[], selectedRows: StrategiesOrder[]) => {
+    setSelectedRowKeys(selectedRowKeys);
+    setSelectRowData(selectedRows)
   }
 
   return (
@@ -124,13 +122,13 @@ export const CloseStrategyModal = NiceModal.create((props: Props) => {
       afterClose={() => afterClose()}
     >
       <Box position='relative' h='560px'>
-        <StrategieyModalTable data={strategies}
-          onChangeCallback={setSelectRows}
-          selectRows={selectRows}
+        <StrategieyModalTable
+          data={strategies}
+          onChangeCallback={onChangeCallback}
+          modalCallback={modalCallback}
+          selectedRowKeys={selectedRowKeys}
+          total={total}
         />
-        <Box flex mb-8px>
-          <Pagination onChange={onPage} currentPage={currentPage} />
-        </Box>
         <Box position='absolute' bottom0>
           <Button onClick={() => onCloseStrategy()} mr4>Close strategy</Button>
         </Box>
