@@ -101,7 +101,16 @@ export const SpotTable = forwardRef((props: Props, ref) => {
     return isStrategyRelatedOrder
   }
 
-  const onResetOrderStatus = async (item: SpotOrder) => {
+  const onResetOrderStatus = (item: SpotOrder) => {
+    console.log('item', item);
+    toast.warning('Currently not supported')
+  }
+
+  const onRebuildOrderStatus = async (item: SpotOrder) => {
+    if (item.strategyStatus === 2) {
+      toast.warning('Can not reset ended order')
+      return
+    }
 
     const toaster = toast.loading('Reset order...', { showLayer: true })
 
@@ -210,10 +219,9 @@ export const SpotTable = forwardRef((props: Props, ref) => {
       id: 'action', title: 'Action', dataIndex: '', key: 'action', width: 100,
       render(item: SpotOrder) {
         return <>
-          {item.strategyStatus !== 0 ?
-            <Box as='button' cursor='pointer' color='#fff' bg='#ff7875' rounded-4px onClick={() => onResetOrderStatus(item)}>Reset</Box> :
-            <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => createStrategyUtil([item])}>Create</Box>
-          }
+          {item.strategyStatus === 0 && <Box as='button' cursor='pointer' color='#fff' bg='#0ECB81' rounded-4px onClick={() => createStrategyUtil([item])}>Create</Box>}
+          {item.strategyStatus === 1 && <Box as='button' cursor='pointer' color='#fff' bg='#ff7875' rounded-4px onClick={() => onRebuildOrderStatus(item)}>Rebuild</Box>}
+          {item.strategyStatus === 2 && <Box as='button' cursor='pointer' color='#fff' bg='#d9d9d9' rounded-4px onClick={() => onResetOrderStatus(item)}>Reset</Box>}
         </>
       },
     },

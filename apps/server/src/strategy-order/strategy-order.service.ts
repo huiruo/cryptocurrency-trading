@@ -188,48 +188,56 @@ export class StrategyOrderService {
     }
   }
 
-  private calculateSpotOrderMergeStrategy(
+  private async calculateSpotOrderMergeStrategy(
     spotOrders: SpotOrder[],
     strategyOrder: StrategyOrder,
-  ): CalculateStrategiesOrderType {
-    const { symbol } = strategyOrder;
+  ): Promise<CalculateStrategiesOrderType> {
+    const { symbol, qty, quoteQty, userId, free: realizedFree } = strategyOrder;
     let qtyTotal = 0;
+    let free = 0;
     let quoteQtyTotal = 0;
     let isTheSameSymbol = true;
     const targetSymbol = symbol;
 
+    const { spotFree } = await this.getUserSpotFree(userId);
+
     spotOrders.forEach((item) => {
-      const { qty, quoteQty, symbol, isBuyer } = item;
+      const { qty: qtyItem, quoteQty: quoteQtyItem, symbol, isBuyer } = item;
+      const qtyItemInt = Number(qtyItem)
+      const quoteQtyItemInt = Number(quoteQtyItem)
       if (targetSymbol !== symbol) {
         isTheSameSymbol = false;
       }
 
+      free = quoteQtyItemInt * spotFree + free;
+
       if (isBuyer) {
-        qtyTotal = Number(qty) + qtyTotal;
-        quoteQtyTotal = Number(quoteQty) + quoteQtyTotal;
+        qtyTotal = qtyItemInt + qtyTotal;
+        quoteQtyTotal = quoteQtyItemInt + quoteQtyTotal;
       } else {
-        qtyTotal = qtyTotal - Number(qty);
-        quoteQtyTotal = quoteQtyTotal - Number(quoteQty);
+        qtyTotal = qtyTotal - qtyItemInt;
+        quoteQtyTotal = quoteQtyTotal - quoteQtyItemInt;
       }
     });
 
-    const { qty, quoteQty } = strategyOrder;
-    qtyTotal = Number(qty) + qtyTotal;
-    quoteQtyTotal = Number(quoteQty) + quoteQtyTotal;
+    const finalqty = Number(qty) + qtyTotal;
+    const finalQuoteQty = Number(quoteQty) + quoteQtyTotal;
+    const finalFree = realizedFree + free
+    const entryPrice = (finalQuoteQty / finalqty).toFixed(8)
 
     return {
-      qty: qtyTotal.toString(),
-      quoteQty: quoteQtyTotal.toString(),
-      entryPrice: (quoteQtyTotal / qtyTotal).toFixed(8),
+      qty: finalqty.toString(),
+      quoteQty: finalQuoteQty.toString(),
+      entryPrice,
       isTheSameSymbol,
+      free: finalFree
     };
   }
 
   private async updateStrategyOrderUtil(strategiesOrder: StrategyOrder) {
-    const { strategyId, qty, quoteQty, entryPrice, updatedAt } =
+    const { strategyId, qty, quoteQty, entryPrice, updatedAt, free } =
       strategiesOrder;
-
-    const sql = `update strategy_order set qty = "${qty}",quoteQty = "${quoteQty}",entryPrice="${entryPrice}",updatedAt="${updatedAt}" WHERE strategyId = "${strategyId}"`;
+    const sql = `update strategy_order set qty = "${qty}",free="${free}",quoteQty = "${quoteQty}",entryPrice="${entryPrice}",updatedAt="${updatedAt}" WHERE strategyId = "${strategyId}"`;
     return await this.strategiesOrderRepo.query(sql);
   }
 
@@ -517,8 +525,18 @@ export class StrategyOrderService {
     spotOrders: SpotOrder[],
     strategyOrder: StrategyOrder,
   ): Promise<Result> {
-    const { qty, quoteQty, entryPrice, isTheSameSymbol } =
-      this.calculateSpotOrderMergeStrategy(spotOrders, strategyOrder);
+
+    const { userId, strategyId, symbol, time, side } = strategyOrder;
+    /*
+    const spotPrice = await this.getSpotPrice(symbol);
+    const price = get(spotPrice, `${symbol}`, '');
+    if (!price) {
+      return { code: 500, message: 'error', data: null };
+    }
+    */
+
+    const { qty, quoteQty, entryPrice, isTheSameSymbol, free = 0 } =
+      await this.calculateSpotOrderMergeStrategy(spotOrders, strategyOrder);
     if (!isTheSameSymbol) {
       return {
         code: 500,
@@ -526,8 +544,6 @@ export class StrategyOrderService {
         data: null,
       };
     }
-
-    const { userId, strategyId, symbol, time, side } = strategyOrder;
 
     const strategiesOrder = {
       symbol,
@@ -549,7 +565,7 @@ export class StrategyOrderService {
       profitRate: '',
       realizedProfit: 0,
       realizedProfitRate: '',
-      free: 0,
+      free,
 
       stopType: 0,
       stopProfit: '',

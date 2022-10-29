@@ -64,6 +64,7 @@ export interface CreateOrdersStrategy {
 export interface CalculateStrategiesOrderType {
   qty: string
   quoteQty: string
+  free?: number
   entryPrice: string
   isTheSameSymbol: boolean
 }
