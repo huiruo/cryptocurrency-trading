@@ -15,8 +15,7 @@ interface Props {
   spotTableCallBack(): void
 }
 
-// const defaultRunning = 1
-const defaultRunning = 0
+const defaultRunning = 1
 
 /**
  * Code annotation
