@@ -117,9 +117,9 @@ export class BaseServiceBiance {
     }
   }
 
-  async candles(symbol: string) {
+  async candles(symbol: string, interval: string) {
     try {
-      return await this.client.candles({ symbol, interval: '1m' });
+      return await this.client.candles({ symbol, interval: '5m' });
     } catch (error) {
       throw new Error(error);
     }

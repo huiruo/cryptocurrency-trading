@@ -31,7 +31,6 @@ CREATE TABLE `strategy_order`(
   `stopProfitPrice` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'stopProfitPrice',
   `stopLossPrice` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'stopLossPrice',
 
-  `tradeUrl` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `note` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'note',
   `klineShots` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin default NULL,
 

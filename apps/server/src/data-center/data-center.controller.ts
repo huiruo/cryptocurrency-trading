@@ -63,4 +63,9 @@ export class DataCenterController {
   async addAsset(@Body() asset: AssetType): Promise<Result> {
     return await this.DataCenterService.addAsset(asset);
   }
+
+  @Get('getCandle')
+  async getCandle(): Promise<Result> {
+    return await this.DataCenterService.getCandle();
+  }
 }

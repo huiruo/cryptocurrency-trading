@@ -51,3 +51,25 @@ export function formatUnixTime(val: any, fmt = 'yyyy-MM-dd hh:mm:ss') {
 
   return fmt;
 }
+
+const bianceSpotBaseUri = 'https://www.binance.com/en/trade/'
+const bianceFuturesBaseUri = 'https://www.binance.com/zh-CN/futures/'
+
+export const generateBianceUri = (symbol: string, exchange = 'USDT', isSpot = true): { asset: string, assetUri: string } => {
+  let assetUri = ''
+  let asset = symbol
+  const isInclude = symbol.search(new RegExp(`${exchange}`))
+
+  if (isInclude !== -1) {
+    const targetSymbol = symbol.match(new RegExp(`(\\S*)${exchange}`)) || []
+    asset = targetSymbol[1]
+    if (isSpot) {
+      assetUri = `${bianceSpotBaseUri}${asset}_${exchange}`
+    } else {
+      assetUri = `${bianceFuturesBaseUri}${asset}_${exchange}`
+    }
+  }
+
+  return { asset, assetUri }
+}
+// util end 

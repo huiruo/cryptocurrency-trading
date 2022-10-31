@@ -1,6 +1,6 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { Box } from '@fower/react';
-import { formatUnixTime } from '@/utils';
+import { formatUnixTime, generateBianceUri } from '@/utils';
 import { Button } from '@/common/button';
 import traderApi from '@/services/traderApi';
 import { FiterStrategyOrderType, StrategiesOrder } from '@/utils/types';
@@ -59,8 +59,9 @@ export const StrategiesTable = forwardRef((props: Props, ref) => {
   }
 
   const onKline = async (order: StrategiesOrder) => {
-    if (order.tradeUrl) {
-      window.open(order.tradeUrl, '_blank')
+    const { assetUri } = generateBianceUri(order.symbol)
+    if (assetUri) {
+      window.open(assetUri, '_blank')
     } else {
       alert('No link')
     }

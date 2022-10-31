@@ -29,7 +29,6 @@ export class StrategyOrder {
   @Column({ comment: 'stopProfitPrice', }) stopProfitPrice: string;
   @Column({ comment: 'stopLossPrice', }) stopLossPrice: string;
 
-  @Column({ comment: 'tradeUrl', }) tradeUrl: string;
   @Column({ comment: 'note', }) note: string;
   @Column({ comment: 'klineShots', }) klineShots?: string;
 

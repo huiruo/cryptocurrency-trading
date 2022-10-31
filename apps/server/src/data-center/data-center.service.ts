@@ -433,4 +433,12 @@ export class DataCenterService {
       return { code: 500, message: 'Duplicate asset', data: null };
     }
   }
+
+
+  async getCandle(): Promise<Result> {
+    const symbol = 'BTCUSDT'
+    const interval = '5m'
+    const res = await this.client.candles(symbol, interval);
+    return { code: 500, message: 'Duplicate asset', data: res };
+  }
 }

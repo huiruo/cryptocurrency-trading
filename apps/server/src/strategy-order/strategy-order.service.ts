@@ -385,11 +385,6 @@ export class StrategyOrderService {
     return tradeCount
   }
 
-
-
-
-
-
   async createSpotStrategy(spotOrders: SpotOrder[]): Promise<Result> {
     const firstOrder = get(spotOrders, '[0]', {}) as SpotOrder;
     const { orderId, userId, time, symbol, isBuyer } = firstOrder;
@@ -422,8 +417,6 @@ export class StrategyOrderService {
         realizedFree,
       );
 
-      const { tradeUrl } = await this.getAsset(symbol);
-
       const strategiesOrder = {
         symbol,
         price,
@@ -452,7 +445,6 @@ export class StrategyOrderService {
         stopProfitPrice: '',
         stopLossPrice: '',
 
-        tradeUrl,
         note: '',
         klineShots: '',
 
@@ -573,7 +565,6 @@ export class StrategyOrderService {
       stopProfitPrice: '',
       stopLossPrice: '',
 
-      tradeUrl: '',
       note: '',
       klineShots: '',
 
@@ -657,7 +648,6 @@ export class StrategyOrderService {
       stopProfitPrice: '',
       stopLossPrice: '',
 
-      tradeUrl: '',
       note: '',
       klineShots: '',
 
@@ -737,6 +727,8 @@ export class StrategyOrderService {
 
       return { code: 200, message: 'Update succeeded', data: null };
     } catch (error) {
+      console.log('update error', error);
+
       return { code: 500, message: 'update error', data: null };
     }
   }

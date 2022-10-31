@@ -13,7 +13,6 @@ import { useNavigate } from 'react-router-dom';
 export function AddAsset() {
   const [tradeName, setTradeName] = useState('')
   const [symbol, setSymbol] = useState('')
-  const [tradeUrl, setTradeUrl] = useState('')
   const [code, setCode] = useState('')
 
   const navigate = useNavigate();
@@ -31,14 +30,12 @@ export function AddAsset() {
     const data = {
       name: tradeName,
       symbol,
-      tradeUrl,
       code
     }
     const res = await traderApi.addAssetApi(data)
     if (res.code === 200) {
       setSymbol('')
       setTradeName('')
-      setTradeUrl('')
       setCode('')
       toaster.dismiss()
       navigate('/trade/spot/order', { state: { asset: tradeName } })
@@ -60,10 +57,6 @@ export function AddAsset() {
 
           <div className='custom-input'>
             <Input onChange={(e) => { setSymbol(e.target.value) }} value={symbol} placeholder="Please enter symbol" />
-          </div>
-
-          <div className='custom-input'>
-            <Input onChange={(e) => { setTradeUrl(e.target.value) }} value={tradeUrl} placeholder="Please enter trade url" />
           </div>
 
           <div className='custom-input'>
