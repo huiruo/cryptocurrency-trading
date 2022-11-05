@@ -840,4 +840,11 @@ export class StrategyOrderService {
       }
     }
   }
+
+  async getDailyProfit(): Promise<Result> {
+    const userId = 1
+    const sql = `select profit,profitRate,amount,date_format(time,'%Y-%m-%d') as time from daily_profit WHERE userId = "${userId}" order by time asc`
+    const res = await this.dailyProfitRepo.query(sql)
+    return { code: 200, message: 'sync profit statistics', data: res };
+  }
 }

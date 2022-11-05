@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useDocumentTitle } from '@/utils/useDocumentTitle';
-import Header from '@/components/feader';
+import Header from '@/components/header';
 import { Box } from '@fower/react';
 import { StrategiesTable } from './strategies-table';
 import { FiterStrategyOrderType } from '@/utils/types';

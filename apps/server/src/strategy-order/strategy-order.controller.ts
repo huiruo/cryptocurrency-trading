@@ -71,4 +71,10 @@ export class StrategyOrderController {
 
     return await this.StrategyOrderService.getProfitStatistics();
   }
+
+  @Post('getDailyProfit')
+  async getDailyProfit(@Body() params: any): Promise<any> {
+
+    return await this.StrategyOrderService.getDailyProfit();
+  }
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Header from '@/components/feader';
+import Header from '@/components/header';
 import { Input } from '@/common/input';
 import { Button } from '@/common/button';
 import traderApi from '@/services/traderApi';

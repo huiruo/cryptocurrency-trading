@@ -106,23 +106,24 @@ const traderApi = {
 		return http.post<resType>(data, url);
 	},
 	// =========== Strategies Order end ===========
-	// =========== Count start ===========
+	// =========== statistics start ===========
 	syncAmountApi(data: any) {
 		const url: string = `${traderApiUrl}/strategy/order/syncAmount`;
 		return http.post<resType>(data, url);
 	},
-
 	profitStatistics(data: any) {
 		const url: string = `${traderApiUrl}/strategy/order/profitStatistics`;
 		return http.post<resType>(data, url);
 	},
-
 	getProfitStatistics(data: any) {
 		const url: string = `${traderApiUrl}/strategy/order/getProfitStatistics`;
 		return http.post<resType>(data, url);
 	},
-
-	// =========== Count start end ===========
+	getDailyProfit(data: any) {
+		const url: string = `${traderApiUrl}/strategy/order/getDailyProfit`;
+		return http.post<resType>(data, url);
+	},
+	// =========== statistics end ===========
 }
 
 export default traderApi;

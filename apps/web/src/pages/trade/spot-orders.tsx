@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import traderApi from '@/services/traderApi';
 import { SpotOrderFilter } from '@/components/spot-order-filter';
 import { useDocumentTitle } from '@/utils/useDocumentTitle';
-import Header from '@/components/feader';
+import Header from '@/components/header';
 import { Box } from '@fower/react';
 import { SpotTable } from './spot-table';
 import { AssetSync } from '@/components/asset-sync';

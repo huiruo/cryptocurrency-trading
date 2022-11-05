@@ -4,7 +4,7 @@ import { Table } from '@/common/table';
 import { useDocumentTitle } from "@/utils/useDocumentTitle"
 import { Button } from '@/common/button';
 import { formatUnixTime } from '@/utils';
-import Header from '@/components/feader';
+import Header from '@/components/header';
 import { Box } from '@fower/react';
 import { BalancesType } from '@/utils/types';
 

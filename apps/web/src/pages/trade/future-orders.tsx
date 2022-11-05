@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import traderApi from '@/services/traderApi';
 import { Button } from '@/common/button';
 import { useDocumentTitle } from '@/utils/useDocumentTitle';
-import Header from '@/components/feader';
+import Header from '@/components/header';
 import { Box } from '@fower/react';
 import { FutureTable } from './future-table';
 import { FuturesOrder } from '@/utils/types';

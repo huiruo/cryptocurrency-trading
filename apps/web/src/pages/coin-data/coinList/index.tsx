@@ -5,7 +5,7 @@ import { Button } from '@/common/button';
 import { Box } from '@fower/react';
 import { Input } from '@/common/input';
 import { Table } from '@/common/table';
-import Header from '@/components/feader';
+import Header from '@/components/header';
 import { useDocumentTitle } from '@/utils/useDocumentTitle';
 import { useNavigate } from 'react-router-dom';
 

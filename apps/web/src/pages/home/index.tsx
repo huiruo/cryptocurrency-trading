@@ -1,5 +1,5 @@
 import React from 'react';
-import Header from '@/components/feader';
+import Header from '@/components/header';
 
 /**
  * home
