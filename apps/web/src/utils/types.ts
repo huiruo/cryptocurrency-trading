@@ -155,3 +155,10 @@ export interface FiterStrategyOrderType {
   currentPage?: number
   pageSize?: number
 }
+
+export interface ProfitStatisticsType {
+  profit: number
+  profitRate: string
+  amount: number
+  time: string
+}

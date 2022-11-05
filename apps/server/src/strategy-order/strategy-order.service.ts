@@ -9,11 +9,13 @@ import { TraderApi } from 'src/entity/api.entity';
 import { TradeAsset } from 'src/entity/asset.entity';
 import { DailyProfit } from 'src/entity/daily.profit.entity';
 import { FuturesOrder } from 'src/entity/futures-order.entity';
+import { ProfitStatistics } from 'src/entity/profit.statistics.entity';
 import { SpotOrder } from 'src/entity/spot-order.entity';
 import { StrategyOrder } from 'src/entity/strategy-order.entity';
 import { StrategyOrderId } from 'src/entity/strategy-orderid.entity';
 import { BaseServiceBiance } from 'src/utils/base-service-biance';
 import { formatTimestamp } from 'src/utils/utils';
+import Big from 'big.js';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -42,6 +44,9 @@ export class StrategyOrderService {
 
     @InjectRepository(DailyProfit)
     private readonly dailyProfitRepo: Repository<DailyProfit>,
+
+    @InjectRepository(ProfitStatistics)
+    private readonly profitStatisticsRepo: Repository<ProfitStatistics>,
   ) {
     this.initBinanceApi();
   }
@@ -241,7 +246,6 @@ export class StrategyOrderService {
     return await this.strategiesOrderRepo.query(sql);
   }
 
-
   private async calculateSpotOrderCloseStrategy(
     spotOrders: SpotOrder[],
     strategyOrder: StrategyOrder,
@@ -378,7 +382,6 @@ export class StrategyOrderService {
     }
   }
 
-
   private async getTradeCountByDay(day: string, userId: number) {
     const sql = `SELECT * FROM daily_profit WHERE userId=${userId} AND DATE_FORMAT(time, '%Y-%m-%d') = '${day}'`
     const tradeCount = await this.dailyProfitRepo.query(sql);
@@ -511,7 +514,6 @@ export class StrategyOrderService {
       }
     };
   }
-
 
   async mergeSpotStrategy(
     spotOrders: SpotOrder[],
@@ -770,5 +772,72 @@ export class StrategyOrderService {
     }
 
     return { code: 200, message: 'sync amount', data: null };
+  }
+
+  private async getProfitStatisticsById(userId: any): Promise<ProfitStatistics> {
+    const sql = `select profit,profitRate,amount,date_format(time,'%Y-%m-%d %H:%i:%S.%f') AS time from profit_statistics WHERE userId = "${userId}" limit 1`;
+    const profitStatistics = await this.strategiesOrderRepo.query(sql);
+    return get(profitStatistics, '[0]', {});
+  }
+
+  private calculateTotalProfit(dailyProfit: DailyProfit[]): number {
+    const totalProfit = new Big(0)
+    let totalProfitNumber = 0
+    dailyProfit.forEach((item) => {
+      const { profit } = item
+      totalProfitNumber = totalProfit.plus(profit).plus(totalProfitNumber).toNumber()
+    })
+
+    return totalProfitNumber
+  }
+
+  async getProfitStatistics(): Promise<Result> {
+    const userId = 1
+    const res = await this.getProfitStatisticsById(userId)
+    return { code: 200, message: 'sync profit statistics', data: res };
+  }
+
+  async profitStatistics(): Promise<Result> {
+    const userId = 1
+    const profitStatistics = await this.getProfitStatisticsById(userId)
+    if (isEmpty(profitStatistics)) {
+      const dailyProfit = await this.dailyProfitRepo.find({ userId });
+      const { time } = dailyProfit[dailyProfit.length - 1]
+      const totalProfit = this.calculateTotalProfit(dailyProfit)
+      const profitStatistics = {
+        userId,
+        profit: totalProfit,
+        time,
+        profitRate: '',
+        amount: '',
+      }
+
+      try {
+        await this.profitStatisticsRepo.save(profitStatistics)
+        return { code: 200, message: 'sync profit statistics', data: dailyProfit };
+      } catch (error) {
+        console.log('error:', error);
+        return { code: 500, message: 'sync profit statistics error' };
+      }
+    } else {
+      const { time: profitTime, profit } = profitStatistics
+      const querySql = `select profit,profitRate,amount,date_format(time,'%Y-%m-%d %H:%i:%S.%f') as time from daily_profit WHERE userId = "${userId}" and time>"${profitTime}"`;
+      const dailyProfit = await this.dailyProfitRepo.query(querySql);
+      if (isEmpty(dailyProfit)) {
+        return { code: 200, message: 'Already the latest data', data: null };
+      }
+      const { time } = dailyProfit[dailyProfit.length - 1]
+      const totalProfit = this.calculateTotalProfit(dailyProfit)
+      const profitAll = new Big(totalProfit).plus(profit).toNumber()
+
+      try {
+        const updateSql = `update profit_statistics set profit=${profitAll},time = "${time}"  WHERE userId = "${userId}"`;
+        await this.profitStatisticsRepo.query(updateSql)
+        return { code: 200, message: 'sync profit statistics', data: null };
+      } catch (error) {
+        console.log('error:', error);
+        return { code: 500, message: 'sync profit statistics error' };
+      }
+    }
   }
 }

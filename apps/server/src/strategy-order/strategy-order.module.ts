@@ -4,6 +4,7 @@ import { TraderApi } from 'src/entity/api.entity';
 import { TradeAsset } from 'src/entity/asset.entity';
 import { DailyProfit } from 'src/entity/daily.profit.entity';
 import { FuturesOrder } from 'src/entity/futures-order.entity';
+import { ProfitStatistics } from 'src/entity/profit.statistics.entity';
 import { SpotOrder } from 'src/entity/spot-order.entity';
 import { StrategyOrder } from 'src/entity/strategy-order.entity';
 import { StrategyOrderId } from 'src/entity/strategy-orderid.entity';
@@ -19,7 +20,8 @@ import { StrategyOrderService } from './strategy-order.service';
       StrategyOrderId,
       TradeAsset,
       TraderApi,
-      DailyProfit
+      DailyProfit,
+      ProfitStatistics
     ])],
   controllers: [StrategyOrderController],
   providers: [StrategyOrderService],

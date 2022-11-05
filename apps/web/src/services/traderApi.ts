@@ -111,6 +111,17 @@ const traderApi = {
 		const url: string = `${traderApiUrl}/strategy/order/syncAmount`;
 		return http.post<resType>(data, url);
 	},
+
+	profitStatistics(data: any) {
+		const url: string = `${traderApiUrl}/strategy/order/profitStatistics`;
+		return http.post<resType>(data, url);
+	},
+
+	getProfitStatistics(data: any) {
+		const url: string = `${traderApiUrl}/strategy/order/getProfitStatistics`;
+		return http.post<resType>(data, url);
+	},
+
 	// =========== Count start end ===========
 }
 

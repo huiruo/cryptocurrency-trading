@@ -59,4 +59,16 @@ export class StrategyOrderController {
   async syncAmount(@Body() params: any): Promise<any> {
     return await this.StrategyOrderService.syncAmount();
   }
+
+  @Post('profitStatistics')
+  async profitStatistics(@Body() params: any): Promise<any> {
+
+    return await this.StrategyOrderService.profitStatistics();
+  }
+
+  @Post('getProfitStatistics')
+  async getProfitStatistics(@Body() params: any): Promise<any> {
+
+    return await this.StrategyOrderService.getProfitStatistics();
+  }
 }

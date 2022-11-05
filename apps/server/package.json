@@ -26,8 +26,9 @@
     "@nestjs/platform-express": "^8.0.0",
     "@nestjs/serve-static": "^2.2.2",
     "@nestjs/typeorm": "^8.0.2",
+    "@types/big.js": "^6.1.6",
     "@types/lodash": "^4.14.184",
-    "big.js": "^6.1.1",
+    "big.js": "^6.2.1",
     "binance": "^2.0.27",
     "binance-api-node": "^0.11.47",
     "crypto-js": "^4.1.1",
@@ -36,12 +37,12 @@
     "loadash": "^1.0.0",
     "lodash": "^4.17.21",
     "mysql2": "^2.3.3",
+    "nanoid": "^3.3.4",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
     "typeorm": "^0.2.41",
-    "uuid": "^8.3.2",
-    "nanoid": "^3.3.4"
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^8.0.0",
