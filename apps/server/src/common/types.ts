@@ -97,3 +97,8 @@ export interface FiterStrategyOrderType {
   currentPage?: number
   pageSize?: number
 }
+
+export interface FilterDate {
+  startDate: string
+  endDate: string
+}

@@ -18,12 +18,14 @@ export function Strategies() {
   useDocumentTitle("strategies");
 
   const syncCallBack = () => {
+    /*
     const params = {
       is_running: selectStatusValue,
       currentPage: 1,
       symbol: selectAssetValue
     }
-    // getStrategies(params)
+    getStrategies(params)
+    */
   }
 
   const selectStatusCallback = (val: number) => {

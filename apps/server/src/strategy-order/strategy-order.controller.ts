@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { Result } from 'src/common/result.interface';
-import { FiterStrategyOrderType, MergeSpotStrategyParams } from 'src/common/types';
+import { FilterDate, FiterStrategyOrderType, MergeSpotStrategyParams } from 'src/common/types';
 import { SpotOrder } from 'src/entity/spot-order.entity';
 import { StrategyOrder } from 'src/entity/strategy-order.entity';
 import { StrategyOrderService } from './strategy-order.service';
@@ -73,8 +73,9 @@ export class StrategyOrderController {
   }
 
   @Post('getDailyProfit')
-  async getDailyProfit(@Body() params: any): Promise<any> {
+  async getDailyProfit(@Body() params: FilterDate): Promise<any> {
+    const { startDate, endDate } = params
 
-    return await this.StrategyOrderService.getDailyProfit();
+    return await this.StrategyOrderService.getDailyProfit(startDate, endDate);
   }
 }

@@ -65,7 +65,7 @@ export const CloseStrategyModal = NiceModal.create((props: Props) => {
 
     const toaster = toast.loading('Close Strategy...', { showLayer: true })
 
-    const selectRow = get(selectRowData, `[0]`, {})
+    const selectRow = get(selectRowData, `[0]`, {}) as StrategiesOrder
     if (!selectRow.is_running) {
       alert('This strategy was closed and cannot be updated')
 

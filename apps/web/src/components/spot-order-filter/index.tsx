@@ -1,6 +1,5 @@
 import React from 'react';
 import { Button } from '@/common/button';
-import { SearchParmas } from '@/utils/types';
 import { Box } from '@fower/react';
 import { Asset } from '../asset';
 

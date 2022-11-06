@@ -89,7 +89,6 @@ export function StrategieyModalTable(props: Props) {
   const rowSelection = {
     selectedRowKeys,
     onChange: (selectedRowKeys: React.Key[], selectedRows: StrategiesOrder[]) => {
-      console.log(`${selectedRowKeys}`, '--', 'selectedRows: ', selectedRows);
       onChangeCallback(selectedRowKeys, selectedRows)
     },
   };

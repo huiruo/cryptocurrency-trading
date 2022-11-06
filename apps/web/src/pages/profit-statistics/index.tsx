@@ -1,90 +1,39 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Header from '@/components/header';
 import traderApi from '@/services/traderApi';
 import { DailyProfitType } from '@/utils/types';
 import { Box } from '@fower/react';
 import { toast } from '@/common/toast';
-
-
+import moment from 'moment';
 import * as echarts from 'echarts';
 import { EChartsType } from 'echarts/core';
-import {
-  BarChart,
-  // 系列类型的定义后缀都为 SeriesOption
-  BarSeriesOption,
-  LineChart,
-  LineSeriesOption
-} from 'echarts/charts';
-import {
-  TitleComponent,
-  // 组件类型的定义后缀都为 ComponentOption
-  TitleComponentOption,
-  TooltipComponent,
-  TooltipComponentOption,
-  GridComponent,
-  GridComponentOption,
-  // 数据集组件
-  DatasetComponent,
-  DatasetComponentOption,
-  // 内置数据转换器组件 (filter, sort)
-  TransformComponent
-} from 'echarts/components';
-import { LabelLayout, UniversalTransition } from 'echarts/features';
-import { CanvasRenderer } from 'echarts/renderers';
-
-// 通过 ComposeOption 来组合出一个只有必须组件和图表的 Option 类型
-type ECOption = echarts.ComposeOption<
-  | BarSeriesOption
-  | LineSeriesOption
-  | TitleComponentOption
-  | TooltipComponentOption
-  | GridComponentOption
-  | DatasetComponentOption
->;
-
-// 注册必须的组件
-// echarts.use([
-//   TitleComponent,
-//   TooltipComponent,
-//   GridComponent,
-//   DatasetComponent,
-//   TransformComponent,
-//   BarChart,
-//   LineChart,
-//   LabelLayout,
-//   UniversalTransition,
-//   CanvasRenderer
-// ]);
-
-
-// 注册必须的组件
-echarts.use([
-  TitleComponent as any,
-  TooltipComponent,
-  GridComponent,
-  DatasetComponent,
-  TransformComponent,
-  BarChart,
-  LineChart,
-  LabelLayout,
-  UniversalTransition,
-  CanvasRenderer
-]);
+import FilterProfitStatistics from '@/components/filter-profit-statistics';
+import { RadioGroup } from '@/common/radio';
 
 /**
  * Code annotation
  */
+const startDateDefault = moment().month(moment().month() - 1).startOf('month').format('YYYY-MM-DD HH:mm:ss');
+const endDateDefault = moment().endOf('day').format('YYYY-MM-DD HH:mm:ss');
+
+const options = [
+  { label: 'Bar', value: 'bar' },
+  { label: 'Line', value: 'line' },
+];
+
 export function ProfitStatistics() {
   const [dateList, setDateList] = useState<any[]>()
   const [profitList, setProfitList] = useState<any[]>()
+  const [chartType, setChartType] = useState('line');
 
   const echartRef = useRef<any>(null)
-
   const cInstance = useRef<EChartsType>();
 
+  const getProfitStatistics = async (filterDate: string[]) => {
+    const res = await traderApi.getDailyProfit({
+      startDate: filterDate[0],
+      endDate: filterDate[1],
+    })
 
-  const getProfitStatistics = async () => {
-    const res = await traderApi.getDailyProfit({})
     if (res.code === 200) {
       const dateList: string[] = []
       const profitList: number[] = []
@@ -104,7 +53,7 @@ export function ProfitStatistics() {
   }
 
   useEffect(() => {
-    getProfitStatistics()
+    getProfitStatistics([startDateDefault, endDateDefault])
     cInstance.current = echarts.init(echartRef.current) as any;
   }, [])
 
@@ -117,33 +66,9 @@ export function ProfitStatistics() {
       yAxis: {
         type: 'value'
       },
-      series: [
-        {
-          data: profitList,
-          type: 'bar'
-        }
-      ],
-      tooltip: {
-        show: true,
-        confine: true,
-      },
-      label: {
-        show: true
-      }
-    };
-
-    /*
-    const option = {
-      xAxis: {
-        type: 'category',
-        data: dateList
-      },
-      yAxis: {
-        type: 'value'
-      },
       series: [{
         data: profitList,
-        type: 'line'
+        type: chartType
       }],
       tooltip: {
         show: true,
@@ -153,14 +78,25 @@ export function ProfitStatistics() {
         show: true
       }
     }
-    */
+
     cInstance.current && cInstance.current.setOption(option);
-  }, [profitList, dateList])
+
+  }, [profitList, dateList, chartType])
+
+  const onChangeRadioGroup = (val: any) => {
+    setChartType(val)
+  }
 
   return (
-    <>
-      <Header />
-      <Box ref={echartRef} style={{ height: 400 }} />
-    </>
+    <Box toCenterX mb='20px'>
+      {/* <Header /> */}
+      <Box w='90%'>
+        <Box flex justifyContent='space-between'>
+          <FilterProfitStatistics filterProfitCallback={getProfitStatistics} defaultDate={[startDateDefault, endDateDefault]} />
+          <RadioGroup options={options} onChange={onChangeRadioGroup} value={chartType} />
+        </Box>
+        <Box ref={echartRef} bg='#fafafa' h='500px' w='100%' />
+      </Box>
+    </Box>
   )
 }

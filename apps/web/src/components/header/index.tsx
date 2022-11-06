@@ -27,10 +27,6 @@ const Header = () => {
           </li>
 
           <li className='li'>
-            <NavLink to="/trade/statistics" className={pathname === '/trade/statistics' ? 'nav-active' : ''}>Statistics</NavLink>
-          </li>
-
-          <li className='li'>
             <NavLink to="/trade/balances" className={pathname === '/trade/balances' ? 'nav-active' : ''}>Balances</NavLink>
           </li>
 

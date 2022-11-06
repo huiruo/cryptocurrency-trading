@@ -63,7 +63,7 @@ export const MergeStrategyModal = NiceModal.create((props: Props) => {
       return
     }
 
-    const selectRow = get(selectRowData, `[0]`, {})
+    const selectRow = get(selectRowData, `[0]`, {}) as StrategiesOrder
     if (!selectRow.is_running) {
       toast.warning('This strategy was closed and cannot be updated')
 

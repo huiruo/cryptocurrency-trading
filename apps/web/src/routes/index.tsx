@@ -15,7 +15,6 @@ import { Strategies } from "@/pages/trade/strategies";
 import { AddAsset } from "@/pages/trade/add-asset";
 // import CrytoIncreaseCalculator from "@/pages/calculator/cryto-increase-calculator";
 import StockIncreaseCalculator from "@/pages/calculator/stock-increase-calculator";
-import { ProfitStatistics } from "@/pages/profit-statistics";
 
 const routesConfig = [
 	{
@@ -59,10 +58,12 @@ const routesConfig = [
 		path: 'trade/spot/order',
 		element: <SpotOrders />,
 	},
+	/*
 	{
 		path: 'trade/statistics',
 		element: <ProfitStatistics />,
 	},
+	*/
 	// == trade end== 
 ]
 
