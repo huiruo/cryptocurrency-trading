@@ -841,9 +841,9 @@ export class StrategyOrderService {
     }
   }
 
-  async getDailyProfit(startDate: string, endDate: string): Promise<Result> {
+  async getDailyProfit(startTime: string, endTime: string): Promise<Result> {
     const userId = 1
-    const sql = `select profit,profitRate,amount,date_format(time,'%Y-%m-%d') as time from daily_profit WHERE userId = "${userId}" and time between '${startDate}' and '${endDate}' order by time asc`
+    const sql = `select profit,profitRate,amount,date_format(time,'%Y-%m-%d') as time from daily_profit WHERE userId = "${userId}" and time between '${startTime}' and '${endTime}' order by time asc`
     const res = await this.dailyProfitRepo.query(sql)
 
     return { code: 200, message: 'sync profit statistics', data: res };

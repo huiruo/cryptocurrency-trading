@@ -1,5 +1,6 @@
 import { Exchange } from './exchange';
 import Binance from 'binance-api-node';
+import { isNullOrUndefined } from 'util';
 
 export class BaseServiceBiance {
   private client = Binance();
@@ -28,11 +29,21 @@ export class BaseServiceBiance {
   */
   async myTrades(options: any) {
     try {
-      return await this.client.myTrades(
-        options
-      );
+      const res = await this.client.myTrades(options);
+
+      return {
+        isSucceed: true,
+        msg: 'Success',
+        data: res
+      }
     } catch (error) {
-      throw new Error(error);
+
+      return {
+        isSucceed: false,
+        msg: error,
+        data: null
+      }
+      // throw new Error(error);
     }
   }
 

@@ -74,8 +74,8 @@ export class StrategyOrderController {
 
   @Post('getDailyProfit')
   async getDailyProfit(@Body() params: FilterDate): Promise<any> {
-    const { startDate, endDate } = params
+    const { startTime, endTime } = params
 
-    return await this.StrategyOrderService.getDailyProfit(startDate, endDate);
+    return await this.StrategyOrderService.getDailyProfit(startTime, endTime);
   }
 }

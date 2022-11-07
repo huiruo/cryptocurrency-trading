@@ -7,8 +7,8 @@ import { toast } from '@/common/toast';
 import moment from 'moment';
 
 interface Props {
-  filterProfitCallback: (selectDate: string[]) => void
-  defaultDate: string[]
+  filterProfitCallback: (selectTime: string[]) => void
+  defaultTime: string[]
 }
 
 /**
@@ -18,38 +18,38 @@ const { RangePicker } = DatePicker;
 const dateFormat = 'YYYY-MM-DD HH:mm:ss';
 
 export function FilterProfitStatistics(props: Props) {
-  const { filterProfitCallback, defaultDate } = props
-  const [selectDate, setSelectDate] = useState<string[]>([defaultDate[0], defaultDate[1]]);
+  const { filterProfitCallback, defaultTime } = props
+  const [selectTime, setSelectTime] = useState<string[]>([defaultTime[0], defaultTime[1]]);
 
   const handleDateChange = (_: any, dateString: string[]) => {
-    let startDate = ''
-    let endDate = ''
+    let startTime = ''
+    let endTime = ''
     if (dateString[0]) {
-      startDate = moment(dateString[0]).startOf('day').format('YYYY-MM-DD HH:mm:ss')
+      startTime = moment(dateString[0]).startOf('day').format('YYYY-MM-DD HH:mm:ss')
     }
 
     if (dateString[1]) {
-      endDate = moment(dateString[1]).endOf('day').format('YYYY-MM-DD HH:mm:ss')
+      endTime = moment(dateString[1]).endOf('day').format('YYYY-MM-DD HH:mm:ss')
     }
 
-    setSelectDate([startDate, endDate])
+    setSelectTime([startTime, endTime])
   }
 
   const onFilter = () => {
-    if (isEmpty(selectDate[0]) || isEmpty(selectDate[1])) {
+    if (isEmpty(selectTime[0]) || isEmpty(selectTime[1])) {
       toast.warning('Date is empty')
 
       return
     }
 
-    filterProfitCallback(selectDate)
+    filterProfitCallback(selectTime)
   }
 
   return (
     <Box my='10px' ml='10px'>
       <RangePicker
         onChange={handleDateChange}
-        defaultValue={[moment(defaultDate[0], dateFormat), moment(defaultDate[1], dateFormat)]}
+        defaultValue={[moment(defaultTime[0], dateFormat), moment(defaultTime[1], dateFormat)]}
       // picker="month"
       // format={dateFormat}
       />

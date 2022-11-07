@@ -42,8 +42,9 @@ export interface AssetType {
 
 export interface SyncSpotOrderParams {
   name: string
+  startTime: number
+  endTime: number
 }
-
 
 export interface CreateOrdersStrategy {
   userId: number
@@ -99,6 +100,6 @@ export interface FiterStrategyOrderType {
 }
 
 export interface FilterDate {
-  startDate: string
-  endDate: string
+  startTime: string
+  endTime: string
 }

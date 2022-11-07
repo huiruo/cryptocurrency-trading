@@ -12,8 +12,8 @@ import { RadioGroup } from '@/common/radio';
 /**
  * Code annotation
  */
-const startDateDefault = moment().month(moment().month() - 1).startOf('month').format('YYYY-MM-DD HH:mm:ss');
-const endDateDefault = moment().endOf('day').format('YYYY-MM-DD HH:mm:ss');
+const startTimeDefault = moment().month(moment().month() - 1).startOf('month').format('YYYY-MM-DD HH:mm:ss');
+const endTimeDefault = moment().endOf('day').format('YYYY-MM-DD HH:mm:ss');
 
 const options = [
   { label: 'Bar', value: 'bar' },
@@ -28,10 +28,10 @@ export function ProfitStatistics() {
   const echartRef = useRef<any>(null)
   const cInstance = useRef<EChartsType>();
 
-  const getProfitStatistics = async (filterDate: string[]) => {
+  const getProfitStatistics = async (filterTime: string[]) => {
     const res = await traderApi.getDailyProfit({
-      startDate: filterDate[0],
-      endDate: filterDate[1],
+      startTime: filterTime[0],
+      endTime: filterTime[1],
     })
 
     if (res.code === 200) {
@@ -53,7 +53,7 @@ export function ProfitStatistics() {
   }
 
   useEffect(() => {
-    getProfitStatistics([startDateDefault, endDateDefault])
+    getProfitStatistics([startTimeDefault, endTimeDefault])
     cInstance.current = echarts.init(echartRef.current) as any;
   }, [])
 
@@ -92,7 +92,7 @@ export function ProfitStatistics() {
       {/* <Header /> */}
       <Box w='90%'>
         <Box flex justifyContent='space-between'>
-          <FilterProfitStatistics filterProfitCallback={getProfitStatistics} defaultDate={[startDateDefault, endDateDefault]} />
+          <FilterProfitStatistics filterProfitCallback={getProfitStatistics} defaultTime={[startTimeDefault, endTimeDefault]} />
           <RadioGroup options={options} onChange={onChangeRadioGroup} value={chartType} />
         </Box>
         <Box ref={echartRef} bg='#fafafa' h='500px' w='100%' />

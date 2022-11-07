@@ -101,15 +101,33 @@ export class SpotService {
     };
   }
 
-  async syncSpotOrder(asset: SyncSpotOrderParams): Promise<Result> {
-    const info: any = await this.client.myTrades({
-      symbol: asset.name,
-      recvWindow: 59999,
-      // endTime: 1664467199999,
-      // startTime: 1662566400000,
-    });
+  async syncSpotOrder(spotOrderParams: SyncSpotOrderParams): Promise<Result> {
+    const { name, startTime, endTime } = spotOrderParams
+    let myTradesParams = {}
+    if (startTime && endTime) {
+      myTradesParams = {
+        symbol: name,
+        recvWindow: 59999,
+        startTime,
+        endTime,
+        // endTime: 1664467199999,
+        // startTime: 1662566400000,
+      }
+    } else {
+      myTradesParams = {
+        symbol: name,
+        recvWindow: 59999,
+      }
+    }
 
-    info.forEach(async (item) => {
+    const { isSucceed, msg, data } = await this.client.myTrades(myTradesParams);
+    if (!isSucceed) {
+      return { code: 599, message: 'More than 24 hours between startTime and endTime.', data: null };
+    }
+
+    console.log('spotOrderParams:', spotOrderParams, 'info:', data.length);
+
+    data.forEach(async (item) => {
       const { orderId } = item as any;
       // mock userId
       item.userId = 1;
@@ -155,5 +173,4 @@ export class SpotService {
 
     return { code: 200, message: 'ok', data: info };
   }
-
 }

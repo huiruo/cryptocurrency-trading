@@ -17,8 +17,8 @@ export class SpotController {
   }
 
   @Post('syncOrder')
-  async syncSpotOrder(@Body() asset: SyncSpotOrderParams): Promise<Result> {
-    return await this.SpotService.syncSpotOrder(asset);
+  async syncSpotOrder(@Body() spotOrderParams: SyncSpotOrderParams): Promise<Result> {
+    return await this.SpotService.syncSpotOrder(spotOrderParams);
   }
 
   @Post('resetOrderStatus')

@@ -25,7 +25,7 @@ export function SpotOrders() {
     spotTableRef.current.getOrders({ symbol: symbolAsset, currentPage: 1 }, true);
   }
 
-  const onSyncSpotOrder = async (value: string) => {
+  const onSyncSpotOrder = async (value: string, filterTime: number[]) => {
     const toaster = toast.loading('Sync spot order...', { showLayer: true })
     let assetName = value
     if (!value) {
@@ -33,7 +33,9 @@ export function SpotOrders() {
     }
 
     const params = {
-      name: assetName
+      name: assetName,
+      startTime: filterTime[0],
+      endTime: filterTime[1],
     }
 
     const res = await traderApi.syncSpotOrderApi(params)
@@ -46,7 +48,7 @@ export function SpotOrders() {
         duration: 1000,
       })
     } else {
-      toaster.update("Failed to sync spot orders", {
+      toaster.update(res.message, {
         type: 'error',
       })
     }
