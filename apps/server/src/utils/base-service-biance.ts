@@ -1,6 +1,5 @@
 import { Exchange } from './exchange';
 import Binance from 'binance-api-node';
-import { isNullOrUndefined } from 'util';
 
 export class BaseServiceBiance {
   private client = Binance();
@@ -37,7 +36,7 @@ export class BaseServiceBiance {
         data: res
       }
     } catch (error) {
-
+      console.log('error', error);
       return {
         isSucceed: false,
         msg: error,
@@ -83,17 +82,6 @@ export class BaseServiceBiance {
 
   async futuresAllOrders() {
     try {
-      /*
-      return await this.client.futuresOpenOrders({
-        symbol: 'BTCUSDT'
-      })
-      */
-
-      /*
-      "startTime": 1662912000000,
-      "endTime": 1664207999999,
-      recvWindow: 1000 * 10
-      */
       return await this.client.futuresAllOrders({
         symbol: 'BTCUSDT',
         recvWindow: 59999,

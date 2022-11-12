@@ -4,11 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { get, isEmpty } from 'lodash';
 import { Result } from 'src/common/result.interface';
 import { SearchParmas, SyncSpotOrderParams } from 'src/common/types';
-import { TraderApi } from 'src/entity/api.entity';
-import { TradeAsset } from 'src/entity/asset.entity';
-import { DailyProfit } from 'src/entity/daily.profit.entity';
 import { SpotOrder } from 'src/entity/spot-order.entity';
-import { StrategyOrder } from 'src/entity/strategy-order.entity';
 import { StrategyOrderId } from 'src/entity/strategy-orderid.entity';
 import { BaseServiceBiance } from 'src/utils/base-service-biance';
 import { Repository } from 'typeorm';
@@ -22,20 +18,8 @@ export class SpotService {
     @InjectRepository(SpotOrder)
     private readonly spotOrderRepo: Repository<SpotOrder>,
 
-    @InjectRepository(StrategyOrder)
-    private readonly strategiesOrderRepo: Repository<StrategyOrder>,
-
     @InjectRepository(StrategyOrderId)
     private readonly strategyOrderIdRepo: Repository<StrategyOrderId>,
-
-    @InjectRepository(TradeAsset)
-    private readonly tradeAssetRepo: Repository<TradeAsset>,
-
-    @InjectRepository(TraderApi)
-    private readonly traderApiRepo: Repository<TraderApi>,
-
-    @InjectRepository(DailyProfit)
-    private readonly dailyProfitRepo: Repository<DailyProfit>,
   ) {
     this.initBinanceApi();
   }
@@ -63,8 +47,8 @@ export class SpotService {
     await this.strategyOrderIdRepo.query(sql);
   }
 
-  private async findSpotOrderUtil(orderId: number): Promise<SpotOrder> {
-    const sql = `select symbol,orderId from spot_order where orderId='${orderId}'`;
+  private async findSpotOrderUtil(id: number): Promise<SpotOrder> {
+    const sql = `select symbol,orderId from spot_order where id='${id}'`;
     const futureOrder = await this.spotOrderRepo.query(sql);
     return get(futureOrder, '[0]', {});
   }
@@ -103,42 +87,40 @@ export class SpotService {
 
   async syncSpotOrder(spotOrderParams: SyncSpotOrderParams): Promise<Result> {
     const { name, startTime, endTime } = spotOrderParams
-    let myTradesParams = {}
+    let options = {}
     if (startTime && endTime) {
-      myTradesParams = {
+      options = {
         symbol: name,
         recvWindow: 59999,
         startTime,
         endTime,
-        // endTime: 1664467199999,
-        // startTime: 1662566400000,
       }
     } else {
-      myTradesParams = {
+      options = {
         symbol: name,
         recvWindow: 59999,
       }
     }
 
-    const { isSucceed, msg, data } = await this.client.myTrades(myTradesParams);
+    const { isSucceed, msg, data } = await this.client.myTrades(options);
     if (!isSucceed) {
       return { code: 599, message: 'More than 24 hours between startTime and endTime.', data: null };
     }
 
     console.log('spotOrderParams:', spotOrderParams, 'info:', data.length);
 
-    data.forEach(async (item) => {
-      const { orderId } = item as any;
+    for (const item of data) {
+      const { id } = item as any;
       // mock userId
       item.userId = 1;
-      const existSpotOrder = await this.findSpotOrderUtil(orderId);
+      const existSpotOrder = await this.findSpotOrderUtil(id);
       if (isEmpty(existSpotOrder)) {
         console.log('=== not exist spotOrder,insert... ===');
         this.savaSpotOrderUtil(item);
       } else {
         console.log('=== exist spotOrder,skip... ===');
       }
-    });
+    };
 
     return { code: 200, message: 'ok', data: null };
   }
@@ -165,10 +147,7 @@ export class SpotService {
 
   async getSpotAllOrders(): Promise<Result> {
     const info = await this.client.allOrders({
-      // symbol: 'BTCUSDT',
       symbol: 'BTCBUSD',
-      // endTime: 1664467199999,
-      // startTime: 1662566400000,
     });
 
     return { code: 200, message: 'ok', data: info };

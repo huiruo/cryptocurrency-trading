@@ -263,7 +263,7 @@ export const SpotTable = forwardRef((props: Props, ref) => {
       pageSize: pageSize,
       symbol: ''
     }
-    setCurrentPage(currentPage)
+    setCurrentPage(page)
     getSpotOrders(params)
   }
 

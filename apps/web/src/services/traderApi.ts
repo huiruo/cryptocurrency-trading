@@ -7,16 +7,10 @@ interface resType {
 	message?: string
 }
 
-interface onLoginType {
-	data: any,
-	code?: number,
-	message?: string
-}
-
 const traderApi = {
 	onLogin(data: any) {
 		const url = `${traderApiUrl}/trader/user/login`;
-		return http.post<onLoginType>(data, url);
+		return http.post<resType>(data, url);
 	},
 
 	getAssetApi() {
