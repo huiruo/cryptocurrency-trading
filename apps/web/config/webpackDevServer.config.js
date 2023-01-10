@@ -104,7 +104,7 @@ module.exports = function (proxy, allowedHost) {
     proxy: {
       "/traderUrl": {
         // home
-        target: "http://192.168.1.106:1788",
+        target: "http://192.168.1.107:1788",
         // company
         // target: "http://192.168.92.35:1788",
         // man
