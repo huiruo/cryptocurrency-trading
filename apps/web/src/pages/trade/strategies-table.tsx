@@ -135,6 +135,16 @@ export const StrategiesTable = forwardRef((props: Props, ref) => {
       },
     },
     {
+      id: 'realizedProfit', title: 'Final profit', dataIndex: '', key: 'profit', width: 100,
+      render(item: StrategiesOrder) {
+        return <Box w='100px'>
+          {item.is_running ? 'Running' : <span>
+            {item.realizedProfit} {item.realizedProfitRate}
+          </span>}
+        </Box>
+      },
+    },
+    {
       id: 'profit', title: 'Profit', dataIndex: '', key: 'profit', width: 200,
       render(item: StrategiesOrder) {
         return (
@@ -146,16 +156,6 @@ export const StrategiesTable = forwardRef((props: Props, ref) => {
     },
     {
       id: 'free', title: 'Free', dataIndex: 'free', key: 'free', width: 100,
-    },
-    {
-      id: 'realizedProfit', title: 'Final profit', dataIndex: '', key: 'profit', width: 100,
-      render(item: StrategiesOrder) {
-        return <Box w='100px'>
-          {item.is_running ? 'Running' : <span>
-            {item.realizedProfit} {item.realizedProfitRate}
-          </span>}
-        </Box>
-      },
     },
     {
       id: 'entryPrice', title: 'Trade price', dataIndex: '', key: 'entryPrice', width: 100,
