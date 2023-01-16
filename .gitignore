@@ -19,6 +19,18 @@
 *.tar.gz
 *.rar
 
+# qt
+.qm
+.vs
+debug
+trading.pro.user
+trading.vcxproj.user
+release
+*.sln
+*.vcxproj
+trading.vcxproj.filters
+.qmake.stash
+
 # secret
 secret-document
 apps/server-java/src/main/resources/application-prod.properties
