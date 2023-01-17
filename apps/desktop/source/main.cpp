@@ -6,7 +6,7 @@
 #include <QTranslator>
 
 #include "../include/AppManager.h"
-#include "../include/pcpp.h"
+#include "../include/Manager.h"
 
 int main(int argc, char *argv[])
 {
@@ -50,8 +50,8 @@ int main(int argc, char *argv[])
     engine.load(url);
 
     QQmlContext *context = engine.rootContext();
-    PCpp *damo1 = new PCpp();
-    context->setContextProperty("Demo1",damo1);
+    Manager *connection  = new Manager();
+    context->setContextProperty("manager",connection);
 
     return app.exec();
 }

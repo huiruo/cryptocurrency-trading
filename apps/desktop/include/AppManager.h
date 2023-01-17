@@ -9,6 +9,7 @@ class AppManager : public QObject
 {
   Q_OBJECT
   // 注册属性，使之可以在QML中访问--具体语法百度Q_PROPERTY
+  // Q_PROPERTY 注册类型为QString 的ss属性，可以在QML中初始化, NOTIFY表示修改之后会触发的信号
   Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
   Q_PROPERTY(int year READ getYear WRITE setYear NOTIFY yearChanged)
 

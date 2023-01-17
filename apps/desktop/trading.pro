@@ -5,9 +5,9 @@ QT += quick network
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        source/AppManager.cpp \
-        source/PCpp.cpp \
-        source/main.cpp
+        source/appManager.cpp \
+        source/main.cpp \
+        source/manager.cpp
 
 RESOURCES += qml.qrc
 
@@ -29,4 +29,4 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     include/AppManager.h \
-    include/pcpp.h
+    include/Manager.h

@@ -28,13 +28,43 @@ Window {
       text:"Button"
       onClicked: {
         console.log("test1:",cpp_obj.name)
-        console.log("test1:",cpp_obj.year)
-
+        console.log("test2:",cpp_obj.year)
+        console.log("test5:",manager.total)
         // console.log("test1:",cpp_obj.getYear())
         let testArr1 = [1, 2, 3];
-        console.log("test2:",testArr1)
-
-        Demo1.showLog()
+        // console.log("test2:",testArr1)
       }
+    }
+
+    Button{
+      text:"get coin"
+      onClicked: {
+        manager.getCoins()
+      }
+    }
+
+    Button{
+      x:20
+      y:20
+      text:"get strategy"
+      onClicked: {
+        manager.getStrategy(null);
+      }
+    }
+
+    Text {
+      x:400
+      y:100
+      width: 100; height: 25
+      text: qsTr("修改 m_nAge：")
+      verticalAlignment: Text.AlignVCenter
+    }
+
+    Text {
+      x:400
+      y:200
+      width: 100; height: 25
+      text: { manager.total }
+      verticalAlignment: Text.AlignVCenter
     }
 }
