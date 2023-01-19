@@ -2,6 +2,8 @@ import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.5
 import MyAppManager 1.0
+import StrategyOrder 1.0
+//import Manager
 
 Window {
     width: 640
@@ -10,9 +12,10 @@ Window {
     title: qsTr("Trading")
     // 作为一个QML对象
     AppManager{
-        id:cpp_obj
+        id: cpp_obj
         // 也可以像原生QML对象一样操作，增加属性之类的
         property int counts: 0
+        // myYear:22
         onYearChanged: {
             counts++
             console.log('qml onYearChanged',counts)
@@ -22,17 +25,27 @@ Window {
         }
     }
 
+    StrategyOrder{
+        id: strategyOrder
+        Component.onCompleted: {
+            console.log('StrategyOrder:','12')
+        }}
+
     Button{
       x:100
       y:100
       text:"Button"
       onClicked: {
-        console.log("test1:",cpp_obj.name)
-        console.log("test2:",cpp_obj.year)
-        console.log("test5:",manager.total)
+        console.log('=========start');
+        strategyOrder.sendSignal()
+        strategyOrder.changeTotal(strategyOrder.total+1)
+        console.log("qml 1:",cpp_obj.name)
+        console.log("qml 2:",cpp_obj.year)
+        console.log("qml 3:",manager.total)
         // console.log("test1:",cpp_obj.getYear())
-        let testArr1 = [1, 2, 3];
+        // let testArr1 = [1, 2, 3];
         // console.log("test2:",testArr1)
+        console.log('=========end');
       }
     }
 
@@ -59,12 +72,21 @@ Window {
       text: qsTr("修改 m_nAge：")
       verticalAlignment: Text.AlignVCenter
     }
-
     Text {
       x:400
-      y:200
+      y:300
       width: 100; height: 25
-      text: { manager.total }
+      text: {`${strategyOrder.total}-${manager.total}`}
       verticalAlignment: Text.AlignVCenter
     }
+
+    /*
+    ListView {
+      width: 180; height: 200
+      model: OrderModel {}
+      delegate: Text {
+          text: name + ": " + number
+      }
+    }
+    */
 }

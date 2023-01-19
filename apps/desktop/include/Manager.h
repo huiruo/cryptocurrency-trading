@@ -15,8 +15,8 @@ public:
   explicit Manager(QObject *parent = 0);
   // void replyFinished(QNetworkReply* reply,int type);
   // void replyFinished(QNetworkReply* reply);
-  int replyFinished(QNetworkReply* reply);
-  void createRqust(QString url,int type);
+  int replyFinished(QNetworkReply *reply);
+  void createRqust(QString url, int type);
   // Q_INVOKABLE void sendGetRequest();
   Q_INVOKABLE void getCoins();
   Q_INVOKABLE int getStrategy(void);
@@ -25,8 +25,8 @@ public:
   int getTotal() const;
 
 signals:
-	// 信号可以在QML中访问
-	void totalChanged(int year);
+  // 淇″彿鍙互qml璁块棶
+  void totalChanged(int year);
 
 private:
   QString myName;

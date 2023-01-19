@@ -7,7 +7,8 @@ QT += quick network
 SOURCES += \
         source/appManager.cpp \
         source/main.cpp \
-        source/manager.cpp
+        source/manager.cpp \
+        source/strategyOrder.cpp
 
 RESOURCES += qml.qrc
 
@@ -29,4 +30,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     include/AppManager.h \
-    include/Manager.h
+    include/Manager.h \
+    include/StrategyOrder.h

@@ -7,6 +7,7 @@
 
 #include "../include/AppManager.h"
 #include "../include/Manager.h"
+#include "../include/StrategyOrder.h"
 
 int main(int argc, char *argv[])
 {
@@ -33,6 +34,7 @@ int main(int argc, char *argv[])
     arg4:QML类型名
     */
     qmlRegisterType<AppManager>("MyAppManager",1,0,"AppManager");
+    qmlRegisterType<StrategyOrder>("StrategyOrder",1,0,"StrategyOrder");
 
     QQmlApplicationEngine engine;
 
