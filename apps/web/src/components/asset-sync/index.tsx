@@ -4,7 +4,7 @@ import { Button } from '@/common/button';
 import { useNavigate } from 'react-router-dom';
 import { Asset } from '../asset';
 import moment from 'moment';
-import { DatePicker } from 'antd';
+import { DatePicker as MyDatePicker } from 'antd';
 
 interface Props {
   spotCallBack: (value: string, selectTime: number[]) => void
@@ -15,6 +15,8 @@ interface Props {
 const startTimeDefault = Number(moment().startOf('day').format('x'));
 const endTimeDefault = Number(moment().endOf('day').format('x'));
 const dateFormat = 'YYYY-MM-DD HH:mm:ss';
+
+let DatePicker: any = MyDatePicker
 const { RangePicker } = DatePicker;
 
 /**

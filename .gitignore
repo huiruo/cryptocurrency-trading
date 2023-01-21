@@ -30,6 +30,7 @@ release
 *.vcxproj
 trading.vcxproj.filters
 .qmake.stash
+build-trading-Desktop_Qt_6_4_2_MSVC2019_64bit-Debug
 
 # secret
 secret-document
@@ -128,3 +129,6 @@ trade-data-analyse/.idea/
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+server-java/src/main/resources/application-prod.properties
+server/.env
+server/config/env-prod/application-prod.env

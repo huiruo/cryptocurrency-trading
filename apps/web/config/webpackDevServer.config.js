@@ -1,4 +1,4 @@
-'use strict';
+
 
 const fs = require('fs');
 const evalSourceMapMiddleware = require('react-dev-utils/evalSourceMapMiddleware');
@@ -104,7 +104,7 @@ module.exports = function (proxy, allowedHost) {
     proxy: {
       "/traderUrl": {
         // home
-        target: "http://192.168.1.107:1788",
+        target: "http://192.168.0.108:1788",
         // company
         // target: "http://192.168.92.35:1788",
         // man

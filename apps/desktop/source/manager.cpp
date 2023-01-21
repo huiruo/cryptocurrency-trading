@@ -8,6 +8,10 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
+#include "../include/level.h"
+#include "../include/Character.h"
+#include <QRandomGenerator>
+
 const QString strategiesOrderApi = "strategy/order/getOrder";
 const QString codelistApi = "data/center/codelist";
 
@@ -46,7 +50,7 @@ void Manager::getCoins()
 void Manager::createRqust(QString url, int type)
 {
     QNetworkRequest requestInfo;
-    QString baseUrl = "http://192.168.1.107:1788/";
+    QString baseUrl = "http://192.168.0.108:1788/";
     requestInfo.setUrl(QUrl(baseUrl + url));
     requestInfo.setRawHeader("Content-Type", "application/json");
 
@@ -74,7 +78,7 @@ void Manager::createRqust(QString url, int type)
 int Manager::replyFinished(QNetworkReply *reply)
 {
     QString url = reply->url().toString();
-    QString baseUrl = "http://192.168.1.107:1788/";
+    QString baseUrl = "http://192.168.0.108:1788/";
     QString urlTail = url.mid(baseUrl.length());
     qDebug() << "operation:" << reply->operation();
     qDebug() << "url:" << url;
@@ -123,9 +127,34 @@ int Manager::replyFinished(QNetworkReply *reply)
                             QJsonObject rootDataValue = rootObj.value("data").toObject();
                             int total = rootDataValue.value("total").toInt();
                             QJsonArray list = rootDataValue.value("res").toArray();
+
                             Manager::setTotal(total);
                             qDebug() << total;
-                            qDebug() << list;
+                            // qDebug() << list;
+                            // QList<StrategyOrder> dungeonNpcs;
+                            // dungeonNpcs.reserve(2);
+
+                            Level dungeon(QStringLiteral("Dungeon"));
+                            QList<Character> dungeonNpcs;
+                            const int listLength = list.size();
+                            dungeonNpcs.reserve(3);
+                            for (int listIndex = 0; listIndex < listLength; ++listIndex)
+                            {
+                                /*
+                                QJsonObject npcObject = npcArray[npcIndex].toObject();
+                                Character npc;
+                                npc.read(npcObject);
+                                mNpcs.append(npc);
+                                */
+                                dungeonNpcs.append(Character(QStringLiteral("Eric the Evil"),
+                                                             QRandomGenerator::global()->bounded(18, 26),
+                                                             Character::Mage));
+                                qDebug() << "======";
+                                // qDebug() << listIndex;
+                                qDebug() << list[listIndex];
+                            }
+                            dungeon.setNpcs(dungeonNpcs);
+                            // dungeon.setName("test name");
                         }
                     }
                     else

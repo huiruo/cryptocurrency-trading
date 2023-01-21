@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DatePicker } from 'antd';
+import { DatePicker as MyDatePicker } from 'antd';
 import { Box } from '@fower/react';
 import { Button } from '@/common/button/Button';
 import { isEmpty } from 'lodash';
@@ -14,6 +14,7 @@ interface Props {
 /**
  * Code annotation
  */
+let DatePicker: any = MyDatePicker
 const { RangePicker } = DatePicker;
 const dateFormat = 'YYYY-MM-DD HH:mm:ss';
 
