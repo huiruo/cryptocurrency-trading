@@ -34,7 +34,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     include/AppManager.h \
     include/Manager.h \
-    include/StrategyOrder.h \
     include/character.h \
     include/level.h \
     include/todolist.h \

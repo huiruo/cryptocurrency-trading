@@ -9,7 +9,7 @@
 #include <QJsonArray>
 
 #include "../include/level.h"
-#include "../include/Character.h"
+#include "../include/character.h"
 #include <QRandomGenerator>
 
 const QString strategiesOrderApi = "strategy/order/getOrder";
