@@ -9,8 +9,8 @@
 #include "../include/AppManager.h"
 #include "../include/Manager.h"
 
-#include "../include/todomodel.h"
-#include "../include/todolist.h"
+#include "../include/stgyordermodel.h"
+#include "../include/stgyorderlist.h"
 
 int main(int argc, char *argv[])
 {
@@ -19,10 +19,10 @@ int main(int argc, char *argv[])
 #endif
     QGuiApplication app(argc, argv);
 
-    qmlRegisterType<ToDoModel>("ToDo", 1, 0, "ToDoModel");
-    qmlRegisterUncreatableType<ToDoList>("ToDo", 1, 0, "ToDoList", QStringLiteral("TodoList cannot be created"));
+    qmlRegisterType<StgyOrderModel>("ToDo", 1, 0, "StgyOrderModel");
+    qmlRegisterUncreatableType<StgyOrderList>("ToDo", 1, 0, "StgyOrderList", QStringLiteral("StgyOrderList cannot be created"));
 
-    ToDoList toDoList;
+    StgyOrderList stgyorderlist;
 
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
 
-    engine.rootContext()->setContextProperty(QStringLiteral("toDoList"), &toDoList);
+    engine.rootContext()->setContextProperty(QStringLiteral("myStgyorderlist"), &stgyorderlist);
 
     // 也可以注册为qml全局对象
     //  AppManager *appManager = new AppManager();

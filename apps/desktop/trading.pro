@@ -10,8 +10,8 @@ SOURCES += \
         source/level.cpp \
         source/main.cpp \
         source/manager.cpp \
-        source/todolist.cpp \
-        source/todomodel.cpp
+        source/stgyorderlist.cpp \
+        source/stgyordermodel.cpp
 
 RESOURCES += qml.qrc
 
@@ -36,5 +36,5 @@ HEADERS += \
     include/Manager.h \
     include/character.h \
     include/level.h \
-    include/todolist.h \
-    include/todomodel.h
+    include/stgyorderlist.h \
+    include/stgyordermodel.h

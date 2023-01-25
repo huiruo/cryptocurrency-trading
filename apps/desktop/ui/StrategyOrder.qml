@@ -9,9 +9,8 @@ ColumnLayout{Frame{
             implicitHeight: 300
             clip: true
             // model: StrategyOrderModel{}
-            // model: StrategyOrderModel{}
-            model: ToDoModel{
-                list: toDoList
+            model: StgyOrderModel{
+                list: myStgyorderlist
             }
             delegate: RowLayout {
                 width:parent.width
@@ -32,12 +31,12 @@ ColumnLayout{Frame{
         Button{
             text: qsTr("Add new item")
             Layout.fillWidth: true
-            onClicked: toDoList.appendItem()
+            onClicked: myStgyorderlist.appendItem()
         }
         Button{
             text: qsTr("Remove item")
             Layout.fillWidth: true
-            onClicked: toDoList.removeCompletedItems()
+            onClicked: myStgyorderlist.removeCompletedItems()
         }
     }
 }
