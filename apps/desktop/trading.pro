@@ -5,13 +5,13 @@ QT += quick network
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        include/strategyordermodel.cpp \
         source/appManager.cpp \
         source/character.cpp \
         source/level.cpp \
         source/main.cpp \
         source/manager.cpp \
-        source/strategyOrder.cpp
+        source/todolist.cpp \
+        source/todomodel.cpp
 
 RESOURCES += qml.qrc
 
@@ -37,4 +37,5 @@ HEADERS += \
     include/StrategyOrder.h \
     include/character.h \
     include/level.h \
-    include/strategyordermodel.h
+    include/todolist.h \
+    include/todomodel.h

@@ -1,17 +1,23 @@
-#ifndef STRATEGYORDERMODEL_H
-#define STRATEGYORDERMODEL_H
+#ifndef TODOMODEL_H
+#define TODOMODEL_H
+#include "todolist.h"
 
 #include <QAbstractListModel>
 
-class StrategyOrderModel : public QAbstractListModel
+// class ToDoList;
+
+class ToDoModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_PROPERTY(ToDoList *list READ list WRITE setList)
+
 public:
-    explicit StrategyOrderModel(QObject *parent = nullptr);
+    explicit ToDoModel(QObject *parent = nullptr);
     enum {
       DoneRole = Qt::UserRole,
       DescriptionRole
     };
+
     // Basic functionality:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
@@ -25,7 +31,11 @@ public:
 
     virtual QHash<int,QByteArray> roleNames() const override;
 
+    ToDoList *list() const;
+    void setList(ToDoList *newList);
+
 private:
+    ToDoList *mlist;
 };
 
-#endif // STRATEGYORDERMODEL_H
+#endif // TODOMODEL_H
