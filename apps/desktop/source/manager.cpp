@@ -32,6 +32,38 @@ int Manager::getTotal() const
     return total;
 }
 
+// new start
+void Manager::setLevels(QList<Level> levels)
+{
+    // if (mLevels == levels)
+    // return;
+    mLevels = levels;
+    emit levelsChanged(levels);
+}
+
+QList<Level> Manager::getLevels() const
+{
+    qDebug() << "getLevels()==> start";
+    qDebug() << mLevels.length();
+
+    for (Level pt : mLevels)
+    {
+        qDebug() << mLevels.size() << "===长度";
+        qDebug() << pt.getName();
+        QList<Character> npcs = pt.npcs();
+        qDebug() << npcs.size() << "===npcs长度";
+        for (Character npc : npcs)
+        {
+            // qDebug() << npc.name() << "npc==打印";
+            qDebug() << npc.level() << "npc==打印";
+        }
+    }
+
+    qDebug() << "getLevels()==> end";
+    return mLevels;
+}
+// new end
+
 int Manager::getStrategy(void)
 {
     qDebug() << "test2:";
@@ -50,7 +82,7 @@ void Manager::getCoins()
 void Manager::createRqust(QString url, int type)
 {
     QNetworkRequest requestInfo;
-    QString baseUrl = "http://192.168.0.108:1788/";
+    QString baseUrl = "http://192.168.0.107:1788/";
     requestInfo.setUrl(QUrl(baseUrl + url));
     requestInfo.setRawHeader("Content-Type", "application/json");
 
@@ -78,7 +110,7 @@ void Manager::createRqust(QString url, int type)
 int Manager::replyFinished(QNetworkReply *reply)
 {
     QString url = reply->url().toString();
-    QString baseUrl = "http://192.168.0.108:1788/";
+    QString baseUrl = "http://192.168.0.107:1788/";
     QString urlTail = url.mid(baseUrl.length());
     qDebug() << "operation:" << reply->operation();
     qDebug() << "url:" << url;
@@ -129,8 +161,8 @@ int Manager::replyFinished(QNetworkReply *reply)
                             QJsonArray list = rootDataValue.value("res").toArray();
 
                             Manager::setTotal(total);
-                            qDebug() << total;
-                            // qDebug() << list;
+                            qDebug() << total << "====";
+                            qDebug() << rootDataValue.value("res");
                             // QList<StrategyOrder> dungeonNpcs;
                             // dungeonNpcs.reserve(2);
 
@@ -141,20 +173,19 @@ int Manager::replyFinished(QNetworkReply *reply)
                             for (int listIndex = 0; listIndex < listLength; ++listIndex)
                             {
                                 /*
-                                QJsonObject npcObject = npcArray[npcIndex].toObject();
-                                Character npc;
-                                npc.read(npcObject);
-                                mNpcs.append(npc);
-                                */
                                 dungeonNpcs.append(Character(QStringLiteral("Eric the Evil"),
                                                              QRandomGenerator::global()->bounded(18, 26),
                                                              Character::Mage));
-                                qDebug() << "======";
-                                // qDebug() << listIndex;
-                                qDebug() << list[listIndex];
+                                */
+                                dungeonNpcs.append(Character(QStringLiteral("Eric the Evil"),
+                                                             listIndex,
+                                                             Character::Mage));
+                                qDebug() << listLength << "aa======";
+                                qDebug() << list[listIndex] << "====for end====";
                             }
                             dungeon.setNpcs(dungeonNpcs);
-                            // dungeon.setName("test name");
+                            dungeon.setName("test name");
+                            mLevels.append(dungeon);
                         }
                     }
                     else

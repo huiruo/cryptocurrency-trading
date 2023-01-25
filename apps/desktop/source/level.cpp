@@ -10,6 +10,27 @@ Level::Level(const QString &name) : mName(name)
 {
 }
 
+
+// new start
+void Level::setName(const QString name)
+{
+  qDebug() << "Level::setName" << name;
+  if (mName != name)
+  {
+    // qDebug() << "emit nameChanged";
+    mName = name;
+    // emit nameChanged(name);
+  }
+}
+
+QString Level::getName() const
+{
+  qDebug() << "Level::getName";
+  return mName;
+}
+// new end
+// new end
+
 QString Level::name() const
 {
   return mName;

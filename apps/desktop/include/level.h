@@ -26,6 +26,14 @@ public:
 
   void print(int indentation = 0) const;
 
+  // new start
+  // 给类属性添加访问方法--myName
+  void setName(const QString name);
+  QString getName() const;
+// QList<Character> npcs() const;
+// void setNpcs(const QList<Character> &npcs);
+  // new end
+
 private:
   QString mName;
   QList<Character> mNpcs;
