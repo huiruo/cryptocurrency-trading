@@ -1,5 +1,5 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import {env,envNumber} from '../src/utils/env-unit'
+import { env, envNumber } from '../src/utils/env-unit'
 
 /*
 const HOST_PROD = env('host_prod')
@@ -16,7 +16,7 @@ const DATABASE_DEV = env('database_dev')
 //读取.env并格式化配置，同时第二个参数可设置默认值
 //console.log("读取配置：",envNumber('APP_PORT', 3000))
 */
-const localConfig:TypeOrmModuleOptions={
+const localConfig: TypeOrmModuleOptions = {
   type: "mysql",
   host: env('host_dev'),
   port: envNumber('port_dev'),
@@ -24,11 +24,11 @@ const localConfig:TypeOrmModuleOptions={
   password: env('password_dev'),
   database: env('database_dev'),
   entities: ["dist/**/*.entity{.ts,.js}"],
-  connectTimeout:60000,
+  connectTimeout: 60000,
   synchronize: false
 }
 
-const productConfig:TypeOrmModuleOptions={
+const productConfig: TypeOrmModuleOptions = {
   type: "mysql",
   host: env('host_prod'),
   port: envNumber('port_prod'),
@@ -36,13 +36,14 @@ const productConfig:TypeOrmModuleOptions={
   password: env('password_prod'),
   database: env('database_prod'),
   entities: ["dist/**/*.entity{.ts,.js}"],
-  connectTimeout:60000,
+  connectTimeout: 60000,
   synchronize: false
 }
 
 //const config =process.env.NODE_ENV==='prod'?productConfig:localConfig;
+const config = process.env.NODE_ENV === 'prod' ? productConfig : localConfig;
+console.log('config:', config)
 //远程连不上，写死本地数据库
-// const config =process.env.NODE_ENV==='dev'?productConfig:localConfig;
-const config =localConfig;
+// const config =localConfig;
 
 export default config;
