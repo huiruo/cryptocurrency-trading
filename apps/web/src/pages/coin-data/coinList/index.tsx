@@ -4,7 +4,7 @@ import { formatUnixTime } from '@/utils';
 import { Button } from '@/common/button';
 import { Box } from '@fower/react';
 import { Input } from '@/common/input';
-import { Table } from '@/common/table';
+import { Pagination, Table as AntTable } from 'antd';
 import Header from '@/components/header';
 import { useDocumentTitle } from '@/utils/useDocumentTitle';
 import { useNavigate } from 'react-router-dom';
@@ -21,8 +21,10 @@ interface Props {
 export function CoinList() {
 
   const [coinData, setCoinData] = useState<any>([])
-  const [currentPage, setCurrentPage] = useState(1)
   const [searchSymbol, setSearchSymbol] = useState<string>('')
+  const [total, setTotal] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   const navigate = useNavigate();
 
@@ -37,16 +39,6 @@ export function CoinList() {
       code: item.code
     }
     await traderApi.syncCoinInfoApi(data)
-  }
-
-  const onNextPage = () => {
-    setCurrentPage(currentPage + 1)
-    getCoin(currentPage + 1)
-  }
-
-  const onPrePage = () => {
-    setCurrentPage(currentPage - 1)
-    getCoin(currentPage - 1)
   }
 
   const columns = [
@@ -84,10 +76,11 @@ export function CoinList() {
       currentPage: currentPage || 1,
       pageSize: pageSize || 10
     }
-    const res = await traderApi.getCoinApi(data)
 
-    setCoinData(res)
+    const res = await traderApi.getCoinApi(data)
     if (res.code === 200) {
+      setCoinData(res.data.res)
+      setTotal(res.data.total)
     } else {
       alert("Sync failed")
     }
@@ -99,6 +92,22 @@ export function CoinList() {
 
   const onAddCode = () => {
     navigate('/coin/addCode')
+  }
+
+  const onShowSizeChange = (page: number, pageSize: number) => {
+    setPageSize(pageSize)
+    setCurrentPage(page)
+  }
+
+  const onChangePage = (page: number, pageSize: number) => {
+    console.log('onChangePage page, pageSize', page, pageSize)
+    setCurrentPage(page)
+    // const params = {
+    //   currentPage: page,
+    //   pageSize: pageSize,
+    //   symbol: '',
+    // }
+    getCoin(page, pageSize)
   }
 
   useEffect(() => {
@@ -129,13 +138,27 @@ export function CoinList() {
 
         <Box toCenterX>
           <Box className='table-box-container'>
-            <Table columns={columns} data={coinData} className='table-box' />
+            <AntTable
+              columns={columns}
+              dataSource={coinData}
+              className='table-box'
+              pagination={false}
+            />
           </Box>
         </Box>
 
         <Box toCenterX mt='20px' mb='20px'>
           <Box w='90%'>
-            <Button onClick={onPrePage}>Previous page</Button>  Current Page：{currentPage} <Button onClick={onNextPage}>Next page</Button>
+            {/* <Button onClick={onPrePage}>Previous page</Button>  Current Page：{currentPage} <Button onClick={onNextPage}>Next page</Button> */}
+            <Pagination
+              current={currentPage}
+              total={total}
+              pageSizeOptions={["10", "20", "40"]}
+              showTotal={total => `Total:${total}`}
+              showSizeChanger={true}
+              onChange={onChangePage}
+              onShowSizeChange={onShowSizeChange}
+            />
           </Box>
         </Box>
       </Box>

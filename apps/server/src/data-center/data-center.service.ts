@@ -103,7 +103,16 @@ export class DataCenterService {
     const sql = `select * from coin order by ranked asc limit ${(currentPage - 1) * pageSize
       },${pageSize}`;
 
-    return await this.coninRepo.query(sql);
+    const pageRes = await this.spotOrderRepo.query(`select count(1) as total from coin`);
+    const res = await this.coninRepo.query(sql);
+
+    return {
+      code: 200, message: 'ok', data:
+      {
+        total: Number(get(pageRes, '[0].total', 0)),
+        res: res
+      }
+    };
   }
 
   async getSymbol(symbol: string) {

@@ -241,14 +241,13 @@ export const StrategiesTable = forwardRef((props: Props, ref) => {
       symbol: '',
       is_running: selectStatusValue
     }
-    setCurrentPage(currentPage)
+    setCurrentPage(page)
     getStrategies(params)
   }
 
   const rowSelection = {
     selectedRowKeys,
     onChange: (selectedRowKeys: React.Key[], selectedRows: StrategiesOrder[]) => {
-      // console.log(`${selectedRowKeys}`, '--', 'selectedRows: ', selectedRows);
       setSelectedRowKeys(selectedRowKeys);
       setSelectRowData(selectedRows)
     },
@@ -267,9 +266,11 @@ export const StrategiesTable = forwardRef((props: Props, ref) => {
   return (
     <Box className='table-box-container' mt-10px>
       <AntTable
-        rowSelection={rowSelection}
+        className='table-box'
         rowKey="id"
-        columns={columns} dataSource={strategies} className='table-box'
+        rowSelection={rowSelection}
+        columns={columns}
+        dataSource={strategies}
         pagination={false}
       />
 

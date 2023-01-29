@@ -58,6 +58,14 @@ export function FutureTable(props: Props) {
         </Box>
       },
     },
+    { id: 'closePosition', title: 'closePosition', dataIndex: 'closePosition', key: 'closePosition', width: 100 },
+    {
+      id: 'closePosition', title: 'ClosePosition', dataIndex: 'closePosition', key: 'closePosition', width: 100,
+      render(item: any) {
+        // return <span>{item.closePosition ? 'ture' : 'false'}</span>
+        return <span>{item.closePosition}</span>
+      },
+    },
     { id: 'price', title: 'Price', dataIndex: 'price', key: 'price', width: 100 },
     { id: 'avgPrice', title: 'AvgPrice', dataIndex: 'avgPrice', key: 'avgPrice', width: 100 },
     {
@@ -90,24 +98,12 @@ export function FutureTable(props: Props) {
         </Box>
       },
     },
-    {
-      id: 'createdAt', title: 'Created', dataIndex: '', key: 'createdAt', width: 100,
-      render(item: any) {
-        return <span>{formatUnixTime(item.createdAt)}</span>
-      },
-    },
     { id: 'clientOrderId', title: 'ClientOrderId', dataIndex: 'clientOrderId', key: 'clientOrderId', width: 100 },
     { id: 'timeInForce', title: 'TimeInForce', dataIndex: 'timeInForce', key: 'timeInForce', width: 100 },
     {
       id: 'reduceOnly', title: 'ReduceOnly', dataIndex: 'reduceOnly', key: 'reduceOnly', width: 100,
       render(item: any) {
         return <span>{item.reduceOnly ? 'ture' : 'false'}</span>
-      },
-    },
-    {
-      id: 'closePosition', title: 'ClosePosition', dataIndex: 'closePosition', key: 'closePosition', width: 100,
-      render(item: any) {
-        return <span>{item.closePosition ? 'ture' : 'false'}</span>
       },
     },
     { id: 'positionSide', title: 'PositionSide', dataIndex: 'positionSide', key: 'positionSide', width: 100 },
@@ -124,7 +120,7 @@ export function FutureTable(props: Props) {
   return (
     <Box toCenterX>
       <Box className='table-box-container'>
-        <Table columns={columns} data={data} className='table-box' />
+        <Table rowKey="orderId" columns={columns} data={data} className='table-box' />
       </Box>
     </Box>
   );

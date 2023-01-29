@@ -81,6 +81,19 @@ export class FutureService {
     return { code: 200, message: 'ok', data: info };
   }
 
+  async futuresOpenOrders(): Promise<Result> {
+    const info = await this.client.futuresOpenOrders();
+    return { code: 200, message: 'ok', data: info };
+  }
+
+  async futuresCancelAllOpenOrders(options: {
+    symbol: string
+  }): Promise<Result> {
+    //  ETHUSDT
+    const info = await this.client.futuresCancelAllOpenOrders(options);
+    return { code: 200, message: 'ok', data: info };
+  }
+
   async getFutureOrders(
     currentPage: number,
     pageSize: number,

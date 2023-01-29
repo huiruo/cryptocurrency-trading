@@ -99,6 +99,11 @@ export interface FiterStrategyOrderType {
   pageSize?: number
 }
 
+export interface PaginationType {
+  currentPage: number
+  pageSize: number
+}
+
 export interface FilterDate {
   startTime: string
   endTime: string

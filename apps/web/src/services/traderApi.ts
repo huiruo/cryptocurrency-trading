@@ -50,8 +50,13 @@ const traderApi = {
 	},
 
 	syncFutureOrderApi() {
-		const url: string = `${traderApiUrl}/data/center/syncFutureOrder`;
+		const url: string = `${traderApiUrl}/future/syncFutureOrder`;
 		return http.get<resType>({}, url);
+	},
+
+	cancelFutureAllOpenOrders(options: any) {
+		const url: string = `${traderApiUrl}/future/cancelAllOpenOrders`;
+		return http.get<resType>(options, url);
 	},
 
 	futureOrdersApi(data: any) {

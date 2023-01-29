@@ -26,21 +26,37 @@ export function FutureOrders() {
 
       setFutureOrders(res.data)
     } else {
-      alert("get future orders error")
+      console.log("get future orders error")
     }
   }
 
   const onSyncFutureOrder = async () => {
     const res = await traderApi.syncFutureOrderApi()
+    console.log('onSyncFutureOrder:', res)
+
     if (res.code === 200) {
-      getFutureOrders(1)
+      setFutureOrders(res.data)
     } else {
-      alert("get future orders error")
+      console.log("onSyncFutureOrder future orders error")
     }
   }
 
+  const onCancelAllOpenOrders = async () => {
+    const openOrderSymbol = futureOrders.map(item => {
+      return item.symbol
+    })
+    for (const symbol of Array.from(new Set(openOrderSymbol))) {
+      const res = await traderApi.cancelFutureAllOpenOrders({ symbol })
+      if (res.code === 200) {
+        console.log("CancelAllOpenOrders success")
+      } else {
+        console.log("CancelAllOpenOrders future orders error")
+      }
+    };
+  }
+
   useEffect(() => {
-    getFutureOrders(1)
+    // getFutureOrders(1)
   }, [])
 
   return (
@@ -51,6 +67,7 @@ export function FutureOrders() {
         <Box toCenterX mb='20px'>
           <Box w='90%'>
             <Button onClick={() => onSyncFutureOrder()} mr4>Sync future orders</Button>
+            <Button onClick={() => onCancelAllOpenOrders()} mr4>Cancel All Open Orders</Button>
           </Box>
         </Box>
 

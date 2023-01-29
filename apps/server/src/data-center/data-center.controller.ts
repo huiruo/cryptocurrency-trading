@@ -2,13 +2,14 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 import { Result } from 'src/common/result.interface';
 import {
   AssetType,
+  PaginationType
 } from 'src/common/types';
 import { DataCenterService } from './data-center.service';
 
-export interface Page {
-  currentPage: number;
-  pageSize: number;
-}
+// export interface Page {
+//   currentPage: number;
+//   pageSize: number;
+// }
 
 @Controller('data/center')
 export class DataCenterController {
@@ -34,7 +35,8 @@ export class DataCenterController {
   }
 
   @Post('getCoin')
-  async getCoin(@Body() page: Page): Promise<Result> {
+  async getCoin(@Body() page: PaginationType): Promise<Result> {
+    console.log('getCoin', page)
     const data = await this.DataCenterService.getCoin(
       page.currentPage,
       page.pageSize,

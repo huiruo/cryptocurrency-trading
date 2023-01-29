@@ -92,6 +92,29 @@ export class BaseServiceBiance {
     }
   }
 
+  async futuresOpenOrders() {
+    try {
+      return await this.client.futuresOpenOrders({
+        // symbol: 'BTCUSDT',
+        // recvWindow: 59999,
+      });
+    } catch (error) {
+
+      throw new Error('futuresOpenOrders error');
+    }
+  }
+
+  async futuresCancelAllOpenOrders(options: {
+    symbol: string
+  }) {
+    try {
+      return await this.client.futuresCancelAllOpenOrders(options);
+    } catch (error) {
+
+      throw new Error('futuresCancelAllOpenOrders error');
+    }
+  }
+
   async futuresBatchOrders() {
     try {
       return await this.client.futuresBatchOrders({ batchOrders: [] });
