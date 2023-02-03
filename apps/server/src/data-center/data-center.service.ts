@@ -22,6 +22,19 @@ import {
 import { TradeAsset } from '../entity/asset.entity';
 import { TraderApi } from '../entity/api.entity';
 import { DailyProfit } from '../entity/daily.profit.entity';
+import Big from 'big.js';
+
+export interface BalanceType {
+  asset: string;
+  free: string;
+  locked: string;
+  symbol?: string
+  value?: number
+}
+
+
+const stableCoins = ['USDT', 'BUSD', 'USDC'];
+const alCoin = ['BTC', 'ETH', 'BNB']
 
 @Injectable()
 export class DataCenterService {
@@ -74,6 +87,7 @@ export class DataCenterService {
   async initBinanceApi() {
     const apiKey = this.configService.get<string>('binanceApiKey');
     const secretKey = this.configService.get<string>('binanceSecretKey');
+    console.log('Api', { apiKey, secretKey });
     if (apiKey && secretKey) {
       const baseServiceBinance = new BaseServiceBiance(apiKey, secretKey);
       this.client = baseServiceBinance;
@@ -394,25 +408,154 @@ export class DataCenterService {
     await this.balancesRepo.save(order);
   }
 
+  async getAllSymbolsPrice(): Promise<{ [index: string]: string }> {
+    const res = await this.client.prices();
+    return res
+  }
+
+  async getTickerPrice(symbols: string[]) {
+    const config = {
+      options: {},
+      baseURL: `https://api.binance.com/api/v3/ticker/price`,
+      method: 'GET',
+      url: `?symbols=["${symbols.join('","')}"]`,
+      apiKey: '',
+      proxyUrl: '',
+    };
+    const gotData: any = await createRequest(config);
+    if (gotData.statusCode === 200) {
+      return gotData.data
+    }
+  }
+
+  // 处理活期理财；生成请求price数组
+  private handleFlexibleEarn(symbol: string, balances: BalanceType[]): boolean {
+    const earnTarget = 'LD' + symbol
+    const assetEarnIndex = balances.findIndex(item => {
+      return item.asset === earnTarget;
+    });
+
+    if (assetEarnIndex > -1) {
+      const assetIndex = balances.findIndex(item => {
+        return item.asset === symbol;
+      });
+      const { free: earnfree, locked: earnLocked, asset } = balances[assetEarnIndex]
+      if (assetIndex > -1) {
+        // 1.移除活期理财，合并入asset
+        const { free, locked } = balances[assetIndex]
+        const freeTotal = new Big(free).plus(earnfree).toString();
+        balances[assetIndex] = { locked, free: freeTotal, asset: symbol, symbol: asset }
+        balances.splice(assetEarnIndex, 1)
+
+        return true
+      } else {
+        // 2.直接添加活期理财
+        balances[assetEarnIndex] = { locked: earnLocked, free: earnfree, asset: symbol, symbol: asset }
+
+        return true
+      }
+    } else {
+      console.log("3.不包含活期理财");
+      return false
+    }
+  }
+
+  calculateValue(balances: BalanceType[], symbolsPriceMap): { total: number, alCoinVal: number, otherCoinVal: number } {
+    let total = 0
+    let alCoinVal = 0
+    let otherCoinVal = 0
+    balances.forEach((balance, index) => {
+      const { free, asset, locked } = balance
+      const exchange = asset + 'USDT'
+      const freeNums = Number(free)
+      if (!stableCoins.includes(asset)) {
+        const lockedNums = Number(locked)
+        const price = Number(symbolsPriceMap.get(exchange))
+        const coins = new Big(freeNums).plus(lockedNums);
+        const value = coins.times(price).toNumber()
+        total = total + value
+        balances[index].value = value
+        if (alCoin.includes(asset)) {
+          console.log(`${asset}添加入alCoin`)
+          alCoinVal = alCoinVal + value
+        } else {
+          console.log(`${asset}添加入otherCoin`)
+          otherCoinVal = otherCoinVal + value
+        }
+      } else {
+        // freeNums包括活期的理财稳定币+现货，但是不包括挖矿锁仓/定期的币
+        total = total + freeNums
+        alCoinVal = alCoinVal + freeNums
+        balances[index].value = freeNums
+      }
+    })
+
+    return { total, alCoinVal, otherCoinVal }
+  }
+
   async syncBalances(): Promise<Result> {
     try {
       const res = await this.client.getAccountInfo();
       const balances = get(res, 'balances', []).filter(
         (item) => Number(item.free) !== 0,
-      );
+      ) as BalanceType[];
 
+      const balancesExchangeUsdt = []
+      balances.forEach(item => {
+        const { asset } = item
+        this.handleFlexibleEarn(asset, balances)
+        // 请求price数组排除稳定币,否则接口报错
+        if (!stableCoins.includes(asset)) {
+          const exchange = `${asset}USDT`
+          balancesExchangeUsdt.push(exchange)
+        }
+      });
+
+      const symbolsPrice = await this.getTickerPrice(balancesExchangeUsdt)
+      const symbolsPriceMap = new Map(symbolsPrice.map(item => [item.symbol, item.price]))
+      // 计算
+
+      // const otherCoinMaxPositionRatio = 0.3
+      const otherCoinMaxPositionRatio = 0.1
+      const { total, alCoinVal, otherCoinVal } = this.calculateValue(balances, symbolsPriceMap)
+      const alCoinValRatio = new Big(alCoinVal).div(total).toNumber()
+      const otherCoinValRatio = new Big(otherCoinVal).div(total).toNumber()
+
+      console.log('symbolsPrice:', symbolsPrice)
+      // console.log('balances:', balances)
+      console.log(`total:`, { total, alCoinVal, otherCoinVal })
+      console.log(`alCoinValRatio持仓占比${(alCoinValRatio * 100).toFixed(4)}%,总值${alCoinVal}U`)
+      console.log(`otherCoinValRatio持仓占比${(otherCoinValRatio * 100).toFixed(4)}%,总值${otherCoinVal}U`)
+      console.log('======>')
+      if (otherCoinValRatio > otherCoinMaxPositionRatio) {
+        console.log(`otherCoin总值${otherCoinVal}U,超过${otherCoinMaxPositionRatio * 100}%,开始选择清仓`)
+      }
+      console.log('======>')
+
+      // const maxPositionRatio = 0.3
+      const maxPositionRatio = 0.1
+      balances.forEach(item => {
+        const { value, asset } = item
+        const ratio = new Big(value).div(total).toNumber()
+        console.log(`${asset}持仓占比${(ratio * 100).toFixed(4)}%,总值${value}U`)
+        if (ratio > maxPositionRatio) {
+          console.log(`账户总价值${total}U，${asset}总值${value}U,超过${maxPositionRatio * 100}%,开始清仓`)
+        }
+      })
+
+      /*
       const sql = `TRUNCATE TABLE balances`;
       await this.coninRepo.query(sql);
-
       //{asset: 'ETH', free: '0.00003934', locked: '0.00000000'}
       balances.forEach(async (item) => {
         // mock userId
-        item.userId = 1;
-        this.createBalancesUtil(item);
+        this.createBalancesUtil({ ...item, userId: 1 });
       });
+      */
 
       return { code: 200, message: 'ok', data: balances };
     } catch (error) {
+      console.log('error:', error)
       return { code: 500, message: 'sync balances error', data: null };
     }
   }

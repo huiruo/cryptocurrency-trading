@@ -30,7 +30,8 @@ export function Balances() {
   const onSyncBalances = async () => {
     const res = await traderApi.syncBalancesApi()
     if (res.code === 200) {
-      getBalances()
+      // getBalances()
+      setBalances(res.data)
     } else {
       alert("get balances error")
     }
@@ -49,7 +50,7 @@ export function Balances() {
   ]
 
   useEffect(() => {
-    getBalances()
+    // getBalances()
   }, [])
 
   return (

@@ -139,6 +139,14 @@ export class BaseServiceBiance {
     }
   }
 
+  async prices(symbol?: string): Promise<{ [index: string]: string }> {
+    try {
+      return await this.client.prices();
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
   async candles(symbol: string, interval: string) {
     try {
       return await this.client.candles({ symbol, interval: '5m' });

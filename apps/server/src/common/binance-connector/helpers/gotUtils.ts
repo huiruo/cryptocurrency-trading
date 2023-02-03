@@ -148,7 +148,8 @@ export class gotUtils {
     } catch (e) {
 
       const ret: gotResType = {};
-      if (!isNull(e.response)) {
+      // if (!isNull(e.response)) {
+      if (e.response) {
         ret.error = e;
         ret.statusCode = e.response.statusCode;
         ret.statusMessage = e.response.statusMessage;
