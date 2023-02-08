@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { get, isEmpty } from 'lodash';
+import { cloneDeep, get, isEmpty } from 'lodash';
 import { Result } from 'src/common/result.interface';
 import { createRequest } from 'src/common/binance-connector/helpers/utils';
 import { ConfigService } from '@nestjs/config';
@@ -23,15 +23,20 @@ import { TradeAsset } from '../entity/asset.entity';
 import { TraderApi } from '../entity/api.entity';
 import { DailyProfit } from '../entity/daily.profit.entity';
 import Big from 'big.js';
+import { OrderType } from 'binance-api-node';
 
 export interface BalanceType {
   asset: string;
   free: string;
+  // 挂单的锁定
   locked: string;
-  symbol?: string
+  // 币价值
   value?: number
+  // 可以出售的free,当有理财才有值，否则直接取free进行出售
+  canSellFree?: string
 }
 
+let isTrade = 0
 
 const stableCoins = ['USDT', 'BUSD', 'USDC'];
 const alCoin = ['BTC', 'ETH', 'BNB']
@@ -413,7 +418,9 @@ export class DataCenterService {
     return res
   }
 
-  async getTickerPrice(symbols: string[]) {
+  async getSymbolsPrice(symbols: string[]) {
+    // doc
+    // https://binance-docs.github.io/apidocs/spot/cn/#8ff46b58de
     const config = {
       options: {},
       baseURL: `https://api.binance.com/api/v3/ticker/price`,
@@ -422,45 +429,66 @@ export class DataCenterService {
       apiKey: '',
       proxyUrl: '',
     };
+    // console.log('config', config)
     const gotData: any = await createRequest(config);
     if (gotData.statusCode === 200) {
       return gotData.data
     }
   }
 
-  // 处理活期理财；生成请求price数组
-  private handleFlexibleEarn(symbol: string, balances: BalanceType[]): boolean {
-    const earnTarget = 'LD' + symbol
-    const assetEarnIndex = balances.findIndex(item => {
-      return item.asset === earnTarget;
-    });
-
-    if (assetEarnIndex > -1) {
-      const assetIndex = balances.findIndex(item => {
-        return item.asset === symbol;
-      });
-      const { free: earnfree, locked: earnLocked, asset } = balances[assetEarnIndex]
-      if (assetIndex > -1) {
-        // 1.移除活期理财，合并入asset
-        const { free, locked } = balances[assetIndex]
-        const freeTotal = new Big(free).plus(earnfree).toString();
-        balances[assetIndex] = { locked, free: freeTotal, asset: symbol, symbol: asset }
-        balances.splice(assetEarnIndex, 1)
-
-        return true
+  private search_LD_earn(asset: string): { isEarn: boolean, asset: string } {
+    const isInclude = asset.search(new RegExp(`^LD`))
+    if (isInclude !== -1) {
+      // 除开和理财名字相似的asset
+      if (asset === 'LDO') {
+        // 不是是理财,但是LDO
+        // console.log('C.不是是理财,但是LDO', asset, '-', isInclude)
+        return { isEarn: false, asset }
       } else {
-        // 2.直接添加活期理财
-        balances[assetEarnIndex] = { locked: earnLocked, free: earnfree, asset: symbol, symbol: asset }
-
-        return true
+        // 是理财
+        return { isEarn: true, asset: asset.substring(2) }
       }
     } else {
-      console.log("3.不包含活期理财");
-      return false
+      // 不是是理财
+      return { isEarn: false, asset }
     }
   }
 
-  calculateValue(balances: BalanceType[], symbolsPriceMap): { total: number, alCoinVal: number, otherCoinVal: number } {
+  // 处理活期理财/挂单locked；生成请求price数组
+  private handleFlexibleEarnAndlocked(index: number, balances: BalanceType[], earns: string[]): string {
+    const balance = balances[index]
+    const { locked, free } = balance
+    const { asset, isEarn } = this.search_LD_earn(balance.asset)
+    // 处理挂单
+    if (Number(locked)) {
+      const assetIndex = balances.findIndex(item => {
+        return item.asset === asset;
+      });
+      const freeTotal = new Big(free).plus(locked).toString();
+      balances[assetIndex] = { ...balance, free: freeTotal, canSellFree: free }
+    }
+
+    // 处理活期理财
+    if (isEarn) {
+      const assetIndex = balances.findIndex(item => {
+        return item.asset === asset;
+      });
+      if (assetIndex > -1) {
+        // 1.存在现货+活期，移除活期理财，合并入现货
+        const { free: spotFree, asset: spotAsset, locked: spotLocked } = balances[assetIndex]
+        const freeTotal = new Big(free).plus(spotFree).toString();
+        balances[assetIndex] = { locked: spotLocked, free: freeTotal, asset: spotAsset, canSellFree: spotFree }
+        earns.push(balance.asset)
+      } else {
+        // 2.直接添加活期理财
+        balances[index] = { locked, free, asset, canSellFree: '0' }
+      }
+    }
+
+    return asset
+  }
+
+  calculateValue(balances: BalanceType[], symbolsPriceMap: Map<string, string>): { total: number, alCoinVal: number, otherCoinVal: number } {
     let total = 0
     let alCoinVal = 0
     let otherCoinVal = 0
@@ -476,10 +504,10 @@ export class DataCenterService {
         total = total + value
         balances[index].value = value
         if (alCoin.includes(asset)) {
-          console.log(`${asset}添加入alCoin`)
+          // console.log(`${asset}添加入alCoin`)
           alCoinVal = alCoinVal + value
         } else {
-          console.log(`${asset}添加入otherCoin`)
+          // console.log(`${asset}添加入otherCoin`)
           otherCoinVal = otherCoinVal + value
         }
       } else {
@@ -495,15 +523,15 @@ export class DataCenterService {
 
   async syncBalances(): Promise<Result> {
     try {
+      const balancesExchangeUsdt: string[] = []
+      const earns: string[] = []
       const res = await this.client.getAccountInfo();
       const balances = get(res, 'balances', []).filter(
         (item) => Number(item.free) !== 0,
       ) as BalanceType[];
 
-      const balancesExchangeUsdt = []
-      balances.forEach(item => {
-        const { asset } = item
-        this.handleFlexibleEarn(asset, balances)
+      balances.forEach((_, index) => {
+        const asset = this.handleFlexibleEarnAndlocked(index, balances, earns)
         // 请求price数组排除稳定币,否则接口报错
         if (!stableCoins.includes(asset)) {
           const exchange = `${asset}USDT`
@@ -511,36 +539,68 @@ export class DataCenterService {
         }
       });
 
-      const symbolsPrice = await this.getTickerPrice(balancesExchangeUsdt)
-      const symbolsPriceMap = new Map(symbolsPrice.map(item => [item.symbol, item.price]))
-      // 计算
+      const balancesTarget = balances.filter(item => !earns.includes(item.asset))
+      const symbols = Array.from(new Set(balancesExchangeUsdt))
+      const symbolsPrice = await this.getSymbolsPrice(symbols)
+      const symbolsPriceMap = new Map(symbolsPrice.map((item: { symbol: string; price: string; }) => [item.symbol, item.price])) as Map<string, string>
 
-      // const otherCoinMaxPositionRatio = 0.3
-      const otherCoinMaxPositionRatio = 0.1
-      const { total, alCoinVal, otherCoinVal } = this.calculateValue(balances, symbolsPriceMap)
+      /*
+        开始计算
+      */
+      // const maxOtherCoinRatio = 0.3
+      const maxOtherCoinRatio = 0.1
+      const { total, alCoinVal, otherCoinVal } = this.calculateValue(balancesTarget, symbolsPriceMap)
       const alCoinValRatio = new Big(alCoinVal).div(total).toNumber()
       const otherCoinValRatio = new Big(otherCoinVal).div(total).toNumber()
 
-      console.log('symbolsPrice:', symbolsPrice)
-      // console.log('balances:', balances)
-      console.log(`total:`, { total, alCoinVal, otherCoinVal })
-      console.log(`alCoinValRatio持仓占比${(alCoinValRatio * 100).toFixed(4)}%,总值${alCoinVal}U`)
-      console.log(`otherCoinValRatio持仓占比${(otherCoinValRatio * 100).toFixed(4)}%,总值${otherCoinVal}U`)
-      console.log('======>')
-      if (otherCoinValRatio > otherCoinMaxPositionRatio) {
-        console.log(`otherCoin总值${otherCoinVal}U,超过${otherCoinMaxPositionRatio * 100}%,开始选择清仓`)
+      console.log('earns:', earns)
+      console.log(`0.账户总值：${(total)}U`)
+      console.log(`1.alCoinValRatio持仓占比${(alCoinValRatio * 100).toFixed(4)}%,总值${alCoinVal}U`)
+      console.log(`2.otherCoinValRatio持仓占比${(otherCoinValRatio * 100).toFixed(4)}%,总值${otherCoinVal}U`)
+      if (otherCoinValRatio > maxOtherCoinRatio) {
+        console.log(`A.otherCoin总值${otherCoinVal}U,超过${maxOtherCoinRatio * 100}%,开始选择清仓`)
       }
-      console.log('======>')
 
       // const maxPositionRatio = 0.3
       const maxPositionRatio = 0.1
-      balances.forEach(item => {
-        const { value, asset } = item
+      let orderType = 'LIMIT'
+      // let orderType = 'MARKET'
+
+      console.log('==============>')
+      balancesTarget.forEach(async item => {
+        const { value, asset, canSellFree, free } = item
         const ratio = new Big(value).div(total).toNumber()
-        console.log(`${asset}持仓占比${(ratio * 100).toFixed(4)}%,总值${value}U`)
-        if (ratio > maxPositionRatio) {
-          console.log(`账户总价值${total}U，${asset}总值${value}U,超过${maxPositionRatio * 100}%,开始清仓`)
+        console.log(`4-1.${asset}持仓占比${(ratio * 100).toFixed(4)}%,总值${value}U`)
+
+        /*
+        if (asset === 'WAN') {
+          console.log(`4-2.账户总价值${total}U，${asset}总值${value}U,超过${maxPositionRatio * 100}%,开始清仓`)
+          const quantity = Number(canSellFree || free)
+          const price = '0.25000'
+
+          if (orderType === OrderType.LIMIT) {
+            await this.sellSpot(asset, quantity, 'LIMIT', price)
+          } else if (orderType === OrderType.MARKET) {
+            await this.sellSpot(asset, quantity, 'MARKET')
+          }
         }
+        */
+
+        ///*
+        if (ratio > maxPositionRatio) {
+          console.log(`4-2.账户总价值${total}U，${asset}总值${value}U,超过${maxPositionRatio * 100}%,开始清仓`)
+          const quantity = Number(canSellFree || free)
+          // const quantity = 0.0000009
+          // const quantity = 9001
+          const price = '25000'
+
+          if (orderType === OrderType.LIMIT) {
+            await this.sellSpot(asset, quantity, 'LIMIT', price)
+          } else if (orderType === OrderType.MARKET) {
+            await this.sellSpot(asset, quantity, 'MARKET')
+          }
+        }
+        //*/
       })
 
       /*
@@ -557,6 +617,97 @@ export class DataCenterService {
     } catch (error) {
       console.log('error:', error)
       return { code: 500, message: 'sync balances error', data: null };
+    }
+  }
+
+  async exchangeInfo(symbol: string) {
+    const config = {
+      options: {},
+      baseURL: `https://api.binance.com/api/v3/exchangeInfo`,
+      method: 'GET',
+      url: `?symbol=${symbol}`,
+      apiKey: '',
+      proxyUrl: '',
+    };
+    const gotData: any = await createRequest(config);
+    if (gotData.statusCode === 200) {
+      return get(gotData.data, 'symbols[0].filters', [])
+    }
+  }
+
+  // 获取小数点后位数
+  private countDecimal(num: number): number {
+    console.log('获取小数点后位数:', num.toString().split("."))
+    const splitNum = num.toString().split(".")
+    // 有可能是整数
+    if (splitNum.length === 1) {
+      return 0
+    }
+
+    return num.toString().split(".")[1].length;
+  }
+
+  // 不四舍五入
+  private numPoint(num: number, point: number): number {
+    return Math.floor(num * Math.pow(10, point)) / Math.pow(10, point);
+  }
+
+  /*
+  LIMIT ==> LOT_SIZE 
+  MARKET ==> MARKET_LOT_SIZE 
+  */
+  async sellSpot(asset: string, quantity: number, orderType: string, price?: string) {
+    const defaultExchange = 'USDT'
+    const exchange = `${asset}${defaultExchange}`
+    const filters = await this.exchangeInfo(exchange)
+
+    // 这里有个问题，如果市价单读取MARKET_LOT_SIZE，stepSize,minQty 为0会导致订单提交失败，所以这里都按照 LOT_SIZE 的过滤器来过滤订单
+    const filterKey = 'LOT_SIZE'
+    // const filterKey = 'MARKET_LOT_SIZE'
+    const LOT_SIZE = filters.find(item => { return item.filterType === filterKey });
+
+    const { minQty, maxQty, stepSize } = LOT_SIZE
+    const stepSizeNum = Number(stepSize)
+    const minQtyNum = Number(minQty)
+    const maxQtyNum = Number(maxQty)
+
+    let callCellQty = 0
+    const decimalCount = this.countDecimal(stepSizeNum)
+    callCellQty = this.numPoint(quantity, decimalCount)
+
+    console.log('LOT_SIZE', LOT_SIZE);
+    console.log('sellSpot====>end', filters)
+    console.log('callCellQty:', callCellQty, 'quantity', quantity)
+    console.log('decimalCount:', decimalCount)
+    /* 
+      https://binance-docs.github.io/apidocs/spot/cn/#cc81fff589
+      (callCellQty - minQtyNum) % stepSizeNum !== 0
+    */
+    const filterStepSize = new Big(callCellQty).minus(minQtyNum).mod(stepSizeNum).toNumber()
+    if (filterStepSize === 0 && maxQtyNum > callCellQty && minQtyNum < callCellQty) {
+      if (orderType === OrderType.LIMIT) {
+        const tradeRes = await this.client.tradeSpot({
+          symbol: exchange,
+          side: 'SELL',
+          quantity: callCellQty.toString(),
+          price,
+          type: orderType
+        })
+        console.log('1-1.可以提交limit...', { exchange, quantity: callCellQty, price, orderType });
+        console.log('1-2.res', tradeRes);
+      } else if (orderType === OrderType.MARKET) {
+        console.log('0.开始提交市价...', { exchange, quantity: callCellQty, orderType });
+        // const tradeRes = await this.client.tradeSpotTest({
+        const tradeRes = await this.client.tradeSpot({
+          symbol: exchange,
+          side: 'SELL',
+          quantity: callCellQty.toString(),
+          type: orderType
+        })
+        console.log('1-1.可以提交市价...', { exchange, quantity: callCellQty, orderType });
+      }
+    } else {
+      console.log('2.stepsize error...', { exchange, quantity: callCellQty, price, orderType });
     }
   }
   // =========== Balances end ===========

@@ -1,5 +1,5 @@
 import { Exchange } from './exchange';
-import Binance from 'binance-api-node';
+import Binance, { NewOrderSpot, Order, OrderType } from 'binance-api-node';
 
 export class BaseServiceBiance {
   private client = Binance();
@@ -19,7 +19,24 @@ export class BaseServiceBiance {
     try {
       return await this.client.accountInfo();
     } catch (error) {
+      console.log('error:', error)
       throw new Error('apiKey and secretKey are invalid');
+    }
+  }
+
+  async tradeSpot(options: NewOrderSpot): Promise<Order> {
+    try {
+      return await this.client.order(options);
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async tradeSpotTest(options: NewOrderSpot): Promise<Order> {
+    try {
+      return await this.client.orderTest(options);
+    } catch (error) {
+      throw new Error(error);
     }
   }
 
