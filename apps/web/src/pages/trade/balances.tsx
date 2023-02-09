@@ -37,6 +37,15 @@ export function Balances() {
     }
   }
 
+  const onTestWebsocket = async () => {
+    const res = await traderApi.testWebsocketApi()
+    if (res.code === 200) {
+      console.log('res', res);
+    } else {
+      alert("get balances error")
+    }
+  }
+
   const columns = [
     { id: 'asset', title: 'Symbol', dataIndex: 'asset', key: 'asset', width: 100 },
     { id: 'free', title: 'Free', dataIndex: 'free', key: 'free', width: 100 },
@@ -61,6 +70,7 @@ export function Balances() {
         <Box toCenterX mb='20px'>
           <Box w='90%'>
             <Button onClick={() => onSyncBalances()} mr4>Sync balances</Button>
+            <Button onClick={() => onTestWebsocket()} mr4>test websocket</Button>
           </Box>
         </Box>
 

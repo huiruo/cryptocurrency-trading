@@ -44,6 +44,11 @@ const traderApi = {
 		return http.get<resType>({}, url);
 	},
 
+	testWebsocketApi() {
+		const url: string = `${traderApiUrl}/data/center/testWebsocket`;
+		return http.get<resType>({}, url);
+	},
+
 	balancesApi() {
 		const url: string = `${traderApiUrl}/data/center/balances`;
 		return http.get<resType>({}, url);

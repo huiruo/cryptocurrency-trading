@@ -47,8 +47,12 @@ export class DataCenterController {
   // =========== Balances start ===========
   @Get('syncBalances')
   async syncAccountInfo(): Promise<Result> {
-    console.log('syncBalances')
     return await this.DataCenterService.syncBalances();
+  }
+
+  @Get('testWebsocket')
+  async testWebsocket(): Promise<Result> {
+    return await this.DataCenterService.testWebsocket();
   }
 
   @Get('balances')

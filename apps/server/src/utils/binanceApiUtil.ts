@@ -1,4 +1,4 @@
-import { binanceConnector } from '../common/binance-connector/index';
+import { BinanceConnector } from '../common/binance-connector/index';
 
 export const getSymbolPriceUtil = async (
   binance_api_key: string,
@@ -7,15 +7,12 @@ export const getSymbolPriceUtil = async (
 ) => {
   const proxy_url = null;
 
-  const client = new binanceConnector(
+  const client = new BinanceConnector(
     binance_api_key,
     binance_api_secret,
-    proxy_url,
-    {},
   );
 
   const { statusCode, data, statusMessage } = await client.tickerPrice(symbol);
 
-  // return { code: 200, message: '查询成功',data};
   return { code: statusCode, message: statusMessage, data };
 };

@@ -24,6 +24,7 @@ import { TraderApi } from '../entity/api.entity';
 import { DailyProfit } from '../entity/daily.profit.entity';
 import Big from 'big.js';
 import { OrderType } from 'binance-api-node';
+import { BinanceConnector } from 'src/common/binance-connector';
 
 export interface BalanceType {
   asset: string;
@@ -519,6 +520,58 @@ export class DataCenterService {
     })
 
     return { total, alCoinVal, otherCoinVal }
+  }
+
+  async createListenKey(client) {
+    return client.createListenKey()
+  }
+
+  async testWebsocket(): Promise<Result> {
+    console.log('testWebsocket-->');
+    const apiKey = this.configService.get<string>('binanceApiKey');
+    const secretKey = this.configService.get<string>('binanceSecretKey');
+    console.log('Api', { apiKey, secretKey });
+
+    const client = new BinanceConnector(apiKey, secretKey)
+    const { data } = await client.tickerPrice('BTCUSDT');
+    console.log('BTCUSDT:', data);
+
+    const res1 = await client.account();
+    const balances = get(res1, 'data.balances', []).filter(
+      (item) => Number(item.free) !== 0,
+    ) as BalanceType[];
+    console.log('res1:', balances);
+
+
+    const callbacks = {
+      open: () => console.debug('Connected with Websocket server'),
+      close: () => console.debug('Disconnected with Websocket server'),
+      message: data => console.info(data)
+    }
+
+    /*
+    // 聚合交易数据(aggTrades)
+    // const symbol = 'bnbusdt'
+    const symbol = 'BTCUSDT'
+    const wsRef = client.aggTradeWS(symbol, callbacks)
+    setTimeout(() => client.unsubscribe(wsRef), 10000)
+    */
+
+    // userData
+    // const client2 = new Spot(apiKey, '')
+    let listenKey = ''
+    // const client2 = new Spot(apiKey)
+    const { data: lkData, status } = await this.createListenKey(client)
+    if (status === 200) {
+      listenKey = get(lkData, 'listenKey', '')
+    }
+
+    // wss://stream.binance.com:9443/ws/
+    const wsRef = client.userData(listenKey, callbacks)
+    // 测试5分钟后取消订阅
+    setTimeout(() => client.unsubscribe(wsRef), 300000)
+
+    return { code: 200, message: 'ok', data: null };
   }
 
   async syncBalances(): Promise<Result> {
