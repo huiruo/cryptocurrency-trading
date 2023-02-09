@@ -1,63 +1,81 @@
-import crypto from 'crypto';
-import {
-  removeEmptyValue,
-  buildQueryString,
-  createRequest,
-  defaultLogger,
-} from './helpers/utils';
+const crypto = require('crypto')
 
-// export {};
-interface optionsType {
-  apiKey: string;
-  apiSecret: string;
-  baseURL?: string;
-  logger?: any;
-}
+import { removeEmptyValue, buildQueryString, createRequest, defaultLogger } from './helpers/utils'
 
 export class APIBase {
   public apiKey: string;
   public apiSecret: string;
   public baseURL: string;
-  public logger: string;
-  constructor(options: optionsType) {
-    const { apiKey, apiSecret, baseURL, logger } = options;
 
-    this.apiKey = apiKey;
-    this.apiSecret = apiSecret;
-    this.baseURL = baseURL;
-    this.logger = logger || defaultLogger;
+  public timeout: string;
+  public proxy: string;
+  public httpsAgent: string;
+  public logger: any;
+  public privateKey: string;
+  public privateKeyPassphrase: string;
+
+  constructor(options) {
+    const { apiKey, apiSecret, baseURL, logger, timeout, proxy, httpsAgent, privateKey, privateKeyPassphrase } = options
+
+    this.apiKey = apiKey
+    this.apiSecret = apiSecret
+    this.baseURL = baseURL
+    // default is 0 (no timeout)
+    this.timeout = timeout || 0
+    this.proxy = proxy || false
+    this.httpsAgent = httpsAgent
+    this.logger = logger || defaultLogger
+    this.privateKey = privateKey || ''
+    this.privateKeyPassphrase = privateKeyPassphrase || ''
   }
 
   publicRequest(method, path, params = {}) {
-    params = removeEmptyValue(params);
-    params = buildQueryString(params);
+    params = removeEmptyValue(params)
+    params = buildQueryString(params)
     if (params !== '') {
-      path = `${path}?${params}`;
+      path = `${path}?${params}`
     }
     return createRequest({
-      method: method,
+      method,
       baseURL: this.baseURL,
       url: path,
       apiKey: this.apiKey,
-    });
+      timeout: this.timeout,
+      proxy: this.proxy,
+      httpsAgent: this.httpsAgent
+    })
   }
 
   signRequest(method, path, params = {}) {
-    params = removeEmptyValue(params);
-    const timestamp = Date.now();
-    const queryString = buildQueryString({ ...params, timestamp });
-    const signature = crypto
-      .createHmac('sha256', this.apiSecret)
-      .update(queryString)
-      .digest('hex');
+    params = removeEmptyValue(params)
+    const timestamp = Date.now()
+    const queryString = buildQueryString({ ...params, timestamp })
+    let signature
+
+    if (!this.privateKey) {
+      signature = crypto
+        .createHmac('sha256', this.apiSecret)
+        .update(queryString)
+        .digest('hex')
+    } else {
+      signature = crypto
+        .createSign('RSA-SHA256')
+        .update(queryString)
+        .sign({
+          key: this.privateKey,
+          passphrase: this.privateKeyPassphrase
+        }, 'base64')
+      signature = encodeURIComponent(signature)
+    }
 
     return createRequest({
-      method: method,
+      method,
       baseURL: this.baseURL,
       url: `${path}?${queryString}&signature=${signature}`,
       apiKey: this.apiKey,
-    });
+      timeout: this.timeout,
+      proxy: this.proxy,
+      httpsAgent: this.httpsAgent
+    })
   }
 }
-
-// module.exports.APIBase = APIBase;

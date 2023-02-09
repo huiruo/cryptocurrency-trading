@@ -1,54 +1,62 @@
-import { APIBase } from './APIBase';
-import { flowRight } from './helpers/utils';
+
+import { APIBase } from './APIBase'
+import { flowRight } from './helpers/utils'
+
 import {
   Blvt,
   Bswap,
   SubAccount,
   Market,
   Trade,
-  Futures,
-  Fiat,
   Wallet,
   Margin,
   Mining,
   Savings,
+  Staking,
   Stream,
   Websocket,
+  Futures,
+  Fiat,
   C2C,
+  Loan,
+  Pay,
+  Convert,
+  Rebate,
+  NFT,
+  GiftCard,
+  PortfolioMargin,
 } from './modules';
-import { optionsType } from './types';
 
-// export {};
-export class binanceConnector extends flowRight(
+export class BinanceConnector extends flowRight(
   Blvt,
   Bswap,
   SubAccount,
-  Websocket,
-  Stream,
-  Savings,
-  Margin,
-  Mining,
-  Wallet,
   Market,
   Trade,
+  Wallet,
+  Margin,
+  Mining,
+  Savings,
+  Staking,
+  Stream,
+  Websocket,
   Futures,
   Fiat,
   C2C,
+  Loan,
+  Pay,
+  Convert,
+  Rebate,
+  NFT,
+  GiftCard,
+  PortfolioMargin,
 )(APIBase) {
-  constructor(
-    apiKey = '',
-    apiSecret = '',
-    proxyUrl,
-    options: optionsType = {},
-  ) {
-    options.baseURL = options.baseURL || 'https://api.binance.com';
-    options.proxyUrl = proxyUrl;
+  constructor(apiKey = '', apiSecret = '', options: any = {}) {
+    options.baseURL = options.baseURL || 'https://api.binance.com'
     super({
       apiKey,
       apiSecret,
-      ...options,
-    });
+      ...options
+    })
   }
 }
-
-// module.exports.binanceConnector = binanceConnector;
