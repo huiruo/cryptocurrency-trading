@@ -108,3 +108,12 @@ export interface FilterDate {
   startTime: string
   endTime: string
 }
+
+
+export interface gotResType {
+  body?: any;
+  statusCode?: string | number;
+  error?: string | number;
+  statusMessage?: string | number;
+  response?: any;
+}
