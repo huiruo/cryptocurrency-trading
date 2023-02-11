@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { cloneDeep, get, isEmpty } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import { Result } from 'src/common/result.interface';
-import { createRequest } from 'src/common/binance-connector/helpers/utils';
+import { createRequest } from 'src/common/got-requst/utils';
 import { ConfigService } from '@nestjs/config';
 import { CoinCode } from './data-center.entity';
 import { Coin } from '../entity/coin.entity';
@@ -16,15 +16,13 @@ import { FuturesOrder } from '../entity/futures-order.entity';
 import { SpotOrder } from '../entity/spot-order.entity';
 import { StrategyOrder } from '../entity/strategy-order.entity';
 import { StrategyOrderId } from '../entity/strategy-orderid.entity';
-import {
-  AssetType,
-} from 'src/common/types';
+import { AssetType } from 'src/common/types';
 import { TradeAsset } from '../entity/asset.entity';
 import { TraderApi } from '../entity/api.entity';
 import { DailyProfit } from '../entity/daily.profit.entity';
 import Big from 'big.js';
 import { OrderType } from 'binance-api-node';
-import { BinanceConnector } from 'src/common/binance-connector';
+import { BinanceConnector } from 'src/common/binance-connector2';
 
 export interface BalanceType {
   asset: string;
@@ -41,10 +39,14 @@ let isTrade = 0
 
 const stableCoins = ['USDT', 'BUSD', 'USDC'];
 const alCoin = ['BTC', 'ETH', 'BNB']
+// 不存在/过期的代币
+const excludeSymbol = ['ETHW']
 
 @Injectable()
 export class DataCenterService {
   private client: BaseServiceBiance;
+  private wsClient: any;
+  private wsRef: any;
   constructor(
     private configService: ConfigService,
 
@@ -93,7 +95,9 @@ export class DataCenterService {
   async initBinanceApi() {
     const apiKey = this.configService.get<string>('binanceApiKey');
     const secretKey = this.configService.get<string>('binanceSecretKey');
+
     console.log('Api', { apiKey, secretKey });
+
     if (apiKey && secretKey) {
       const baseServiceBinance = new BaseServiceBiance(apiKey, secretKey);
       this.client = baseServiceBinance;
@@ -420,7 +424,6 @@ export class DataCenterService {
   }
 
   async getSymbolsPrice(symbols: string[]) {
-    // doc
     // https://binance-docs.github.io/apidocs/spot/cn/#8ff46b58de
     const config = {
       options: {},
@@ -430,7 +433,9 @@ export class DataCenterService {
       apiKey: '',
       proxyUrl: '',
     };
-    // console.log('config', config)
+
+    console.log('config', config)
+
     const gotData: any = await createRequest(config);
     if (gotData.statusCode === 200) {
       return gotData.data
@@ -455,11 +460,19 @@ export class DataCenterService {
     }
   }
 
-  // 处理活期理财/挂单locked；生成请求price数组
-  private handleFlexibleEarnAndlocked(index: number, balances: BalanceType[], earns: string[]): string {
+  // 处理活期理财/挂单locked/过期的代币；生成请求price数组
+  private handleFlexibleEarnAndlocked(index: number, balances: BalanceType[], earnsOrExclude: string[]): string {
     const balance = balances[index]
     const { locked, free } = balance
     const { asset, isEarn } = this.search_LD_earn(balance.asset)
+    // 处理不存在/过期的代币
+    if (excludeSymbol.includes(asset)) {
+      console.log('处理不存在/过期的代币', asset);
+      earnsOrExclude.push(asset)
+
+      return asset
+    }
+
     // 处理挂单
     if (Number(locked)) {
       const assetIndex = balances.findIndex(item => {
@@ -479,7 +492,7 @@ export class DataCenterService {
         const { free: spotFree, asset: spotAsset, locked: spotLocked } = balances[assetIndex]
         const freeTotal = new Big(free).plus(spotFree).toString();
         balances[assetIndex] = { locked: spotLocked, free: freeTotal, asset: spotAsset, canSellFree: spotFree }
-        earns.push(balance.asset)
+        earnsOrExclude.push(balance.asset)
       } else {
         // 2.直接添加活期理财
         balances[index] = { locked, free, asset, canSellFree: '0' }
@@ -495,21 +508,25 @@ export class DataCenterService {
     let otherCoinVal = 0
     balances.forEach((balance, index) => {
       const { free, asset, locked } = balance
+
       const exchange = asset + 'USDT'
       const freeNums = Number(free)
       if (!stableCoins.includes(asset)) {
         const lockedNums = Number(locked)
+        // 这里注意，symbolsPriceMap.get(exchange) 找不到 对应的key,下面逻辑就会报错,所以这里排除price为 NaN 容错
         const price = Number(symbolsPriceMap.get(exchange))
-        const coins = new Big(freeNums).plus(lockedNums);
-        const value = coins.times(price).toNumber()
-        total = total + value
-        balances[index].value = value
-        if (alCoin.includes(asset)) {
-          // console.log(`${asset}添加入alCoin`)
-          alCoinVal = alCoinVal + value
-        } else {
-          // console.log(`${asset}添加入otherCoin`)
-          otherCoinVal = otherCoinVal + value
+        if (price) {
+          const coins = new Big(freeNums).plus(lockedNums);
+          const value = coins.times(price).toNumber()
+          total = total + value
+          balances[index].value = value
+          if (alCoin.includes(asset)) {
+            // ${asset}添加入alCoin
+            alCoinVal = alCoinVal + value
+          } else {
+            // ${asset}添加入otherCoin
+            otherCoinVal = otherCoinVal + value
+          }
         }
       } else {
         // freeNums包括活期的理财稳定币+现货，但是不包括挖矿锁仓/定期的币
@@ -522,31 +539,88 @@ export class DataCenterService {
     return { total, alCoinVal, otherCoinVal }
   }
 
-  async createListenKey(client) {
-    return client.createListenKey()
+  async createListenKey() {
+    return this.wsClient.createListenKey()
+  }
+
+  handleSocketData(data: any, eventType: string) {
+    if (eventType === 'executionReport') {
+      const { E: time, s: symbol, S: side, o: orderType, q: qty, p: price, X: orderStatus, i: orderId, n: freeNum, N: freeAsset, Z: tradedQty, Y: notTradedQty } = data
+      console.log('订单处理:', {
+        eventType,
+        time,
+        symbol,
+        side,
+        orderType,
+        qty,
+        price,
+        orderStatus,
+        orderId,
+        freeNum,
+        freeAsset,
+        tradedQty,
+        notTradedQty
+      })
+
+      console.log('orderStatus', orderStatus);
+
+      if (orderStatus == 'NEW') {
+        console.log('==挂单==', symbol);
+        if (symbol === 'IMXUSDT') {
+          console.log('获取订单==>', symbol);
+
+        }
+      }
+
+      if (orderStatus == 'TRADE') {
+        console.log('==订单成交==', symbol);
+      }
+
+      if (orderStatus == 'CANCELED') {
+        console.log('==取消订单==');
+      }
+
+      if (orderStatus == 'REJECTED') {
+        console.log('==新订单被拒绝==', symbol);
+      }
+    }
+  }
+
+  async unsubscribeWebsocket(): Promise<Result> {
+    if (this.wsClient) {
+      console.log('unsubscribeWebsocket start');
+      this.wsClient.unsubscribe(this.wsRef)
+      this.wsClient = null
+      return { code: 200, message: 'ok', data: null };
+    } else {
+      console.log('Websocket not running');
+
+      return { code: 200, message: 'Websocket not running', data: null };
+    }
   }
 
   async testWebsocket(): Promise<Result> {
-    console.log('testWebsocket-->');
     const apiKey = this.configService.get<string>('binanceApiKey');
     const secretKey = this.configService.get<string>('binanceSecretKey');
-    console.log('Api', { apiKey, secretKey });
-
-    const client = new BinanceConnector(apiKey, secretKey)
+    this.wsClient = new BinanceConnector(apiKey, secretKey)
+    /*
     const { data } = await client.tickerPrice('BTCUSDT');
     console.log('BTCUSDT:', data);
-
     const res1 = await client.account();
     const balances = get(res1, 'data.balances', []).filter(
       (item) => Number(item.free) !== 0,
     ) as BalanceType[];
     console.log('res1:', balances);
-
+    */
 
     const callbacks = {
-      open: () => console.debug('Connected with Websocket server'),
-      close: () => console.debug('Disconnected with Websocket server'),
-      message: data => console.info(data)
+      open: () => console.log('Connected with Websocket server'),
+      close: () => console.log('Disconnected with Websocket server'),
+      message: data => {
+        console.log('info===>', data)
+        const dataObj = JSON.parse(data) as any
+        this.handleSocketData(dataObj, dataObj.e)
+      }
     }
 
     /*
@@ -558,18 +632,16 @@ export class DataCenterService {
     */
 
     // userData
-    // const client2 = new Spot(apiKey, '')
     let listenKey = ''
-    // const client2 = new Spot(apiKey)
-    const { data: lkData, status } = await this.createListenKey(client)
+    const { data: lkData, status } = await this.createListenKey()
     if (status === 200) {
       listenKey = get(lkData, 'listenKey', '')
     }
 
     // wss://stream.binance.com:9443/ws/
-    const wsRef = client.userData(listenKey, callbacks)
-    // 测试5分钟后取消订阅
-    setTimeout(() => client.unsubscribe(wsRef), 300000)
+    this.wsRef = this.wsClient.userData(listenKey, callbacks)
+    // 测试5*6分钟后取消订阅
+    // setTimeout(() => this.wsClient.unsubscribe(this.wsRef), 300000 * 1)
 
     return { code: 200, message: 'ok', data: null };
   }
@@ -577,25 +649,42 @@ export class DataCenterService {
   async syncBalances(): Promise<Result> {
     try {
       const balancesExchangeUsdt: string[] = []
-      const earns: string[] = []
+      const earnsOrExclude: string[] = []
       const res = await this.client.getAccountInfo();
       const balances = get(res, 'balances', []).filter(
         (item) => Number(item.free) !== 0,
       ) as BalanceType[];
 
       balances.forEach((_, index) => {
-        const asset = this.handleFlexibleEarnAndlocked(index, balances, earns)
-        // 请求price数组排除稳定币,否则接口报错
-        if (!stableCoins.includes(asset)) {
+        const asset = this.handleFlexibleEarnAndlocked(index, balances, earnsOrExclude)
+        // 请求price数组排除稳定币和过期代币,否则接口报错
+        if (!stableCoins.includes(asset) && !excludeSymbol.includes(asset)) {
           const exchange = `${asset}USDT`
           balancesExchangeUsdt.push(exchange)
         }
       });
 
-      const balancesTarget = balances.filter(item => !earns.includes(item.asset))
+      const balancesTarget = balances.filter(item => !earnsOrExclude.includes(item.asset))
+
+      // mock test start
+      balancesTarget.push({
+        asset: 'IMX',
+        free: '504.54000000',
+        locked: '0.00000000'
+      })
+      balancesExchangeUsdt.push('IMXUSDT')
+      // mock test end
+
       const symbols = Array.from(new Set(balancesExchangeUsdt))
       const symbolsPrice = await this.getSymbolsPrice(symbols)
       const symbolsPriceMap = new Map(symbolsPrice.map((item: { symbol: string; price: string; }) => [item.symbol, item.price])) as Map<string, string>
+
+      console.log('balances:', balances);
+      /*
+      console.log('balances:', balances);
+      console.log('balancesExchangeUsdt:', balancesExchangeUsdt);
+      console.log('symbolsPriceMap:', symbolsPriceMap);
+      */
 
       /*
         开始计算
@@ -606,7 +695,7 @@ export class DataCenterService {
       const alCoinValRatio = new Big(alCoinVal).div(total).toNumber()
       const otherCoinValRatio = new Big(otherCoinVal).div(total).toNumber()
 
-      console.log('earns:', earns)
+      console.log('earnsOrExclude:', earnsOrExclude)
       console.log(`0.账户总值：${(total)}U`)
       console.log(`1.alCoinValRatio持仓占比${(alCoinValRatio * 100).toFixed(4)}%,总值${alCoinVal}U`)
       console.log(`2.otherCoinValRatio持仓占比${(otherCoinValRatio * 100).toFixed(4)}%,总值${otherCoinVal}U`)
@@ -646,12 +735,13 @@ export class DataCenterService {
           // const quantity = 0.0000009
           // const quantity = 9001
           const price = '25000'
-
+          /*
           if (orderType === OrderType.LIMIT) {
             await this.sellSpot(asset, quantity, 'LIMIT', price)
           } else if (orderType === OrderType.MARKET) {
             await this.sellSpot(asset, quantity, 'MARKET')
           }
+          */
         }
         //*/
       })
@@ -666,7 +756,7 @@ export class DataCenterService {
       });
       */
 
-      return { code: 200, message: 'ok', data: balances };
+      return { code: 200, message: 'ok', data: balancesTarget };
     } catch (error) {
       console.log('error:', error)
       return { code: 500, message: 'sync balances error', data: null };

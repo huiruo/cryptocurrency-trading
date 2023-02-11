@@ -11,7 +11,7 @@ export class BaseServiceBiance {
     try {
       this.client = Binance({ apiKey: apiKey, apiSecret: secretKey });
     } catch (error) {
-      throw new Error('apiKey and secretKey are invalid');
+      throw new Error(error);
     }
   }
 
@@ -19,8 +19,7 @@ export class BaseServiceBiance {
     try {
       return await this.client.accountInfo();
     } catch (error) {
-      console.log('error:', error)
-      throw new Error('apiKey and secretKey are invalid');
+      throw new Error(error);
     }
   }
 
@@ -93,7 +92,7 @@ export class BaseServiceBiance {
     try {
       return await this.client.futuresAccountInfo({ recvWindow: 1000 * 10 });
     } catch (error) {
-      throw new Error('apiKey and secretKey are invalid');
+      throw new Error(error);
     }
   }
 
@@ -105,7 +104,7 @@ export class BaseServiceBiance {
       });
     } catch (error) {
 
-      throw new Error('futuresAllOrders error');
+      throw new Error(error);
     }
   }
 
@@ -117,7 +116,7 @@ export class BaseServiceBiance {
       });
     } catch (error) {
 
-      throw new Error('futuresOpenOrders error');
+      throw new Error(error);
     }
   }
 
@@ -128,7 +127,7 @@ export class BaseServiceBiance {
       return await this.client.futuresCancelAllOpenOrders(options);
     } catch (error) {
 
-      throw new Error('futuresCancelAllOpenOrders error');
+      throw new Error(error);
     }
   }
 
@@ -136,7 +135,7 @@ export class BaseServiceBiance {
     try {
       return await this.client.futuresBatchOrders({ batchOrders: [] });
     } catch (error) {
-      throw new Error('futuresBatchOrders error');
+      throw new Error(error);
     }
   }
 

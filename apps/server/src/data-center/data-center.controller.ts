@@ -36,7 +36,6 @@ export class DataCenterController {
 
   @Post('getCoin')
   async getCoin(@Body() page: PaginationType): Promise<Result> {
-    console.log('getCoin', page)
     const data = await this.DataCenterService.getCoin(
       page.currentPage,
       page.pageSize,
@@ -53,6 +52,11 @@ export class DataCenterController {
   @Get('testWebsocket')
   async testWebsocket(): Promise<Result> {
     return await this.DataCenterService.testWebsocket();
+  }
+
+  @Get('unsubscribeWebsocket')
+  async unsubscribeWebsocket(): Promise<Result> {
+    return await this.DataCenterService.unsubscribeWebsocket();
   }
 
   @Get('balances')

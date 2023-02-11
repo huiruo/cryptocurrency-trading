@@ -46,6 +46,15 @@ export function Balances() {
     }
   }
 
+  const onUnsubscribeWebsocket = async () => {
+    const res = await traderApi.unsubscribeWebsocketApi()
+    if (res.code === 200) {
+      console.log('res', res.message);
+    } else {
+      alert("get balances error")
+    }
+  }
+
   const columns = [
     { id: 'asset', title: 'Symbol', dataIndex: 'asset', key: 'asset', width: 100 },
     { id: 'free', title: 'Free', dataIndex: 'free', key: 'free', width: 100 },
@@ -71,6 +80,7 @@ export function Balances() {
           <Box w='90%'>
             <Button onClick={() => onSyncBalances()} mr4>Sync balances</Button>
             <Button onClick={() => onTestWebsocket()} mr4>test websocket</Button>
+            <Button onClick={() => onUnsubscribeWebsocket()} mr4>unsubscribe Websocket</Button>
           </Box>
         </Box>
 
