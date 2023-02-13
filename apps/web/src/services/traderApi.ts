@@ -44,13 +44,18 @@ const traderApi = {
 		return http.get<resType>({}, url);
 	},
 
-	testWebsocketApi() {
-		const url: string = `${traderApiUrl}/data/center/testWebsocket`;
+	startUserWebsocket() {
+		const url: string = `${traderApiUrl}/data/center/userWebsocket`;
 		return http.get<resType>({}, url);
 	},
 
-	unsubscribeWebsocketApi() {
-		const url: string = `${traderApiUrl}/data/center/unsubscribeWebsocket`;
+	unsubscribeUserWsApi() {
+		const url: string = `${traderApiUrl}/data/center/unsubscribeUserWs`;
+		return http.get<resType>({}, url);
+	},
+
+	unsubscribePositionWsApi() {
+		const url: string = `${traderApiUrl}/data/center/unsubscribePositionWs`;
 		return http.get<resType>({}, url);
 	},
 

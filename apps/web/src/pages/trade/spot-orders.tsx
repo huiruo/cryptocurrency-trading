@@ -33,7 +33,7 @@ export function SpotOrders() {
     }
 
     const params = {
-      name: assetName,
+      symbol: assetName,
       startTime: filterTime[0],
       endTime: filterTime[1],
     }

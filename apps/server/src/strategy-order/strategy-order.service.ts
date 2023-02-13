@@ -193,10 +193,7 @@ export class StrategyOrderService {
     }
   }
 
-  private async calculateSpotOrderMergeStrategy(
-    spotOrders: SpotOrder[],
-    strategyOrder: StrategyOrder,
-  ): Promise<CalculateStrategiesOrderType> {
+  private async calculateSpotOrderMergeStrategy(spotOrders: SpotOrder[], strategyOrder: StrategyOrder): Promise<CalculateStrategiesOrderType> {
     const { symbol, qty, quoteQty, userId, free: realizedFree } = strategyOrder;
     let qtyTotal = 0;
     let free = 0;
@@ -515,11 +512,7 @@ export class StrategyOrderService {
     };
   }
 
-  async mergeSpotStrategy(
-    spotOrders: SpotOrder[],
-    strategyOrder: StrategyOrder,
-  ): Promise<Result> {
-
+  async mergeSpotStrategy(spotOrders: SpotOrder[], strategyOrder: StrategyOrder): Promise<Result> {
     const { userId, strategyId, symbol, time, side } = strategyOrder;
     /*
     const spotPrice = await this.getSpotPrice(symbol);

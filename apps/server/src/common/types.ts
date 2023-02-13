@@ -41,7 +41,7 @@ export interface AssetType {
 }
 
 export interface SyncSpotOrderParams {
-  name: string
+  symbol: string
   startTime: number
   endTime: number
 }

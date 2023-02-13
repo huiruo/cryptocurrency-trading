@@ -16,13 +16,16 @@ import { FuturesOrder } from '../entity/futures-order.entity';
 import { SpotOrder } from '../entity/spot-order.entity';
 import { StrategyOrder } from '../entity/strategy-order.entity';
 import { StrategyOrderId } from '../entity/strategy-orderid.entity';
-import { AssetType } from 'src/common/types';
+import { AssetType, SyncSpotOrderParams } from 'src/common/types';
 import { TradeAsset } from '../entity/asset.entity';
 import { TraderApi } from '../entity/api.entity';
 import { DailyProfit } from '../entity/daily.profit.entity';
 import Big from 'big.js';
-import { OrderType } from 'binance-api-node';
+import { plus, minus, times, divide } from 'src/common/boter-math'
+import { MyTrade, OrderType } from 'binance-api-node';
 import { BinanceConnector } from 'src/common/binance-connector2';
+import { mockBTCOrders, mockIMX } from './mock-orders'
+import { log } from 'console';
 
 export interface BalanceType {
   asset: string;
@@ -42,11 +45,34 @@ const alCoin = ['BTC', 'ETH', 'BNB']
 // 不存在/过期的代币
 const excludeSymbol = ['ETHW']
 
+interface MyTrades {
+  symbol: string
+  qty: number
+  quoteQty: number
+  costPrice: number
+  totalFree: number
+  time: string
+  finalOrderId: string
+  isBuyer?: boolean
+}
+
+interface myTradeProfit {
+  profit: number;
+  profitRate: string;
+  // free: number
+}
+
+const myTrades: MyTrades[] = []
+
 @Injectable()
 export class DataCenterService {
   private client: BaseServiceBiance;
-  private wsClient: any;
-  private wsRef: any;
+  private userWsClient: any;
+  private userWsRef: any;
+
+  private positionWsClient: any;
+  private positionWsRef: any;
+
   constructor(
     private configService: ConfigService,
 
@@ -539,11 +565,66 @@ export class DataCenterService {
     return { total, alCoinVal, otherCoinVal }
   }
 
-  async createListenKey() {
-    return this.wsClient.createListenKey()
+  async getSpotOrder(spotOrderParams: SyncSpotOrderParams): Promise<MyTrade[]> {
+    const { symbol, startTime, endTime } = spotOrderParams
+    let options = {}
+    if (startTime && endTime) {
+      options = {
+        symbol,
+        recvWindow: 59999,
+        startTime,
+        endTime,
+      }
+    } else {
+      options = {
+        symbol,
+        recvWindow: 59999,
+      }
+    }
+
+    const { isSucceed, msg, data } = await this.client.myTrades(options);
+    if (!isSucceed) {
+      console.log('获取该资源的所有订单,error:', msg);
+      return null
+    }
+
+    console.log('获取该资源的所有订单数据:', data.length, spotOrderParams);
+
+    return data
   }
 
-  handleSocketData(data: any, eventType: string) {
+  async createListenKey() {
+    return this.userWsClient.createListenKey()
+  }
+
+  async startUserWebsocket(): Promise<Result> {
+    const apiKey = this.configService.get<string>('binanceApiKey');
+    const secretKey = this.configService.get<string>('binanceSecretKey');
+    this.userWsClient = new BinanceConnector(apiKey, secretKey)
+
+    const callbacks = {
+      open: () => console.log('Connected with Websocket server use userData'),
+      close: () => console.log('Disconnected with Websocket server use userData'),
+      message: (data: any) => {
+        console.log('UserWebsocket===>', data)
+        const dataObj = JSON.parse(data)
+        this.onUserData(dataObj, dataObj.e)
+      }
+    }
+
+    const { data: lkData, status } = await this.createListenKey()
+    if (status === 200) {
+      const listenKey = get(lkData, 'listenKey', '')
+      // wss://stream.binance.com:9443/ws/
+      this.userWsRef = this.userWsClient.userData(listenKey, callbacks)
+
+      return { code: 200, message: 'subscribeWebsocket userData ok', data: null };
+    }
+
+    return { code: 200, message: 'failed to subscribeWebsocket userData', data: null };
+  }
+
+  async onUserData(data: any, eventType: string) {
     if (eventType === 'executionReport') {
       const { E: time, s: symbol, S: side, o: orderType, q: qty, p: price, X: orderStatus, i: orderId, n: freeNum, N: freeAsset, Z: tradedQty, Y: notTradedQty } = data
       console.log('订单处理:', {
@@ -562,98 +643,382 @@ export class DataCenterService {
         notTradedQty
       })
 
-      console.log('orderStatus', orderStatus);
-
-      if (orderStatus == 'NEW') {
-        console.log('==挂单==', symbol);
-        if (symbol === 'IMXUSDT') {
-          console.log('获取订单==>', symbol);
-
-        }
+      // if (orderStatus === 'NEW') {
+      if (orderStatus === 'NEW' || orderStatus === 'CANCELED') {
+        console.log('==1.挂单==', orderStatus, symbol);
+        console.log('==测试,以下逻辑正式上线放在 orderStatus == TRADE,这里为了方便测试==', symbol);
+        // if (symbol === 'IMXUSDT') {
+        //   const symbol = 'IMXUSDT'
+        // 这里只传 symbol,因为订单可能被拆分，qty等参数在这里失去作用,所以订单的聚合在下面的逻辑
+        this.onTrade(symbol, side)
+        // }
       }
 
-      if (orderStatus == 'TRADE') {
-        console.log('==订单成交==', symbol);
+      if (orderStatus === 'TRADE') {
+        console.log('==2.订单成交==', symbol);
       }
 
-      if (orderStatus == 'CANCELED') {
-        console.log('==取消订单==');
+      if (orderStatus === 'CANCELED') {
+        console.log('==3.取消订单==');
       }
 
       if (orderStatus == 'REJECTED') {
-        console.log('==新订单被拒绝==', symbol);
+        console.log('==4.新订单被拒绝==', symbol);
       }
     }
   }
 
-  async unsubscribeWebsocket(): Promise<Result> {
-    if (this.wsClient) {
-      console.log('unsubscribeWebsocket start');
-      this.wsClient.unsubscribe(this.wsRef)
-      this.wsClient = null
-      return { code: 200, message: 'ok', data: null };
-    } else {
-      console.log('Websocket not running');
-
-      return { code: 200, message: 'Websocket not running', data: null };
-    }
-  }
-
-  async testWebsocket(): Promise<Result> {
-    const apiKey = this.configService.get<string>('binanceApiKey');
-    const secretKey = this.configService.get<string>('binanceSecretKey');
-    this.wsClient = new BinanceConnector(apiKey, secretKey)
-    /*
-    const { data } = await client.tickerPrice('BTCUSDT');
-    console.log('BTCUSDT:', data);
-    const res1 = await client.account();
-    const balances = get(res1, 'data.balances', []).filter(
+  // 找出持仓资源,也可以在 socket userData订阅返回，这里选择拿接口数据
+  async getAccountAsset(symbol: string): Promise<BalanceType> {
+    const res = await this.client.getAccountInfo();
+    const balances = get(res, 'balances', []).filter(
       (item) => Number(item.free) !== 0,
     ) as BalanceType[];
-    console.log('res1:', balances);
-    */
 
+    // test mock
+    /*
+    balances.push({
+      asset: 'IMX',
+      free: '504.54000000',
+      locked: '0.00000000'
+    })
+    */
+    // 2.10 18:02 挂单成交,1.008
+    balances.push({
+      asset: 'IMX',
+      free: '991.08',
+      locked: '0.00000000'
+    })
+    // console.log('balances:', balances);
+    // test mock
+
+    let balance = {} as BalanceType
+    balances.forEach((item) => {
+      const isInclude = symbol.search(new RegExp(`^${item.asset}`))
+      // console.log('==1.找出持仓asset==:', item);
+      if (isInclude !== -1) {
+        console.log('==2.找到持仓asset==:', item);
+        balance = item
+      }
+    })
+
+    return balance
+  }
+
+  async getAccountInfo(): Promise<BalanceType[]> {
+    const res = await this.client.getAccountInfo();
+    const balances = get(res, 'balances', []).filter(
+      (item) => Number(item.free) !== 0,
+    ) as BalanceType[];
+
+    return balances
+  }
+
+  tradeWS() {
+    const apiKey = this.configService.get<string>('binanceApiKey');
+    const secretKey = this.configService.get<string>('binanceSecretKey');
+    this.userWsClient = new BinanceConnector(apiKey, secretKey)
     const callbacks = {
       open: () => console.log('Connected with Websocket server'),
       close: () => console.log('Disconnected with Websocket server'),
-      message: data => {
-        console.log('info===>', data)
-        const dataObj = JSON.parse(data) as any
-        this.handleSocketData(dataObj, dataObj.e)
+      message: data => console.log('tradeWS:', data)
+    }
+
+    this.userWsRef = this.userWsClient.tradeWS('BTCUSDT', callbacks)
+    // setTimeout(() => this.wsClient.unsubscribe(wsRef), 60000)
+  }
+
+  tickerWS() {
+    // this.wsClient = new BinanceConnector('', '')
+    const apiKey = this.configService.get<string>('binanceApiKey');
+    const secretKey = this.configService.get<string>('binanceSecretKey');
+    this.userWsClient = new BinanceConnector(apiKey, secretKey)
+    const callbacks = {
+      open: () => console.log('Connected with Websocket server'),
+      close: () => console.log('Disconnected with Websocket server'),
+      message: data => console.log('tickerWS:', data)
+    }
+
+    this.userWsRef = this.userWsClient.tradeWS('BTCUSDT', callbacks)
+  }
+
+  /*
+  1s 1m 3m 5m 15m 30m 
+  */
+  klineWS(symbol: string, interval = '1m') {
+    // const apiKey = this.configService.get<string>('binanceApiKey');
+    // const secretKey = this.configService.get<string>('binanceSecretKey');
+    // this.wsClient = new BinanceConnector(apiKey, secretKey)
+    this.userWsClient = new BinanceConnector('', '')
+    const callbacks = {
+      open: () => console.log('Connected with Websocket server'),
+      close: () => console.log('Disconnected with Websocket server'),
+      message: data => console.log('tickerWS:', data)
+    }
+
+    this.userWsRef = this.userWsClient.klineWS(symbol, interval, callbacks)
+  }
+
+  // const symbols = ['IMXUSDT', 'BTCUSDT']
+  // const wsType = 'kline_1m'
+  // const wsType = 'kline_1s'
+  // const wsType = 'ticker'
+  // const wsType = 'miniTicker'
+  subscribeWsForPosition(wsType: string, myTradesParms: MyTrades[]) {
+    const symbolStreams = myTradesParms.map(item => `${item.symbol.toLowerCase()}@${wsType}`)
+    console.log('symbolStreams:', symbolStreams);
+    this.combinedStreams(symbolStreams, myTradesParms)
+  }
+
+  combinedStreams(symbolStreams: string[], myTradesParms: MyTrades[]) {
+    this.positionWsClient = new BinanceConnector('', '')
+    const callbacks = {
+      open: () => console.log('Connected with Websocket server use combinedStreams'),
+      close: () => console.log('Disconnected with Websocket server use combinedStreams'),
+      message: (data: any) => {
+        const dataObj = JSON.parse(data)
+        this.onCombinedStreams(dataObj.data, myTradesParms)
       }
     }
+    this.positionWsRef = this.positionWsClient.combinedStreams(symbolStreams, callbacks)
+  }
 
-    /*
-    // 聚合交易数据(aggTrades)
-    // const symbol = 'bnbusdt'
-    const symbol = 'BTCUSDT'
-    const wsRef = client.aggTradeWS(symbol, callbacks)
-    setTimeout(() => client.unsubscribe(wsRef), 10000)
-    */
+  onCombinedStreams(data: any, myTradesParms: MyTrades[]) {
+    const symbol = get(data, 's', '')
+    const price = get(data, 'k.c', '')
+    // console.log('info:', {
+    //   symbol,
+    //   high: get(data, 'k.h', ''),
+    //   low: get(data, 'k.l', ''),
+    //   first: get(data, 'k.o', ''),
+    //   price
+    // })
 
-    // userData
-    let listenKey = ''
-    const { data: lkData, status } = await this.createListenKey()
-    if (status === 200) {
-      listenKey = get(lkData, 'listenKey', '')
+    console.log('==combinedStreams===>', price)
+
+    // 开始计算盈利
+    myTradesParms.forEach((item, index) => {
+      if (item.symbol === symbol) {
+        const { qty, quoteQty, costPrice, totalFree } = item
+        console.log('开始计算盈利', symbol);
+        this.calculateMyTradeProfit(qty, quoteQty, costPrice, totalFree, price)
+      }
+    })
+  }
+
+  private async calculateMyTradeProfit(
+    qty: number,
+    quoteQty: number,
+    costPrice: number,
+    totalFree: number,
+    price: number,
+  ): Promise<myTradeProfit> {
+    // profit =（当天结算价－开仓价格）×持仓量×合约单位－手续费
+    const profit = minus(times(minus(price, costPrice), qty), totalFree)
+    const profitRate = times(divide(profit, quoteQty), 100).toFixed(2) + '%'
+    console.log('计算结果:', { profit, profitRate });
+
+    return {
+      profit,
+      profitRate,
+    };
+  }
+
+  async onTrade(symbol: string, side: boolean) {
+    // 第0步骤，ws 监听挂单的成交
+    // 逻辑在上面
+
+    // 第一步获取持仓资源
+    const { free: freeStr } = await this.getAccountAsset(symbol)
+    // 容错,获取持仓资源为空
+    if (!freeStr) {
+      console.log('获取持仓资源为空==>')
+      return
     }
+    const free = Number(freeStr)
+    console.log('获取持仓资源:', freeStr, '-', symbol)
 
-    // wss://stream.binance.com:9443/ws/
-    this.wsRef = this.wsClient.userData(listenKey, callbacks)
-    // 测试5*6分钟后取消订阅
-    // setTimeout(() => this.wsClient.unsubscribe(this.wsRef), 300000 * 1)
+    // 第二步获取该资源的所有订单: 排序：[older,...,newest],接口最大返回 500 条
+    // const orders = await this.getSpotOrder({ symbol, startTime: 0, endTime: 0 })
+    // const orders = mockBTCOrders
+    const orders = mockIMX
+    // console.log('orders:', orders);
 
-    return { code: 200, message: 'ok', data: null };
+
+    // console.log('这里是测试，移除最后一条数据');
+    // orders.splice(orders.length - 1, 1)
+
+    // 第三步开始计算成本
+    /*
+    1.买入0.1 btc，-->清仓 0.1 btc
+    2.asset: 0.05 btc,买入0.1 btc，-->清仓 0.15 btc
+    3.拆分订单的情况同
+    */
+    /*
+    {
+      symbol: 'IMXUSDT',
+      id: 13372380,
+      orderId: 245913449,
+      orderListId: -1,
+      price: '1.04300000',
+      qty: '504.54000000',
+      quoteQty: '526.23522000',
+      commission: '0.00127767',
+      commissionAsset: 'BNB',
+      time: 1676121041776,
+      isBuyer: false,
+      isMaker: false,
+      isBestMatch: true
+    }
+    */
+    // 反向遍历从最新遍历
+    let length = orders.length
+
+    // 生成myTrade
+    let qtyLoop = 0
+    let quoteQtyLoop = 0
+    let costPriceLoop = 0
+
+    for (let dynamicLength = orders.length - 1; dynamicLength >= 0; dynamicLength--) {
+      const { qty: qtyStr, quoteQty: quoteQtyStr, price: priceStr, symbol, orderId, time, isBuyer } = orders[dynamicLength];
+      const qty = Number(qtyStr)
+      const quoteQty = Number(quoteQtyStr)
+      const price = Number(priceStr)
+      // console.log('计算中:', dynamicLength)
+
+      // 情况1：只有一个订单
+      if (free === qty) {
+        console.log('=== 处理结果,order:', dynamicLength, '-', orders[dynamicLength]);
+        const trade = {
+          symbol,
+          qty,
+          quoteQty,
+          costPrice: price,
+          totalFree: 0,
+          finalOrderId: orderId,
+          time: ''
+        }
+
+        myTrades.push(trade)
+        // 第四步，开启 ws
+        this.startSubscribeWsForPosition(myTrades)
+        console.log('break:')
+
+        break
+      }
+
+      console.log('情况2===>：', dynamicLength);
+      // 继续加 qty
+      // 情况2：拆分订单,它的订单id是同一个
+      if (dynamicLength !== length - 1) {
+        let lastOrder = orders[dynamicLength + 1]
+        if (lastOrder.orderId === orderId) {
+          console.log('A.情况2-是合并订单', dynamicLength)
+          qtyLoop = plus(qtyLoop, qty)
+          quoteQtyLoop = plus(quoteQtyLoop, quoteQty)
+          // 补仓成本= 持仓成本+（补仓买入金额+手续费）/补仓数量
+          costPriceLoop = Number(divide(quoteQtyLoop, qtyLoop).toFixed(8))
+        } else {
+          console.log('B.情况2-独立订单', dynamicLength)
+          if (qtyLoop === free) {
+
+            console.log('-捕捉到交易订单-', { qtyLoop, quoteQtyLoop, costPriceLoop })
+            const trade = {
+              symbol,
+              qty: qtyLoop,
+              quoteQty: quoteQtyLoop,
+              costPrice: costPriceLoop,
+              totalFree: 0,
+              finalOrderId: orderId,
+              time,
+            }
+            myTrades.push(trade)
+            // 第四步，开启 ws
+            this.startSubscribeWsForPosition(myTrades)
+            break
+          } else {
+            console.log('D.asset对应不上，进一步计算是否有补仓/减仓', { qtyLoop, free })
+          }
+        }
+      } else {
+        qtyLoop = plus(qtyLoop, qty)
+        quoteQtyLoop = plus(quoteQtyLoop, quoteQty)
+        costPriceLoop = Number(divide(quoteQtyLoop, qtyLoop).toFixed(8))
+        console.log('=是第一条=，忽略合并:', { qtyLoop, costPriceLoop })
+      }
+    }
+  }
+
+  calculateSpotCostPrice(qty: number, quoteQty: number, isBuyer: number): { qtyLoop: number; quoteQtyLoop: number; constPrice: number } {
+    // 补仓成本= 持仓成本+（补仓买入金额+手续费）/补仓数量
+
+    return {
+      qtyLoop: 0,
+      quoteQtyLoop: 0,
+      constPrice: 0
+    }
+  }
+
+  async startSubscribeWsForPosition(myTrades: MyTrades[]) {
+    console.log('第四步，开启 ws==>', myTrades);
+    if (this.positionWsClient) {
+      console.log('第四步1-1，先关闭 ws==>');
+      await this.unsubscribePositionWs()
+      console.log('第四步1-2，再开启 ws==>');
+      this.subscribeWsForPosition('kline_1m', myTrades)
+    } else {
+      console.log('第四步-B，开启 ws==>');
+      this.subscribeWsForPosition('kline_1m', myTrades)
+    }
+  }
+
+  async unsubscribePositionWs(): Promise<Result> {
+    console.log('unsubscribePositionWs start');
+    if (this.positionWsClient) {
+      console.log('A-1.PositionWs 不为空');
+      await this.positionWsClient.unsubscribe(this.positionWsRef)
+      console.log('A-2.PositionWs 不为空');
+      this.positionWsClient = null
+      this.positionWsRef = null
+      return { code: 200, message: 'stop ok', data: null };
+    } else {
+      // this.tradeWS()
+      // this.tickerWS()
+      // const symbol = 'IMXUSDT'
+      // this.klineWS(symbol, '1s',)
+      // this.onTrade()
+      console.log('B.PositionWs not running');
+      return { code: 200, message: 'PositionWs not running', data: null };
+      // return { code: 200, message: 'Websocket not running', data: orders };
+    }
+  }
+
+  async unsubscribeUserWs(): Promise<Result> {
+    console.log('unsubscribeUserWs start');
+    if (this.userWsClient) {
+      console.log('A-1.UserWs 不为空');
+      await this.userWsClient.unsubscribe(this.userWsRef)
+      console.log('A-2.UserWs 不为空');
+      this.userWsClient = null
+      this.userWsRef = null
+      return { code: 200, message: 'stop ok', data: null };
+    } else {
+      // this.tradeWS()
+      // this.tickerWS()
+      // const symbol = 'IMXUSDT'
+      // this.klineWS(symbol, '1s',)
+      // this.onTrade()
+      console.log('B.UserWs not running');
+      return { code: 200, message: 'UserWs not running', data: null };
+      // return { code: 200, message: 'Websocket not running', data: orders };
+    }
   }
 
   async syncBalances(): Promise<Result> {
     try {
       const balancesExchangeUsdt: string[] = []
       const earnsOrExclude: string[] = []
-      const res = await this.client.getAccountInfo();
-      const balances = get(res, 'balances', []).filter(
-        (item) => Number(item.free) !== 0,
-      ) as BalanceType[];
+      const balances = await this.getAccountInfo()
 
       balances.forEach((_, index) => {
         const asset = this.handleFlexibleEarnAndlocked(index, balances, earnsOrExclude)
@@ -667,12 +1032,14 @@ export class DataCenterService {
       const balancesTarget = balances.filter(item => !earnsOrExclude.includes(item.asset))
 
       // mock test start
+      /*
       balancesTarget.push({
         asset: 'IMX',
         free: '504.54000000',
         locked: '0.00000000'
       })
       balancesExchangeUsdt.push('IMXUSDT')
+      */
       // mock test end
 
       const symbols = Array.from(new Set(balancesExchangeUsdt))

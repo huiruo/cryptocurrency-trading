@@ -37,8 +37,8 @@ export function Balances() {
     }
   }
 
-  const onTestWebsocket = async () => {
-    const res = await traderApi.testWebsocketApi()
+  const startUserWebsocket = async () => {
+    const res = await traderApi.startUserWebsocket()
     if (res.code === 200) {
       console.log('res', res);
     } else {
@@ -46,8 +46,17 @@ export function Balances() {
     }
   }
 
-  const onUnsubscribeWebsocket = async () => {
-    const res = await traderApi.unsubscribeWebsocketApi()
+  const onUnsubscribePositionWs = async () => {
+    const res = await traderApi.unsubscribePositionWsApi()
+    if (res.code === 200) {
+      console.log('res', res.message);
+    } else {
+      alert("get balances error")
+    }
+  }
+
+  const onUnsubscribeUserWs = async () => {
+    const res = await traderApi.unsubscribeUserWsApi()
     if (res.code === 200) {
       console.log('res', res.message);
     } else {
@@ -78,9 +87,10 @@ export function Balances() {
       <Box pb='50px' mt='20px'>
         <Box toCenterX mb='20px'>
           <Box w='90%'>
-            <Button onClick={() => onSyncBalances()} mr4>Sync balances</Button>
-            <Button onClick={() => onTestWebsocket()} mr4>test websocket</Button>
-            <Button onClick={() => onUnsubscribeWebsocket()} mr4>unsubscribe Websocket</Button>
+            <Button onClick={() => onSyncBalances()} mr4>sync balances</Button>
+            <Button onClick={() => startUserWebsocket()} mr4>start user ws</Button>
+            <Button onClick={() => onUnsubscribeUserWs()} mr4>unsubscribe userWs</Button>
+            <Button onClick={() => onUnsubscribePositionWs()} mr4>unsubscribe positionWs</Button>
           </Box>
         </Box>
 

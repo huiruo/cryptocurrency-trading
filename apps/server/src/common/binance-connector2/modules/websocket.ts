@@ -26,6 +26,7 @@ export const Websocket = superclass => class extends superclass {
    * {@link https://binance-docs.github.io/apidocs/spot/en/#aggregate-trade-streams}
    *
    * @param {string} symbol
+   * 归集交易与逐笔交易的区别在于，同一价格、同一方向、同一时间的trade会被聚合为一条
    */
   aggTradeWS(symbol, callbacks) {
     validateRequiredParameters({ symbol })

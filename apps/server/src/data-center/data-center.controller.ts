@@ -49,14 +49,19 @@ export class DataCenterController {
     return await this.DataCenterService.syncBalances();
   }
 
-  @Get('testWebsocket')
+  @Get('userWebsocket')
   async testWebsocket(): Promise<Result> {
-    return await this.DataCenterService.testWebsocket();
+    return await this.DataCenterService.startUserWebsocket();
   }
 
-  @Get('unsubscribeWebsocket')
-  async unsubscribeWebsocket(): Promise<Result> {
-    return await this.DataCenterService.unsubscribeWebsocket();
+  @Get('unsubscribeUserWs')
+  async unsubscribeUserWs(): Promise<Result> {
+    return await this.DataCenterService.unsubscribeUserWs();
+  }
+
+  @Get('unsubscribePositionWs')
+  async unsubscribePositionWs(): Promise<Result> {
+    return await this.DataCenterService.unsubscribePositionWs();
   }
 
   @Get('balances')

@@ -72,7 +72,6 @@ export class SpotService {
         },${pageSize}`;
     }
 
-
     const res = await this.spotOrderRepo.query(sql);
     const pageRes = await this.spotOrderRepo.query(pageSql);
 
@@ -86,25 +85,25 @@ export class SpotService {
   }
 
   async syncSpotOrder(spotOrderParams: SyncSpotOrderParams): Promise<Result> {
-    const { name, startTime, endTime } = spotOrderParams
+    const { symbol, startTime, endTime } = spotOrderParams
     let options = {}
     if (startTime && endTime) {
       options = {
-        symbol: name,
+        symbol,
         recvWindow: 59999,
         startTime,
         endTime,
       }
     } else {
       options = {
-        symbol: name,
+        symbol,
         recvWindow: 59999,
       }
     }
 
     const { isSucceed, msg, data } = await this.client.myTrades(options);
     if (!isSucceed) {
-      return { code: 599, message: 'More than 24 hours between startTime and endTime.', data: null };
+      return { code: 599, message: msg, data: null };
     }
 
     console.log('spotOrderParams:', spotOrderParams, 'info:', data.length);
