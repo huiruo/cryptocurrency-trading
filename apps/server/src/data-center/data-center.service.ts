@@ -38,8 +38,6 @@ export interface BalanceType {
   canSellFree?: string
 }
 
-let isTrade = 0
-
 const stableCoins = ['USDT', 'BUSD', 'USDC'];
 const alCoin = ['BTC', 'ETH', 'BNB']
 // 不存在/过期的代币
@@ -51,9 +49,10 @@ interface MyTrades {
   quoteQty: number
   costPrice: number
   totalFree: number
-  time: string
-  finalOrderId: string
+  time: number
+  finalOrderId: number
   isBuyer?: boolean
+  isRunning: boolean
 }
 
 interface myTradeProfit {
@@ -684,11 +683,13 @@ export class DataCenterService {
     })
     */
     // 2.10 18:02 挂单成交,1.008
+    /*
     balances.push({
       asset: 'IMX',
       free: '991.08',
       locked: '0.00000000'
     })
+    */
     // console.log('balances:', balances);
     // test mock
 
@@ -829,19 +830,22 @@ export class DataCenterService {
     // 逻辑在上面
 
     // 第一步获取持仓资源
-    const { free: freeStr } = await this.getAccountAsset(symbol)
+    const { free: freeStr, locked: lockedStr } = await this.getAccountAsset(symbol)
+    console.log('获取持仓资源是否为空==>', { freeStr, lockedStr })
     // 容错,获取持仓资源为空
     if (!freeStr) {
       console.log('获取持仓资源为空==>')
       return
     }
     const free = Number(freeStr)
-    console.log('获取持仓资源:', freeStr, '-', symbol)
+    const locked = Number(lockedStr)
+    const assetTotal = plus(free, locked)
+    console.log('获取持仓资源:', { free, locked, assetTotal }, '-', symbol)
 
     // 第二步获取该资源的所有订单: 排序：[older,...,newest],接口最大返回 500 条
-    // const orders = await this.getSpotOrder({ symbol, startTime: 0, endTime: 0 })
+    const orders = await this.getSpotOrder({ symbol, startTime: 0, endTime: 0 })
     // const orders = mockBTCOrders
-    const orders = mockIMX
+    // const orders = mockIMX
     // console.log('orders:', orders);
 
 
@@ -877,7 +881,7 @@ export class DataCenterService {
     // 生成myTrade
     let qtyLoop = 0
     let quoteQtyLoop = 0
-    let costPriceLoop = 0
+    let freeLoop = 0
 
     for (let dynamicLength = orders.length - 1; dynamicLength >= 0; dynamicLength--) {
       const { qty: qtyStr, quoteQty: quoteQtyStr, price: priceStr, symbol, orderId, time, isBuyer } = orders[dynamicLength];
@@ -887,19 +891,28 @@ export class DataCenterService {
       // console.log('计算中:', dynamicLength)
 
       // 情况1：只有一个订单
-      if (free === qty) {
-        console.log('=== 处理结果,order:', dynamicLength, '-', orders[dynamicLength]);
-        const trade = {
-          symbol,
-          qty,
-          quoteQty,
-          costPrice: price,
-          totalFree: 0,
-          finalOrderId: orderId,
-          time: ''
+      if (assetTotal === qty) {
+        if (isBuyer) {
+          console.log('只有一个订单-买入')
+          myTrades.push({
+            symbol,
+            qty,
+            quoteQty,
+            costPrice: price,
+            totalFree: 0,
+            finalOrderId: orderId,
+            time,
+            isRunning: true
+          })
         }
 
-        myTrades.push(trade)
+        /* 清仓逻辑未处理,不应该在这
+        else {
+          console.log('只有一个订单-卖出')
+          const index = myTrades.findIndex(item => item.symbol == symbol)
+          myTrades[index].isRunning = false
+        }
+        */
         // 第四步，开启 ws
         this.startSubscribeWsForPosition(myTrades)
         console.log('break:')
@@ -908,22 +921,24 @@ export class DataCenterService {
       }
 
       console.log('情况2===>：', dynamicLength);
-      // 继续加 qty
-      // 情况2：拆分订单,它的订单id是同一个
+      // dynamicLength !== length - 1 排除最新的一条数据
       if (dynamicLength !== length - 1) {
+        // 情况2：拆分订单,判断它的订单id是同一个
         let lastOrder = orders[dynamicLength + 1]
         if (lastOrder.orderId === orderId) {
-          console.log('A.情况2-是合并订单', dynamicLength)
-          qtyLoop = plus(qtyLoop, qty)
-          quoteQtyLoop = plus(quoteQtyLoop, quoteQty)
-          // 补仓成本= 持仓成本+（补仓买入金额+手续费）/补仓数量
-          costPriceLoop = Number(divide(quoteQtyLoop, qtyLoop).toFixed(8))
+          const { qtyCal, quoteQtyCal } = this.calculateSpotCostPrice(qty, quoteQty, qtyLoop, quoteQtyLoop, isBuyer)
+          qtyLoop = qtyCal
+          quoteQtyLoop = quoteQtyCal
+          if (isBuyer) {
+            console.log('A.情况2-是合并订单买入', qty, qtyLoop, '--', quoteQty, quoteQtyLoop)
+          } else {
+            console.log('A.情况2-是合并订单卖出', qty, qtyLoop, '--', quoteQty, quoteQtyLoop)
+          }
         } else {
-          console.log('B.情况2-独立订单', dynamicLength)
-          if (qtyLoop === free) {
-
-            console.log('-捕捉到交易订单-', { qtyLoop, quoteQtyLoop, costPriceLoop })
-            const trade = {
+          if (qtyLoop === assetTotal) {
+            const costPriceLoop = Number(divide(quoteQtyLoop, qtyLoop).toFixed(8))
+            console.log('B.合并订单计算完毕-结束循环', { qtyLoop, quoteQtyLoop, costPriceLoop })
+            myTrades.push({
               symbol,
               qty: qtyLoop,
               quoteQty: quoteQtyLoop,
@@ -931,31 +946,74 @@ export class DataCenterService {
               totalFree: 0,
               finalOrderId: orderId,
               time,
-            }
-            myTrades.push(trade)
+              isRunning: true
+            })
             // 第四步，开启 ws
             this.startSubscribeWsForPosition(myTrades)
+
             break
           } else {
-            console.log('D.asset对应不上，进一步计算是否有补仓/减仓', { qtyLoop, free })
+            const { qtyCal, quoteQtyCal } = this.calculateSpotCostPrice(qty, quoteQty, qtyLoop, quoteQtyLoop, isBuyer)
+            if (isBuyer) {
+              console.log('B.独立订单-asset对应不上，进一步计算补仓', { qty, qtyLoop, quoteQty, quoteQtyLoop, assetTotal })
+            } else {
+              console.log('B.独立订单-asset对应不上，进一步计算减仓', { qty, qtyLoop, quoteQty, quoteQtyLoop, assetTotal })
+            }
+            // 如果订单计算的qty> 持有的token数量,初略认为是最后一个订单
+            // 0.99 > 1.023 < 2
+            if (qtyCal > assetTotal) {
+              const costPriceLoop = Number(divide(quoteQtyLoop, qtyLoop).toFixed(8))
+              console.log('如果订单计算的qty> 持有的token数量,初略认为是最后一个订单,结束循环', { qtyLoop, quoteQtyLoop, assetTotal, costPriceLoop })
+              myTrades.push({
+                symbol,
+                qty: qtyLoop,
+                quoteQty: quoteQtyLoop,
+                costPrice: costPriceLoop,
+                totalFree: 0,
+                finalOrderId: orderId,
+                time,
+                isRunning: true
+              })
+              // 第四步，开启 ws
+              this.startSubscribeWsForPosition(myTrades)
+              break
+            }
+            // else if(qtyCal < assetTotal){
+
+            // } 
+            else {
+              qtyLoop = qtyCal
+              quoteQtyLoop = quoteQtyCal
+            }
           }
         }
       } else {
-        qtyLoop = plus(qtyLoop, qty)
-        quoteQtyLoop = plus(quoteQtyLoop, quoteQty)
-        costPriceLoop = Number(divide(quoteQtyLoop, qtyLoop).toFixed(8))
-        console.log('=是第一条=，忽略合并:', { qtyLoop, costPriceLoop })
+        const { qtyCal, quoteQtyCal } = this.calculateSpotCostPrice(qty, quoteQty, qtyLoop, quoteQtyLoop, isBuyer)
+        qtyLoop = qtyCal
+        quoteQtyLoop = quoteQtyCal
+        if (isBuyer) {
+          console.log('=是第一条=，忽略合并-卖入', qty, qtyLoop, '--', quoteQty, quoteQtyLoop)
+        } else {
+          console.log('=是第一条=，忽略合并-卖出', qty, qtyLoop, '--', quoteQty, quoteQtyLoop)
+        }
       }
     }
   }
 
-  calculateSpotCostPrice(qty: number, quoteQty: number, isBuyer: number): { qtyLoop: number; quoteQtyLoop: number; constPrice: number } {
+  calculateSpotCostPrice(qty: number, quoteQty: number, qtyLoop: number, quoteQtyLoop: number, isBuyer: boolean | number): { qtyCal: number; quoteQtyCal: number; } {
     // 补仓成本= 持仓成本+（补仓买入金额+手续费）/补仓数量
-
+    if (isBuyer) {
+      qtyLoop = plus(qtyLoop, qty)
+      quoteQtyLoop = plus(quoteQtyLoop, quoteQty)
+      console.log('A.情况2-是合并订单买入', qty, qtyLoop, '--', quoteQty, quoteQtyLoop)
+    } else {
+      qtyLoop = minus(qtyLoop, qty)
+      quoteQtyLoop = minus(quoteQtyLoop, quoteQty)
+      console.log('A.情况2-是合并订单卖出', qty, qtyLoop, '--', quoteQty, quoteQtyLoop)
+    }
     return {
-      qtyLoop: 0,
-      quoteQtyLoop: 0,
-      constPrice: 0
+      qtyCal: qtyLoop,
+      quoteQtyCal: quoteQtyLoop,
     }
   }
 
