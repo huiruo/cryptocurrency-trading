@@ -12,6 +12,7 @@ interface Props {
   assetSyncValueCallback: (value: string) => void
 }
 
+// 单位毫秒
 const startTimeDefault = Number(moment().startOf('day').format('x'));
 const endTimeDefault = Number(moment().endOf('day').format('x'));
 const dateFormat = 'YYYY-MM-DD HH:mm:ss';

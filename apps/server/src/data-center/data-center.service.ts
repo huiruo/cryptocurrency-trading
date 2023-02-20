@@ -24,8 +24,7 @@ import Big from 'big.js';
 import { plus, minus, times, divide } from 'src/common/boter-math'
 import { MyTrade, OrderType } from 'binance-api-node';
 import { BinanceConnector } from 'src/common/binance-connector2';
-import { mockBTCOrders, mockIMX } from './mock-orders'
-import { log } from 'console';
+// import { mockBTCOrders, mockIMX } from './mock-orders'
 
 export interface BalanceType {
   asset: string;
@@ -33,7 +32,7 @@ export interface BalanceType {
   // 挂单的锁定
   locked: string;
   // 币价值
-  value?: number
+  quoteQty: number
   // 可以出售的free,当有理财才有值，否则直接取free进行出售
   canSellFree?: string
 }
@@ -488,7 +487,9 @@ export class DataCenterService {
   // 处理活期理财/挂单locked/过期的代币；生成请求price数组
   private handleFlexibleEarnAndlocked(index: number, balances: BalanceType[], earnsOrExclude: string[]): string {
     const balance = balances[index]
-    const { locked, free } = balance
+    const { locked: lockedStr, free: freeStr } = balance
+    const free = Number(freeStr)
+    const locked = Number(lockedStr)
     const { asset, isEarn } = this.search_LD_earn(balance.asset)
     // 处理不存在/过期的代币
     if (excludeSymbol.includes(asset)) {
@@ -499,12 +500,12 @@ export class DataCenterService {
     }
 
     // 处理挂单
-    if (Number(locked)) {
+    if (locked) {
       const assetIndex = balances.findIndex(item => {
         return item.asset === asset;
       });
-      const freeTotal = new Big(free).plus(locked).toString();
-      balances[assetIndex] = { ...balance, free: freeTotal, canSellFree: free }
+      const freeTotal = plus(free, locked).toString();
+      balances[assetIndex] = { ...balance, free: freeTotal, canSellFree: freeStr }
     }
 
     // 处理活期理财
@@ -512,52 +513,57 @@ export class DataCenterService {
       const assetIndex = balances.findIndex(item => {
         return item.asset === asset;
       });
+
       if (assetIndex > -1) {
         // 1.存在现货+活期，移除活期理财，合并入现货
         const { free: spotFree, asset: spotAsset, locked: spotLocked } = balances[assetIndex]
-        const freeTotal = new Big(free).plus(spotFree).toString();
-        balances[assetIndex] = { locked: spotLocked, free: freeTotal, asset: spotAsset, canSellFree: spotFree }
+        const freeTotal = plus(free, Number(spotFree)).toString();
+        balances[assetIndex] = { locked: spotLocked, free: freeTotal, asset: spotAsset, quoteQty: 0, canSellFree: spotFree }
         earnsOrExclude.push(balance.asset)
       } else {
         // 2.直接添加活期理财
-        balances[index] = { locked, free, asset, canSellFree: '0' }
+        balances[index] = { locked: lockedStr, free: freeStr, asset, quoteQty: 0, canSellFree: '0' }
       }
     }
 
     return asset
   }
 
+  // 计算总价值和单个币种的价值
   calculateValue(balances: BalanceType[], symbolsPriceMap: Map<string, string>): { total: number, alCoinVal: number, otherCoinVal: number } {
     let total = 0
     let alCoinVal = 0
     let otherCoinVal = 0
     balances.forEach((balance, index) => {
-      const { free, asset, locked } = balance
+      const { free: freeStr, asset, locked } = balance
 
       const exchange = asset + 'USDT'
-      const freeNums = Number(free)
+      const free = Number(freeStr)
       if (!stableCoins.includes(asset)) {
         const lockedNums = Number(locked)
         // 这里注意，symbolsPriceMap.get(exchange) 找不到 对应的key,下面逻辑就会报错,所以这里排除price为 NaN 容错
         const price = Number(symbolsPriceMap.get(exchange))
         if (price) {
-          const coins = new Big(freeNums).plus(lockedNums);
-          const value = coins.times(price).toNumber()
-          total = total + value
-          balances[index].value = value
+          const coins = plus(free, lockedNums);
+          // 持仓总价值
+          const quoteQty = times(coins, price)
+          total = plus(total, quoteQty)
+          balances[index].quoteQty = quoteQty
           if (alCoin.includes(asset)) {
             // ${asset}添加入alCoin
-            alCoinVal = alCoinVal + value
+            // alCoinVal = alCoinVal + quoteQty
+            alCoinVal = plus(alCoinVal, quoteQty)
           } else {
             // ${asset}添加入otherCoin
-            otherCoinVal = otherCoinVal + value
+            // otherCoinVal = otherCoinVal + quoteQty
+            otherCoinVal = plus(otherCoinVal, quoteQty)
           }
         }
       } else {
-        // freeNums包括活期的理财稳定币+现货，但是不包括挖矿锁仓/定期的币
-        total = total + freeNums
-        alCoinVal = alCoinVal + freeNums
-        balances[index].value = freeNums
+        // free包括活期的理财稳定币+现货，但是不包括挖矿锁仓/定期的币
+        total = plus(total, free)
+        alCoinVal = plus(alCoinVal, free)
+        balances[index].quoteQty = free
       }
     })
 
@@ -614,7 +620,6 @@ export class DataCenterService {
     const { data: lkData, status } = await this.createListenKey()
     if (status === 200) {
       const listenKey = get(lkData, 'listenKey', '')
-      // wss://stream.binance.com:9443/ws/
       this.userWsRef = this.userWsClient.userData(listenKey, callbacks)
 
       return { code: 200, message: 'subscribeWebsocket userData ok', data: null };
@@ -642,15 +647,8 @@ export class DataCenterService {
         notTradedQty
       })
 
-      // if (orderStatus === 'NEW') {
-      if (orderStatus === 'NEW' || orderStatus === 'CANCELED') {
-        console.log('==1.挂单==', orderStatus, symbol);
-        console.log('==测试,以下逻辑正式上线放在 orderStatus == TRADE,这里为了方便测试==', symbol);
-        // if (symbol === 'IMXUSDT') {
-        //   const symbol = 'IMXUSDT'
-        // 这里只传 symbol,因为订单可能被拆分，qty等参数在这里失去作用,所以订单的聚合在下面的逻辑
-        this.onTrade(symbol, side)
-        // }
+      if (orderStatus === 'NEW') {
+        console.log('==1.挂单==');
       }
 
       if (orderStatus === 'TRADE') {
@@ -659,6 +657,9 @@ export class DataCenterService {
 
       if (orderStatus === 'CANCELED') {
         console.log('==3.取消订单==');
+        // 这里只传 symbol,因为订单可能被拆分，qty等参数在这里失去作用,所以订单的聚合在下面的逻辑
+        console.log('==测试,以下逻辑正式上线放在 orderStatus == TRADE,这里为了方便测试==');
+        this.onTrade(symbol, side)
       }
 
       if (orderStatus == 'REJECTED') {
@@ -787,40 +788,30 @@ export class DataCenterService {
   onCombinedStreams(data: any, myTradesParms: MyTrades[]) {
     const symbol = get(data, 's', '')
     const price = get(data, 'k.c', '')
-    // console.log('info:', {
-    //   symbol,
-    //   high: get(data, 'k.h', ''),
-    //   low: get(data, 'k.l', ''),
-    //   first: get(data, 'k.o', ''),
-    //   price
-    // })
-
-    console.log('==combinedStreams===>', price)
-
+    const time = get(data, 'E', '')
     // 开始计算盈利
-    myTradesParms.forEach((item, index) => {
+    myTradesParms.forEach(item => {
       if (item.symbol === symbol) {
         const { qty, quoteQty, costPrice, totalFree } = item
-        console.log('开始计算盈利', symbol);
-        this.calculateMyTradeProfit(qty, quoteQty, costPrice, totalFree, price)
+        const { profit, profitRate } = this.calculateMyTradeProfit(qty, quoteQty, costPrice, totalFree, price)
+        console.log(`${symbol}=${price};成本${costPrice},盈亏${profit},${profitRate},持仓${quoteQty}=${new Date(time).toLocaleString()}`);
       }
     })
   }
 
-  private async calculateMyTradeProfit(
+  private calculateMyTradeProfit(
     qty: number,
     quoteQty: number,
     costPrice: number,
     totalFree: number,
     price: number,
-  ): Promise<myTradeProfit> {
+  ): myTradeProfit {
     // profit =（当天结算价－开仓价格）×持仓量×合约单位－手续费
     const profit = minus(times(minus(price, costPrice), qty), totalFree)
     const profitRate = times(divide(profit, quoteQty), 100).toFixed(2) + '%'
-    console.log('计算结果:', { profit, profitRate });
 
     return {
-      profit,
+      profit: Number(profit.toFixed(2)),
       profitRate,
     };
   }
@@ -834,66 +825,40 @@ export class DataCenterService {
     console.log('获取持仓资源是否为空==>', { freeStr, lockedStr })
     // 容错,获取持仓资源为空
     if (!freeStr) {
-      console.log('获取持仓资源为空==>')
+      /* 清仓逻辑未处理
+      else {
+        console.log('只有一个订单-卖出')
+        const index = myTrades.findIndex(item => item.symbol == symbol)
+        myTrades[index].isRunning = false
+      }
+      */
       return
     }
+
     const free = Number(freeStr)
     const locked = Number(lockedStr)
     const assetTotal = plus(free, locked)
-    console.log('获取持仓资源:', { free, locked, assetTotal }, '-', symbol)
+    console.log('获取持仓资源:', { symbol, free, locked, assetTotal })
+
 
     // 第二步获取该资源的所有订单: 排序：[older,...,newest],接口最大返回 500 条
     const orders = await this.getSpotOrder({ symbol, startTime: 0, endTime: 0 })
-    // const orders = mockBTCOrders
-    // const orders = mockIMX
-    // console.log('orders:', orders);
-
-
-    // console.log('这里是测试，移除最后一条数据');
-    // orders.splice(orders.length - 1, 1)
-
-    // 第三步开始计算成本
-    /*
-    1.买入0.1 btc，-->清仓 0.1 btc
-    2.asset: 0.05 btc,买入0.1 btc，-->清仓 0.15 btc
-    3.拆分订单的情况同
-    */
-    /*
-    {
-      symbol: 'IMXUSDT',
-      id: 13372380,
-      orderId: 245913449,
-      orderListId: -1,
-      price: '1.04300000',
-      qty: '504.54000000',
-      quoteQty: '526.23522000',
-      commission: '0.00127767',
-      commissionAsset: 'BNB',
-      time: 1676121041776,
-      isBuyer: false,
-      isMaker: false,
-      isBestMatch: true
-    }
-    */
-    // 反向遍历从最新遍历
-    let length = orders.length
-
     // 生成myTrade
     let qtyLoop = 0
     let quoteQtyLoop = 0
-    let freeLoop = 0
 
+    // 反向遍历从最新遍历
+    let length = orders.length
     for (let dynamicLength = orders.length - 1; dynamicLength >= 0; dynamicLength--) {
       const { qty: qtyStr, quoteQty: quoteQtyStr, price: priceStr, symbol, orderId, time, isBuyer } = orders[dynamicLength];
       const qty = Number(qtyStr)
       const quoteQty = Number(quoteQtyStr)
       const price = Number(priceStr)
-      // console.log('计算中:', dynamicLength)
 
       // 情况1：只有一个订单
       if (assetTotal === qty) {
         if (isBuyer) {
-          console.log('只有一个订单-买入')
+          console.log(`只有一个买入订单-结束循环', ${qty}, ${qtyLoop}, ${quoteQty}, ${quoteQtyLoop},${new Date(time).toLocaleString()}`)
           myTrades.push({
             symbol,
             qty,
@@ -906,21 +871,12 @@ export class DataCenterService {
           })
         }
 
-        /* 清仓逻辑未处理,不应该在这
-        else {
-          console.log('只有一个订单-卖出')
-          const index = myTrades.findIndex(item => item.symbol == symbol)
-          myTrades[index].isRunning = false
-        }
-        */
         // 第四步，开启 ws
         this.startSubscribeWsForPosition(myTrades)
-        console.log('break:')
 
         break
       }
 
-      console.log('情况2===>：', dynamicLength);
       // dynamicLength !== length - 1 排除最新的一条数据
       if (dynamicLength !== length - 1) {
         // 情况2：拆分订单,判断它的订单id是同一个
@@ -930,14 +886,40 @@ export class DataCenterService {
           qtyLoop = qtyCal
           quoteQtyLoop = quoteQtyCal
           if (isBuyer) {
-            console.log('A.情况2-是合并订单买入', qty, qtyLoop, '--', quoteQty, quoteQtyLoop)
+            console.log(`A.情况2-是合并订单买入', ${qty}, ${qtyLoop}, ${quoteQty}, ${quoteQtyLoop},${new Date(time).toLocaleString()}`)
           } else {
-            console.log('A.情况2-是合并订单卖出', qty, qtyLoop, '--', quoteQty, quoteQtyLoop)
+            console.log(`A.情况2-是合并订单卖出', ${qty}, ${qtyLoop}, ${quoteQty}, ${quoteQtyLoop},${new Date(time).toLocaleString()}`)
           }
         } else {
           if (qtyLoop === assetTotal) {
             const costPriceLoop = Number(divide(quoteQtyLoop, qtyLoop).toFixed(8))
-            console.log('B.合并订单计算完毕-结束循环', { qtyLoop, quoteQtyLoop, costPriceLoop })
+            console.log(`B.订单计算完毕-结束循环', ${qty}, ${qtyLoop}, ${quoteQty}, ${quoteQtyLoop},${costPriceLoop},${new Date(time).toLocaleString()}`)
+            myTrades.push({
+              symbol,
+              qty: qtyLoop,
+              quoteQty: quoteQtyLoop,
+              costPrice: costPriceLoop,
+              totalFree: 0,
+              finalOrderId: orderId,
+              time,
+              isRunning: true
+            })
+            // 第四步，开启 ws
+            this.startSubscribeWsForPosition(myTrades)
+
+            break
+          } else if (qtyLoop > assetTotal) {
+            const costPriceLoop = Number(divide(quoteQtyLoop, qtyLoop).toFixed(8))
+            console.log(`如果订单计算的qtyLoop > 持有的token数量,认为上一条是最后一个订单,把数据复原到上一条,结束循环', ${qty}, ${qtyLoop}, ${quoteQty}, ${quoteQtyLoop},${new Date(time).toLocaleString()}`)
+            // 如果是买入，减回去;卖出，加回去
+            if (isBuyer) {
+              qtyLoop = minus(qtyLoop, qty)
+              quoteQtyLoop = minus(quoteQtyLoop, quoteQty)
+            } else {
+              qtyLoop = plus(qtyLoop, qty)
+              quoteQtyLoop = plus(quoteQtyLoop, quoteQty)
+            }
+
             myTrades.push({
               symbol,
               qty: qtyLoop,
@@ -954,36 +936,12 @@ export class DataCenterService {
             break
           } else {
             const { qtyCal, quoteQtyCal } = this.calculateSpotCostPrice(qty, quoteQty, qtyLoop, quoteQtyLoop, isBuyer)
+            qtyLoop = qtyCal
+            quoteQtyLoop = quoteQtyCal
             if (isBuyer) {
-              console.log('B.独立订单-asset对应不上，进一步计算补仓', { qty, qtyLoop, quoteQty, quoteQtyLoop, assetTotal })
+              console.log(`B.独立订单-asset对应不上，进一步计算补仓', ${qty}, ${qtyLoop}, ${quoteQty}, ${quoteQtyLoop},${new Date(time).toLocaleString()}`)
             } else {
-              console.log('B.独立订单-asset对应不上，进一步计算减仓', { qty, qtyLoop, quoteQty, quoteQtyLoop, assetTotal })
-            }
-            // 如果订单计算的qty> 持有的token数量,初略认为是最后一个订单
-            // 0.99 > 1.023 < 2
-            if (qtyCal > assetTotal) {
-              const costPriceLoop = Number(divide(quoteQtyLoop, qtyLoop).toFixed(8))
-              console.log('如果订单计算的qty> 持有的token数量,初略认为是最后一个订单,结束循环', { qtyLoop, quoteQtyLoop, assetTotal, costPriceLoop })
-              myTrades.push({
-                symbol,
-                qty: qtyLoop,
-                quoteQty: quoteQtyLoop,
-                costPrice: costPriceLoop,
-                totalFree: 0,
-                finalOrderId: orderId,
-                time,
-                isRunning: true
-              })
-              // 第四步，开启 ws
-              this.startSubscribeWsForPosition(myTrades)
-              break
-            }
-            // else if(qtyCal < assetTotal){
-
-            // } 
-            else {
-              qtyLoop = qtyCal
-              quoteQtyLoop = quoteQtyCal
+              console.log(`B.独立订单-asset对应不上，进一步计算减仓', ${qty}, ${qtyLoop}, ${quoteQty}, ${quoteQtyLoop},${new Date(time).toLocaleString()}`)
             }
           }
         }
@@ -992,9 +950,9 @@ export class DataCenterService {
         qtyLoop = qtyCal
         quoteQtyLoop = quoteQtyCal
         if (isBuyer) {
-          console.log('=是第一条=，忽略合并-卖入', qty, qtyLoop, '--', quoteQty, quoteQtyLoop)
+          console.log(`=第一条循环数据，-卖入', ${qty}, ${qtyLoop}, ${quoteQty}, ${quoteQtyLoop},${new Date(time).toLocaleString()}`)
         } else {
-          console.log('=是第一条=，忽略合并-卖出', qty, qtyLoop, '--', quoteQty, quoteQtyLoop)
+          console.log(`=第一条循环数据，-卖出', ${qty}, ${qtyLoop}, ${quoteQty}, ${quoteQtyLoop},${new Date(time).toLocaleString()}`)
         }
       }
     }
@@ -1018,8 +976,7 @@ export class DataCenterService {
   }
 
   async startSubscribeWsForPosition(myTrades: MyTrades[]) {
-    console.log('第四步，开启 ws==>', myTrades);
-    if (this.positionWsClient) {
+    if (this.positionWsRef) {
       console.log('第四步1-1，先关闭 ws==>');
       await this.unsubscribePositionWs()
       console.log('第四步1-2，再开启 ws==>');
@@ -1031,44 +988,29 @@ export class DataCenterService {
   }
 
   async unsubscribePositionWs(): Promise<Result> {
-    console.log('unsubscribePositionWs start');
-    if (this.positionWsClient) {
-      console.log('A-1.PositionWs 不为空');
+    if (this.positionWsRef) {
+      console.log('A-1.PositionWs 不为空，开始关闭');
       await this.positionWsClient.unsubscribe(this.positionWsRef)
-      console.log('A-2.PositionWs 不为空');
-      this.positionWsClient = null
+      console.log('A-2.PositionWs 关闭关闭成功');
       this.positionWsRef = null
       return { code: 200, message: 'stop ok', data: null };
     } else {
-      // this.tradeWS()
-      // this.tickerWS()
-      // const symbol = 'IMXUSDT'
-      // this.klineWS(symbol, '1s',)
-      // this.onTrade()
       console.log('B.PositionWs not running');
       return { code: 200, message: 'PositionWs not running', data: null };
-      // return { code: 200, message: 'Websocket not running', data: orders };
     }
   }
 
   async unsubscribeUserWs(): Promise<Result> {
     console.log('unsubscribeUserWs start');
-    if (this.userWsClient) {
+    if (this.userWsRef) {
       console.log('A-1.UserWs 不为空');
       await this.userWsClient.unsubscribe(this.userWsRef)
       console.log('A-2.UserWs 不为空');
-      this.userWsClient = null
       this.userWsRef = null
       return { code: 200, message: 'stop ok', data: null };
     } else {
-      // this.tradeWS()
-      // this.tickerWS()
-      // const symbol = 'IMXUSDT'
-      // this.klineWS(symbol, '1s',)
-      // this.onTrade()
       console.log('B.UserWs not running');
       return { code: 200, message: 'UserWs not running', data: null };
-      // return { code: 200, message: 'Websocket not running', data: orders };
     }
   }
 
@@ -1117,8 +1059,9 @@ export class DataCenterService {
       // const maxOtherCoinRatio = 0.3
       const maxOtherCoinRatio = 0.1
       const { total, alCoinVal, otherCoinVal } = this.calculateValue(balancesTarget, symbolsPriceMap)
-      const alCoinValRatio = new Big(alCoinVal).div(total).toNumber()
-      const otherCoinValRatio = new Big(otherCoinVal).div(total).toNumber()
+
+      const alCoinValRatio = divide(alCoinVal, total)
+      const otherCoinValRatio = divide(otherCoinVal, total)
 
       console.log('earnsOrExclude:', earnsOrExclude)
       console.log(`0.账户总值：${(total)}U`)
@@ -1135,9 +1078,9 @@ export class DataCenterService {
 
       console.log('==============>')
       balancesTarget.forEach(async item => {
-        const { value, asset, canSellFree, free } = item
-        const ratio = new Big(value).div(total).toNumber()
-        console.log(`4-1.${asset}持仓占比${(ratio * 100).toFixed(4)}%,总值${value}U`)
+        const { quoteQty, asset, canSellFree, free } = item
+        const ratio = divide(quoteQty, total)
+        console.log(`4-1.${asset}持仓占比${(ratio * 100).toFixed(4)}%,总值${quoteQty}U`)
 
         /*
         if (asset === 'WAN') {
@@ -1155,7 +1098,7 @@ export class DataCenterService {
 
         ///*
         if (ratio > maxPositionRatio) {
-          console.log(`4-2.账户总价值${total}U，${asset}总值${value}U,超过${maxPositionRatio * 100}%,开始清仓`)
+          console.log(`4-2.账户总价值${total}U，${asset}总值${quoteQty}U,超过${maxPositionRatio * 100}%,开始清仓`)
           const quantity = Number(canSellFree || free)
           // const quantity = 0.0000009
           // const quantity = 9001
@@ -1251,7 +1194,9 @@ export class DataCenterService {
       https://binance-docs.github.io/apidocs/spot/cn/#cc81fff589
       (callCellQty - minQtyNum) % stepSizeNum !== 0
     */
-    const filterStepSize = new Big(callCellQty).minus(minQtyNum).mod(stepSizeNum).toNumber()
+
+    const minsVal = minus(callCellQty, minQtyNum)
+    const filterStepSize = new Big(minsVal).mod(stepSizeNum).toNumber()
     if (filterStepSize === 0 && maxQtyNum > callCellQty && minQtyNum < callCellQty) {
       if (orderType === OrderType.LIMIT) {
         const tradeRes = await this.client.tradeSpot({
