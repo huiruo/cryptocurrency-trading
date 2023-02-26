@@ -5,7 +5,7 @@ import { MarketCenterService } from './market-center.service';
 @Controller('market')
 export class MarketCenterController {
   constructor(
-    private readonly marketCenterService: MarketCenterService, // private configService: ConfigService,
+    private readonly marketCenterService: MarketCenterService,
   ) { }
 
   @Get('startWs')
