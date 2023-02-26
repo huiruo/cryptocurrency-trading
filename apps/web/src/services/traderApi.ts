@@ -138,6 +138,11 @@ const traderApi = {
 		return http.post<resType>(data, url);
 	},
 	// =========== statistics end ===========
+
+	startWsApi() {
+		const url: string = `${traderApiUrl}/market/startWs`;
+		return http.get<resType>({}, url);
+	},
 }
 
 export default traderApi;

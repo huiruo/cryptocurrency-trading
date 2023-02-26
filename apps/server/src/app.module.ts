@@ -8,16 +8,20 @@ import dbConfig from '../config/db'
 import { getDirFilenames } from './utils/getDirFilenames';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { SpotService } from './spot/spot.service';
-import { SpotController } from './spot/spot.controller';
+// import { SpotService } from './spot/spot.service';
+// import { SpotController } from './spot/spot.controller';
 import { SpotModule } from './spot/spot.module';
-import { FutureService } from './future/future.service';
-import { FutureController } from './future/future.controller';
+// import { FutureService } from './future/future.service';
+// import { FutureController } from './future/future.controller';
 import { FutureModule } from './future/future.module';
 import { StrategyOrderModule } from './strategy-order/strategy-order.module';
-import { StrategyOrderController } from './strategy-order/strategy-order.controller';
-import { StrategyOrderService } from './strategy-order/strategy-order.service';
+// import { StrategyOrderController } from './strategy-order/strategy-order.controller';
+// import { StrategyOrderService } from './strategy-order/strategy-order.service';
 import { DataCenterModule } from './data-center/data-center.module';
+
+// import { MarketCenterService } from './market-center/market-center.service';
+// import { MarketCenterController } from './market-center/market-center.controller';
+import { MarketCenterModule } from './market-center/market-center.module';
 
 @Module({
   imports: [
@@ -50,8 +54,8 @@ import { DataCenterModule } from './data-center/data-center.module';
     SpotModule,
     FutureModule,
     StrategyOrderModule,
+    MarketCenterModule,
   ],
-  // controllers: [AppController, CryptoWalletController],
   controllers: [AppController],
   providers: [AppService],
 })

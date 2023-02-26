@@ -26,7 +26,7 @@ export function SpotOrders() {
   }
 
   const onSyncSpotOrder = async (value: string, filterTime: number[]) => {
-    // const toaster = toast.loading('Sync spot order...', { showLayer: true })
+    const toaster = toast.loading('Sync spot order...', { showLayer: true })
     let assetName = value
     if (!value) {
       assetName = 'BTCUSDT'
@@ -38,23 +38,21 @@ export function SpotOrders() {
       endTime: filterTime[1],
     }
 
-    console.log('params:', params);
 
-    return
-    // const res = await traderApi.syncSpotOrderApi(params)
-    // if (res.code === 200) {
-    //   setSelectAssetValue(assetName)
-    //   spotTableRef.current.getOrders({ symbol: assetName, currentPage: 1 }, true);
+    const res = await traderApi.syncSpotOrderApi(params)
+    if (res.code === 200) {
+      setSelectAssetValue(assetName)
+      spotTableRef.current.getOrders({ symbol: assetName, currentPage: 1 }, true);
 
-    //   toaster.update('Sync spot order succeeded', {
-    //     type: 'success',
-    //     duration: 1000,
-    //   })
-    // } else {
-    //   toaster.update(res.message, {
-    //     type: 'error',
-    //   })
-    // }
+      toaster.update('Sync spot order succeeded', {
+        type: 'success',
+        duration: 1000,
+      })
+    } else {
+      toaster.update(res.message, {
+        type: 'error',
+      })
+    }
   }
 
   const selectCallback = (val: string) => {
@@ -80,7 +78,7 @@ export function SpotOrders() {
       <Box pb='50px' mt='20px'>
         <Box toCenterX mb='20px'>
           <Box w='90%'>
-            <AssetSync assetSyncValue={assetSyncValue} assetSyncValueCallback={setAssetSyncValue} spotCallBack={onSyncSpotOrder} />
+            <AssetSync assetSyncValue={assetSyncValue} assetSyncValueCallback={setAssetSyncValue} syncSpotOrder={onSyncSpotOrder} />
             <SpotOrderFilter selectAssetValue={selectAssetValue} selectCallback={selectCallback} spotCallBack={onFilterSpotOrder} />
             <SpotTable ref={spotTableRef} selectAssetValue={selectAssetValue} spotCallBack={spotCallBack} />
           </Box>

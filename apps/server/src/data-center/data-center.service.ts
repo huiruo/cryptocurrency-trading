@@ -24,6 +24,7 @@ import Big from 'big.js';
 import { plus, minus, times, divide } from 'src/common/boter-math'
 import { MyTrade, OrderType } from 'binance-api-node';
 import { BinanceConnector } from 'src/common/binance-connector2';
+import { calculateSpotCostPrice } from 'src/utils/utils';
 // import { mockBTCOrders, mockIMX } from './mock-orders'
 
 export interface BalanceType {
@@ -52,12 +53,6 @@ interface MyTrades {
   finalOrderId: number
   isBuyer?: boolean
   isRunning: boolean
-}
-
-interface myTradeProfit {
-  profit: number;
-  profitRate: string;
-  // free: number
 }
 
 const myTrades: MyTrades[] = []
@@ -117,17 +112,16 @@ export class DataCenterService {
   }
 
   async initBinanceApi() {
+    /*
     const apiKey = this.configService.get<string>('binanceApiKey');
     const secretKey = this.configService.get<string>('binanceSecretKey');
-
-    console.log('Api', { apiKey, secretKey });
-
     if (apiKey && secretKey) {
-      const baseServiceBinance = new BaseServiceBiance(apiKey, secretKey);
-      this.client = baseServiceBinance;
+      this.client = BaseServiceBiance.getInstance();
     } else {
       console.log('=== Api key do not exist ===');
     }
+    */
+    this.client = BaseServiceBiance.getInstance();
   }
 
   async addCode(data: any): Promise<Result> {
@@ -587,14 +581,9 @@ export class DataCenterService {
       }
     }
 
-    const { isSucceed, msg, data } = await this.client.myTrades(options);
-    if (!isSucceed) {
-      console.log('获取该资源的所有订单,error:', msg);
-      return null
-    }
+    const data = await this.client.getMyTrades(options);
 
     console.log('获取该资源的所有订单数据:', data.length, spotOrderParams);
-
     return data
   }
 
@@ -793,27 +782,10 @@ export class DataCenterService {
     myTradesParms.forEach(item => {
       if (item.symbol === symbol) {
         const { qty, quoteQty, costPrice, totalFree } = item
-        const { profit, profitRate } = this.calculateMyTradeProfit(qty, quoteQty, costPrice, totalFree, price)
+        const { profit, profitRate } = calculateMyTradeProfit(qty, quoteQty, costPrice, totalFree, price)
         console.log(`${symbol}=${price};成本${costPrice},盈亏${profit},${profitRate},持仓${quoteQty}=${new Date(time).toLocaleString()}`);
       }
     })
-  }
-
-  private calculateMyTradeProfit(
-    qty: number,
-    quoteQty: number,
-    costPrice: number,
-    totalFree: number,
-    price: number,
-  ): myTradeProfit {
-    // profit =（当天结算价－开仓价格）×持仓量×合约单位－手续费
-    const profit = minus(times(minus(price, costPrice), qty), totalFree)
-    const profitRate = times(divide(profit, quoteQty), 100).toFixed(2) + '%'
-
-    return {
-      profit: Number(profit.toFixed(2)),
-      profitRate,
-    };
   }
 
   async onTrade(symbol: string, side: boolean) {
@@ -882,7 +854,7 @@ export class DataCenterService {
         // 情况2：拆分订单,判断它的订单id是同一个
         let lastOrder = orders[dynamicLength + 1]
         if (lastOrder.orderId === orderId) {
-          const { qtyCal, quoteQtyCal } = this.calculateSpotCostPrice(qty, quoteQty, qtyLoop, quoteQtyLoop, isBuyer)
+          const { qtyCal, quoteQtyCal } = calculateSpotCostPrice(qty, quoteQty, qtyLoop, quoteQtyLoop, isBuyer)
           qtyLoop = qtyCal
           quoteQtyLoop = quoteQtyCal
           if (isBuyer) {
@@ -935,7 +907,7 @@ export class DataCenterService {
 
             break
           } else {
-            const { qtyCal, quoteQtyCal } = this.calculateSpotCostPrice(qty, quoteQty, qtyLoop, quoteQtyLoop, isBuyer)
+            const { qtyCal, quoteQtyCal } = calculateSpotCostPrice(qty, quoteQty, qtyLoop, quoteQtyLoop, isBuyer)
             qtyLoop = qtyCal
             quoteQtyLoop = quoteQtyCal
             if (isBuyer) {
@@ -946,7 +918,7 @@ export class DataCenterService {
           }
         }
       } else {
-        const { qtyCal, quoteQtyCal } = this.calculateSpotCostPrice(qty, quoteQty, qtyLoop, quoteQtyLoop, isBuyer)
+        const { qtyCal, quoteQtyCal } = calculateSpotCostPrice(qty, quoteQty, qtyLoop, quoteQtyLoop, isBuyer)
         qtyLoop = qtyCal
         quoteQtyLoop = quoteQtyCal
         if (isBuyer) {
@@ -955,23 +927,6 @@ export class DataCenterService {
           console.log(`=第一条循环数据，-卖出', ${qty}, ${qtyLoop}, ${quoteQty}, ${quoteQtyLoop},${new Date(time).toLocaleString()}`)
         }
       }
-    }
-  }
-
-  calculateSpotCostPrice(qty: number, quoteQty: number, qtyLoop: number, quoteQtyLoop: number, isBuyer: boolean | number): { qtyCal: number; quoteQtyCal: number; } {
-    // 补仓成本= 持仓成本+（补仓买入金额+手续费）/补仓数量
-    if (isBuyer) {
-      qtyLoop = plus(qtyLoop, qty)
-      quoteQtyLoop = plus(quoteQtyLoop, quoteQty)
-      console.log('A.情况2-是合并订单买入', qty, qtyLoop, '--', quoteQty, quoteQtyLoop)
-    } else {
-      qtyLoop = minus(qtyLoop, qty)
-      quoteQtyLoop = minus(quoteQtyLoop, quoteQty)
-      console.log('A.情况2-是合并订单卖出', qty, qtyLoop, '--', quoteQty, quoteQtyLoop)
-    }
-    return {
-      qtyCal: qtyLoop,
-      quoteQtyCal: quoteQtyLoop,
     }
   }
 
@@ -1250,7 +1205,6 @@ export class DataCenterService {
     }
   }
 
-
   async getCandle(): Promise<Result> {
     const symbol = 'BTCUSDT'
     const interval = '5m'
@@ -1258,3 +1212,7 @@ export class DataCenterService {
     return { code: 500, message: 'Duplicate asset', data: res };
   }
 }
+function calculateMyTradeProfit(qty: number, quoteQty: number, costPrice: number, totalFree: number, price: any): { profit: any; profitRate: any; } {
+  throw new Error('Function not implemented.');
+}
+

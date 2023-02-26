@@ -40,14 +40,16 @@ export class FutureService {
   }
 
   async initBinanceApi() {
+    /*
     const apiKey = this.configService.get<string>('binanceApiKey');
     const secretKey = this.configService.get<string>('binanceSecretKey');
     if (apiKey && secretKey) {
-      const baseServiceBinance = new BaseServiceBiance(apiKey, secretKey);
-      this.client = baseServiceBinance;
+      this.client = BaseServiceBiance.getInstance();
     } else {
       console.log('=== Api key do not exist ===');
     }
+    */
+    this.client = BaseServiceBiance.getInstance();
   }
 
   private async createfutureOrderUtil(order: FuturesOrder) {

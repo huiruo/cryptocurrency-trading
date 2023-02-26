@@ -34,6 +34,10 @@ const Header = () => {
             <NavLink to="/coin/list" className={pathname === '/coin/list' ? 'nav-active' : ''}>Coin list</NavLink>
           </li>
 
+          <li className='li'>
+            <NavLink to="/ws/market" className={pathname === '/ws/market' ? 'nav-active' : ''}>Ws market</NavLink>
+          </li>
+
         </ul>
       </div>
     </div>

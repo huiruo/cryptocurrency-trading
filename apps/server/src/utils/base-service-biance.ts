@@ -1,15 +1,29 @@
+import Binance, { MyTrade, NewOrderSpot, Order, OrderType } from 'binance-api-node';
+import { Injectable } from '@nestjs/common';
 import { Exchange } from './exchange';
-import Binance, { NewOrderSpot, Order, OrderType } from 'binance-api-node';
 
+@Injectable()
 export class BaseServiceBiance {
-  private client = Binance();
+  private static instance: BaseServiceBiance
+  public client = Binance();
   exchange: Exchange;
 
-  constructor(apiKey: string, secretKey: string) {
+  constructor() {
     this.exchange = new Exchange();
+  }
 
+  public static getInstance(): BaseServiceBiance {
+    if (!BaseServiceBiance.instance) {
+      BaseServiceBiance.instance = new BaseServiceBiance();
+    }
+
+    return BaseServiceBiance.instance;
+  }
+
+  public connect(apiKey: string, secretKey: string) {
     try {
       this.client = Binance({ apiKey: apiKey, apiSecret: secretKey });
+      console.log('Binance connection is successful...')
     } catch (error) {
       throw new Error(error);
     }
@@ -39,26 +53,11 @@ export class BaseServiceBiance {
     }
   }
 
-  /*
-  Get trades for the current authenticated account and symbol.
-  */
-  async myTrades(options: any) {
+  async getMyTrades(options: any): Promise<MyTrade[]> {
     try {
-      const res = await this.client.myTrades(options);
-
-      return {
-        isSucceed: true,
-        msg: 'Success',
-        data: res
-      }
+      return await this.client.myTrades(options);
     } catch (error) {
-      console.log('error', error);
-      return {
-        isSucceed: false,
-        msg: error,
-        data: null
-      }
-      // throw new Error(error);
+      console.log('getMyTrades', error);
     }
   }
 

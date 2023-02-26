@@ -25,14 +25,16 @@ export class SpotService {
   }
 
   async initBinanceApi() {
+    /*
     const apiKey = this.configService.get<string>('binanceApiKey');
     const secretKey = this.configService.get<string>('binanceSecretKey');
     if (apiKey && secretKey) {
-      const baseServiceBinance = new BaseServiceBiance(apiKey, secretKey);
-      this.client = baseServiceBinance;
+      this.client = BaseServiceBiance.getInstance();
     } else {
       console.log('=== Api key do not exist ===');
     }
+    */
+    this.client = BaseServiceBiance.getInstance();
   }
 
   private async deleteStrategyOrderId(strategyId: string) {
@@ -53,7 +55,8 @@ export class SpotService {
     return get(futureOrder, '[0]', {});
   }
 
-  private async savaSpotOrderUtil(spotOrder: SpotOrder) {
+  private async savaSpotOrderUtil(spotOrder: SpotOrder, userId: number) {
+    spotOrder.userId = userId
     await this.spotOrderRepo.save(spotOrder);
   }
 
@@ -101,27 +104,28 @@ export class SpotService {
       }
     }
 
-    const { isSucceed, msg, data } = await this.client.myTrades(options);
-    if (!isSucceed) {
-      return { code: 599, message: msg, data: null };
-    }
+    console.log('myTrades', spotOrderParams)
+    const data = await this.client.getMyTrades(options);
+    // if (!isSucceed) {
+    //   return { code: 599, message: msg, data: null };
+    // }
 
     console.log('spotOrderParams:', spotOrderParams, 'info:', data.length);
 
+    const userId = 1;
     for (const item of data) {
       const { id } = item as any;
       // mock userId
-      item.userId = 1;
       const existSpotOrder = await this.findSpotOrderUtil(id);
       if (isEmpty(existSpotOrder)) {
         console.log('=== not exist spotOrder,insert... ===');
-        this.savaSpotOrderUtil(item);
+        // this.savaSpotOrderUtil(item, userId);
       } else {
         console.log('=== exist spotOrder,skip... ===');
       }
     };
 
-    return { code: 200, message: 'ok', data: null };
+    return { code: 200, message: 'ok', data: data };
   }
 
   async resetSpotOrderStatus(spotOrder: SpotOrder): Promise<Result> {

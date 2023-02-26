@@ -7,7 +7,7 @@ import moment from 'moment';
 import { DatePicker as MyDatePicker } from 'antd';
 
 interface Props {
-  spotCallBack: (value: string, selectTime: number[]) => void
+  syncSpotOrder: (value: string, selectTime: number[]) => void
   assetSyncValue: string
   assetSyncValueCallback: (value: string) => void
 }
@@ -25,7 +25,7 @@ const { RangePicker } = DatePicker;
  */
 export function AssetSync(props: Props) {
 
-  const { spotCallBack, assetSyncValue, assetSyncValueCallback } = props
+  const { syncSpotOrder, assetSyncValue, assetSyncValueCallback } = props
   const [selectTime, setSelectTime] = useState<number[]>([startTimeDefault, endTimeDefault]);
   const navigate = useNavigate();
 
@@ -65,7 +65,7 @@ export function AssetSync(props: Props) {
         />
       </Box>
 
-      <Button onClick={() => spotCallBack(assetSyncValue, selectTime)} ml4 mr4>Sync spot orders</Button>
+      <Button onClick={() => syncSpotOrder(assetSyncValue, selectTime)} ml4 mr4>Sync spot orders</Button>
       <Button ml2 onClick={onAddAsset}>Add code</Button>
     </Box>
   )
