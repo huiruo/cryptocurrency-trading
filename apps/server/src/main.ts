@@ -1,7 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { BaseServiceBiance } from './utils/base-service-biance';
+import { BinanceService } from './utils/binance-service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -11,7 +11,7 @@ async function bootstrap() {
   const secretKey = configService.get<string>('binanceSecretKey');
   if (apiKey && secretKey) {
     console.log('bootstrap init base', { apiKey, secretKey });
-    BaseServiceBiance.getInstance().connect(apiKey, secretKey)
+    BinanceService.getInstance().connect(apiKey, secretKey)
   } else {
     console.log('=== Api key do not exist ===');
   }

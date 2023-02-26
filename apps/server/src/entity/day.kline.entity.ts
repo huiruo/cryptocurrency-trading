@@ -17,7 +17,6 @@ export class DayKline {
   })
   symbol: string;
 
-
   @Column({
     comment: 'price',
   })

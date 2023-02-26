@@ -44,6 +44,7 @@ export interface SyncSpotOrderParams {
   symbol: string
   startTime: number
   endTime: number
+  recvWindow?: number
 }
 
 export interface CreateOrdersStrategy {
@@ -116,4 +117,16 @@ export interface gotResType {
   error?: string | number;
   statusMessage?: string | number;
   response?: any;
+}
+
+export interface MyTrades {
+  symbol: string
+  qty: number
+  quoteQty: number
+  costPrice: number
+  totalFree: number
+  time: number
+  finalOrderId: number
+  isBuyer?: boolean
+  isRunning: boolean
 }

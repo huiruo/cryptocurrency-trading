@@ -6,12 +6,12 @@ import { Result } from 'src/common/result.interface';
 import { SearchParmas, SyncSpotOrderParams } from 'src/common/types';
 import { SpotOrder } from 'src/entity/spot-order.entity';
 import { StrategyOrderId } from 'src/entity/strategy-orderid.entity';
-import { BaseServiceBiance } from 'src/utils/base-service-biance';
+import { BinanceService } from 'src/utils/binance-service';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class SpotService {
-  private client: BaseServiceBiance;
+  private client: BinanceService;
   constructor(
     private configService: ConfigService,
 
@@ -29,12 +29,12 @@ export class SpotService {
     const apiKey = this.configService.get<string>('binanceApiKey');
     const secretKey = this.configService.get<string>('binanceSecretKey');
     if (apiKey && secretKey) {
-      this.client = BaseServiceBiance.getInstance();
+      this.client = BinanceService.getInstance();
     } else {
       console.log('=== Api key do not exist ===');
     }
     */
-    this.client = BaseServiceBiance.getInstance();
+    this.client = BinanceService.getInstance();
   }
 
   private async deleteStrategyOrderId(strategyId: string) {
@@ -59,7 +59,6 @@ export class SpotService {
     spotOrder.userId = userId
     await this.spotOrderRepo.save(spotOrder);
   }
-
 
   async getSpotOrder(searchParmas: SearchParmas): Promise<Result> {
     const { currentPage, pageSize, symbol } = searchParmas;
@@ -89,23 +88,8 @@ export class SpotService {
 
   async syncSpotOrder(spotOrderParams: SyncSpotOrderParams): Promise<Result> {
     const { symbol, startTime, endTime } = spotOrderParams
-    let options = {}
-    if (startTime && endTime) {
-      options = {
-        symbol,
-        recvWindow: 59999,
-        startTime,
-        endTime,
-      }
-    } else {
-      options = {
-        symbol,
-        recvWindow: 59999,
-      }
-    }
-
     console.log('myTrades', spotOrderParams)
-    const data = await this.client.getMyTrades(options);
+    const data = await BinanceService.getInstance().getMyTrades({ symbol, startTime, endTime })
     // if (!isSucceed) {
     //   return { code: 599, message: msg, data: null };
     // }

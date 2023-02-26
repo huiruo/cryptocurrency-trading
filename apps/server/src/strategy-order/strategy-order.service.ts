@@ -13,14 +13,14 @@ import { ProfitStatistics } from 'src/entity/profit.statistics.entity';
 import { SpotOrder } from 'src/entity/spot-order.entity';
 import { StrategyOrder } from 'src/entity/strategy-order.entity';
 import { StrategyOrderId } from 'src/entity/strategy-orderid.entity';
-import { BaseServiceBiance } from 'src/utils/base-service-biance';
+import { BinanceService } from 'src/utils/binance-service';
 import { formatTimestamp } from 'src/utils/utils';
 import Big from 'big.js';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class StrategyOrderService {
-  private client: BaseServiceBiance;
+  private client: BinanceService;
   constructor(
     private configService: ConfigService,
 
@@ -56,12 +56,12 @@ export class StrategyOrderService {
     const apiKey = this.configService.get<string>('binanceApiKey');
     const secretKey = this.configService.get<string>('binanceSecretKey');
     if (apiKey && secretKey) {
-      this.client = BaseServiceBiance.getInstance();
+      this.client = BinanceService.getInstance();
     } else {
       console.log('=== Api key do not exist ===');
     }
     */
-    this.client = BaseServiceBiance.getInstance();
+    this.client = BinanceService.getInstance();
   }
 
   private async findStrategyOrderIdUtil(

@@ -59,9 +59,9 @@ export function WsMarket() {
   }, [ws]);
 
   const handleStreams = (data: any) => {
-    console.log('handleStreams:', data)
-    // const { symbol, price, costPrice, profit, profitRate, quoteQty, time } = JSON.parse(data)
-    // setTrade({ symbol, price, costPrice, profit, profitRate, quoteQty, time })
+    // console.log('handleStreams:', data)
+    const { symbol, price, costPrice, profit, profitRate, quoteQty, time } = JSON.parse(data)
+    setTrade({ symbol, price, costPrice, profit, profitRate, quoteQty, time })
   }
 
   /**
@@ -78,7 +78,12 @@ export function WsMarket() {
   }, [ws, getRandomInt, webSocketInit]);
   */
 
-  useEffect(() => { }, [])
+  useEffect(() => {
+    return () => {
+      console.log('clsoe ws')
+      ws.current?.close();
+    }
+  }, [])
 
   const onStartWs = async () => {
     // getRandomInt();

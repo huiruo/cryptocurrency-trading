@@ -10,7 +10,7 @@ import { Coin } from '../entity/coin.entity';
 import { CoinAddition } from '../entity/coin.addition.entity';
 import { DayKline } from '../entity/day.kline.entity';
 import { CoinDevMember } from '../entity/coin.member.entity';
-import { BaseServiceBiance } from 'src/utils/base-service-biance';
+import { BalanceType, BinanceService } from 'src/utils/binance-service';
 import { Balances } from '../entity/balances.entity';
 import { FuturesOrder } from '../entity/futures-order.entity';
 import { SpotOrder } from '../entity/spot-order.entity';
@@ -26,17 +26,6 @@ import { MyTrade, OrderType } from 'binance-api-node';
 import { BinanceConnector } from 'src/common/binance-connector2';
 import { calculateSpotCostPrice } from 'src/utils/utils';
 // import { mockBTCOrders, mockIMX } from './mock-orders'
-
-export interface BalanceType {
-  asset: string;
-  free: string;
-  // 挂单的锁定
-  locked: string;
-  // 币价值
-  quoteQty: number
-  // 可以出售的free,当有理财才有值，否则直接取free进行出售
-  canSellFree?: string
-}
 
 const stableCoins = ['USDT', 'BUSD', 'USDC'];
 const alCoin = ['BTC', 'ETH', 'BNB']
@@ -59,7 +48,7 @@ const myTrades: MyTrades[] = []
 
 @Injectable()
 export class DataCenterService {
-  private client: BaseServiceBiance;
+  private client: BinanceService;
   private userWsClient: any;
   private userWsRef: any;
 
@@ -116,12 +105,12 @@ export class DataCenterService {
     const apiKey = this.configService.get<string>('binanceApiKey');
     const secretKey = this.configService.get<string>('binanceSecretKey');
     if (apiKey && secretKey) {
-      this.client = BaseServiceBiance.getInstance();
+      this.client = BinanceService.getInstance();
     } else {
       console.log('=== Api key do not exist ===');
     }
     */
-    this.client = BaseServiceBiance.getInstance();
+    this.client = BinanceService.getInstance();
   }
 
   async addCode(data: any): Promise<Result> {
@@ -566,22 +555,7 @@ export class DataCenterService {
 
   async getSpotOrder(spotOrderParams: SyncSpotOrderParams): Promise<MyTrade[]> {
     const { symbol, startTime, endTime } = spotOrderParams
-    let options = {}
-    if (startTime && endTime) {
-      options = {
-        symbol,
-        recvWindow: 59999,
-        startTime,
-        endTime,
-      }
-    } else {
-      options = {
-        symbol,
-        recvWindow: 59999,
-      }
-    }
-
-    const data = await this.client.getMyTrades(options);
+    const data = await BinanceService.getInstance().getMyTrades({ symbol, startTime, endTime })
 
     console.log('获取该资源的所有订单数据:', data.length, spotOrderParams);
     return data

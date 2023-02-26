@@ -9,11 +9,11 @@ dotenv.config({
  * @param callback 格式化函数
  */
 const fromatValue = <T>(key: string, defaultValue: T, callback: (value: string) => T): T => {
-    const value: string | undefined = process.env[key]
-    if (typeof value === 'undefined') {
-        return defaultValue
-    }
-    return callback(value)
+  const value: string | undefined = process.env[key]
+  if (typeof value === 'undefined') {
+    return defaultValue
+  }
+  return callback(value)
 }
 
 export const env = (key: string, defaultValue: string = '') => fromatValue(key, defaultValue, value => value)

@@ -1,20 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FuturesOrder } from 'doc/03-futures-1/futures-order.entity';
 import { get, isEmpty } from 'lodash';
 import { Result } from 'src/common/result.interface';
 import { TraderApi } from 'src/entity/api.entity';
 import { TradeAsset } from 'src/entity/asset.entity';
 import { DailyProfit } from 'src/entity/daily.profit.entity';
+import { FuturesOrder } from 'src/entity/futures-order.entity';
 import { StrategyOrder } from 'src/entity/strategy-order.entity';
 import { StrategyOrderId } from 'src/entity/strategy-orderid.entity';
-import { BaseServiceBiance } from 'src/utils/base-service-biance';
+import { BinanceService } from 'src/utils/binance-service';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class FutureService {
-  private client: BaseServiceBiance;
+  private client: BinanceService;
   constructor(
     private configService: ConfigService,
 
@@ -44,12 +44,12 @@ export class FutureService {
     const apiKey = this.configService.get<string>('binanceApiKey');
     const secretKey = this.configService.get<string>('binanceSecretKey');
     if (apiKey && secretKey) {
-      this.client = BaseServiceBiance.getInstance();
+      this.client = BinanceService.getInstance();
     } else {
       console.log('=== Api key do not exist ===');
     }
     */
-    this.client = BaseServiceBiance.getInstance();
+    this.client = BinanceService.getInstance();
   }
 
   private async createfutureOrderUtil(order: FuturesOrder) {

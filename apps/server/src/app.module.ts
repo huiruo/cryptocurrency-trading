@@ -4,24 +4,15 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import dbConfig from '../config/db'
 import { getDirFilenames } from './utils/getDirFilenames';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-// import { SpotService } from './spot/spot.service';
-// import { SpotController } from './spot/spot.controller';
 import { SpotModule } from './spot/spot.module';
-// import { FutureService } from './future/future.service';
-// import { FutureController } from './future/future.controller';
 import { FutureModule } from './future/future.module';
 import { StrategyOrderModule } from './strategy-order/strategy-order.module';
-// import { StrategyOrderController } from './strategy-order/strategy-order.controller';
-// import { StrategyOrderService } from './strategy-order/strategy-order.service';
 import { DataCenterModule } from './data-center/data-center.module';
-
-// import { MarketCenterService } from './market-center/market-center.service';
-// import { MarketCenterController } from './market-center/market-center.controller';
 import { MarketCenterModule } from './market-center/market-center.module';
+import dbConfig from '../config/db'
 
 @Module({
   imports: [
@@ -43,7 +34,7 @@ import { MarketCenterModule } from './market-center/market-center.module';
       */
       // envFilePath:['./config/.env','.env1'],
       envFilePath: [...getDirFilenames({ environment: process.env.NODE_ENV })],
-      //配置为全局可见，否则需要在每个模块中单独导入ConfigModule
+      // 配置为全局可见，否则需要在每个模块中单独导入ConfigModule
       isGlobal: true,
       // ignoreEnvFile:false, 
       ignoreEnvVars: true,
