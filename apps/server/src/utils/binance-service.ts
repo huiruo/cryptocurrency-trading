@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { Exchange } from './exchange';
 import { get } from 'lodash';
 import { SyncSpotOrderParams } from 'src/common/types';
+import { Res } from 'src/common/result.interface';
 
 export interface BalanceType {
   asset: string;
@@ -10,7 +11,7 @@ export interface BalanceType {
   // 挂单的锁定
   locked: string;
   // 币价值
-  quoteQty: number
+  quoteQty?: number
   // 可以出售的free,当有理财才有值，否则直接取free进行出售
   canSellFree?: string
 }
@@ -42,11 +43,21 @@ export class BinanceService {
     }
   }
 
-  async getAccountInfo() {
+  async getAccountInfo(): Promise<Res<BalanceType[]>> {
     try {
-      return await this.client.accountInfo();
+      const balances = await this.client.accountInfo() as any;
+      return {
+        code: 200,
+        message: 'Ok',
+        data: balances
+      }
     } catch (error) {
       console.log('getAccountInfo:', error);
+      return {
+        code: 0,
+        message: error.code,
+        data: null
+      }
     }
   }
 
@@ -178,9 +189,14 @@ export class BinanceService {
 
 
   // 找出持仓资源,也可以在 socket userData订阅返回，这里选择拿接口数据
-  async getAccountAsset(symbol: string): Promise<BalanceType> {
-    const res = await this.getAccountInfo();
-    const balances = get(res, 'balances', []).filter(
+  async getAccountAsset(symbol: string): Promise<Res<BalanceType>> {
+    const { data, code, message } = await this.getAccountInfo();
+    if (code !== 200) {
+      return {
+        data: null, code, message
+      }
+    }
+    const balances = get(data, 'balances', []).filter(
       (item) => Number(item.free) !== 0,
     ) as BalanceType[];
 
@@ -213,7 +229,9 @@ export class BinanceService {
       }
     })
 
-    return balance
+    return {
+      data: balance, code, message
+    }
   }
 
   async getMyTrades(spotOrderParams: SyncSpotOrderParams): Promise<MyTrade[]> {

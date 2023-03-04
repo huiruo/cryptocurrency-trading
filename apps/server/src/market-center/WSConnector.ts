@@ -85,7 +85,16 @@ export class WSConnector {
   }
 
   async handleTrade(wsInst: WebSocket, option: { startTime: number, endTime: number, symbol: string }, symbol: string, isSingle = false) {
-    const { free: freeStr, locked: lockedStr } = await BinanceService.getInstance().getAccountAsset(symbol)
+    const { data, message, code } = await BinanceService.getInstance().getAccountAsset(symbol)
+    console.log('data, message, code', { data, message, code })
+    if (code !== 200) {
+      console.log('返回', { data, message, code })
+      const emit = { "e": "error", msg: message }
+      wsInst.send(JSON.stringify(emit));
+      return
+    }
+
+    const { free: freeStr, locked: lockedStr } = data
     // 容错,获取持仓资源为空
     if (!freeStr) {
       return
@@ -296,7 +305,7 @@ export class WSConnector {
         const { qty, quoteQty, costPrice, totalFree } = item
         const { profit, profitRate } = calculateMyTradeProfit(qty, quoteQty, costPrice, totalFree, price)
         // console.log(`${symbol}=${price};成本${costPrice},盈亏${profit},${profitRate},持仓${quoteQty}=${new Date(time).toLocaleString()}`);
-        const emit = { symbol, price, costPrice, profit, profitRate, quoteQty, time }
+        const emit = { "e": "account", symbol, price, costPrice, profit, profitRate, quoteQty, time }
         wsInst.send(JSON.stringify(emit));
       }
     })

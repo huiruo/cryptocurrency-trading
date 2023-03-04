@@ -4,3 +4,9 @@ export interface Result {
   message: string;
   data?: any;
 }
+
+export interface Res<T> {
+  code: number;
+  message: string;
+  data: T;
+}

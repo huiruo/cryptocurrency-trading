@@ -24,6 +24,7 @@ export function WsMarket() {
   const [message, setMessage] = useState('');
   const [readyState, setReadyState] = useState('正在链接中');
   const [rdNum, SetRdNum] = useState<number>(0);
+  const [msg, setMsg] = useState<string>("");
 
   useDocumentTitle("ws market");
 
@@ -58,10 +59,25 @@ export function WsMarket() {
     }
   }, [ws]);
 
-  const handleStreams = (data: any) => {
-    // console.log('handleStreams:', data)
-    const { symbol, price, costPrice, profit, profitRate, quoteQty, time } = JSON.parse(data)
-    setTrade({ symbol, price, costPrice, profit, profitRate, quoteQty, time })
+  const handleStreams = (res: any) => {
+    console.log('handleStreams:', res)
+    const data = JSON.parse(res)
+
+    switch (data.e) {
+      case 'account':
+        const { symbol, price, costPrice, profit, profitRate, quoteQty, time } = data
+        setTrade({ symbol, price, costPrice, profit, profitRate, quoteQty, time })
+        break;
+
+      case 'error':
+        const { msg } = data
+        console.log(msg)
+        setMsg(msg)
+        break;
+
+      default:
+        break;
+    }
   }
 
   /**
@@ -130,6 +146,7 @@ export function WsMarket() {
             <div>
               ID:{rdNum}
               msg:{message}
+              msg:{msg}
             </div>
           </Box>
         </Box>
