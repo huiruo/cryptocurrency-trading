@@ -1,4 +1,6 @@
-import { WebSocketServer } from 'ws';
+// import { WebSocketServer } from 'ws';
+import WebSocketServer from 'ws';
+import * as ws from 'ws';
 import { plus, minus, times, divide } from 'src/common/boter-math'
 import { BinanceService } from 'src/utils/binance-service';
 import { MyTrades } from 'src/common/types';
@@ -50,7 +52,8 @@ export class WSConnector {
   private connectToServer() {
     if (!this.wss) {
       console.log('wss dont exists, need to open')
-      this.wss = new WebSocketServer({ port: 9443 });
+      // this.wss = new WebSocketServer({ port: 9443 });
+      this.wss = new ws.Server({ port: 9443 });
       // return
     }
     console.log('connecting WSConnector success')
