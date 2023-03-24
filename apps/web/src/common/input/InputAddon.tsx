@@ -23,13 +23,14 @@ export const InputAddon: FC<InputAddonProps> = forwardRef((props: InputAddonProp
 
     if (placement === Placement.start) {
       attrs.borderLeft = 1
-      attrs.roundedLeftMedium = true
+      attrs.roundedLeftMD = true
     }
 
     if (placement === Placement.end) {
       attrs.borderRight = 1
-      attrs.roundedRightMedium = true
+      attrs.roundedRightMD = true
     }
+
   }
   return (
     <Box
@@ -43,5 +44,5 @@ export const InputAddon: FC<InputAddonProps> = forwardRef((props: InputAddonProp
       {...props}
     />
   )
-})
-;(InputAddon as any).id = 'InputAddon'
+});
+(InputAddon as any).id = 'InputAddon'

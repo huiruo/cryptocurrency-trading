@@ -505,6 +505,10 @@ module.exports = function (webpackEnv) {
                 },
               }),
             },
+            {
+              test: /.less$/,
+              use: ["style-loader", "css-loader", "less-loader"],
+            },
             // Opt-in support for SASS (using .scss or .sass extensions).
             // By default we support SASS Modules with the
             // extensions .module.scss or .module.sass
