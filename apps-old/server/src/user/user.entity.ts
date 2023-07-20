@@ -25,4 +25,5 @@ export class User {
         comment: '密码'
     })
     password: string;
+
 }
