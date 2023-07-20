@@ -1,0 +1,38 @@
+{
+  "name": "code-platform",
+  "version": "0.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "prepare": "husky install",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "lint-staged": "lint-staged",
+    "format2": "prettier --write ."
+  },
+  "lint-staged": {
+    "apps/**/*.{js,jsx,ts,tsx}": "eslint --fix",
+    "*.{js,jsx,tsx,ts}": [
+      "prettier --write"
+    ]
+  },
+  "devDependencies": {
+    "eslint-config-custom": "*",
+    "turbo": "latest",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.3",
+    "prettier": "^3.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.61.0",
+    "@typescript-eslint/parser": "^5.61.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "dependencies": {},
+  "packageManager": "yarn@1.22.19"
+}

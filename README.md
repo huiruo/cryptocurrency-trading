@@ -45,14 +45,19 @@ database_dev=trader
 ```
 
 ## Run
-In the apps\server directory:
 ```
-yarn
-yarn start:dev
+cd .
+yarn install
+
+cd apps/web
+yarn dev
 ```
 
-In the apps\web directory:
+## Build
+
+To build all apps and packages, run the following command:
+
 ```
-yarn
-yarn start
+cd .
+yarn run build
 ```

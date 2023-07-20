@@ -34,10 +34,10 @@ build-trading-Desktop_Qt_6_4_2_MSVC2019_64bit-Debug
 
 # secret
 secret-document
-apps/server-java/src/main/resources/application-prod.properties
-apps/server/.env
-apps/server/config/env-prod/application-prod.env
-apps/server/config/env-dev/application-dev.env
+apps-old/server-java/src/main/resources/application-prod.properties
+apps-old/server/.env
+apps-old/server/config/env-prod/application-prod.env
+apps-old/server/config/env-dev/application-dev.env
 
 # js
 node_modules/
@@ -78,7 +78,6 @@ target
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
@@ -94,7 +93,7 @@ hs_err_pid*
 .idea
 /local.properties
 .DS_Store
-/build
+*.pem
 /captures
 .externalNativeBuild
 .cxx
@@ -132,3 +131,33 @@ trade-data-analyse/.idea/
 server-java/src/main/resources/application-prod.properties
 server/.env
 server/config/env-prod/application-prod.env
+
+
+# new
+# new
+.pnp
+.pnp.js
+
+# testing
+coverage
+
+# next.js
+.next/
+out/
+build
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# local env files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env
+
+# turbo
+.turbo
