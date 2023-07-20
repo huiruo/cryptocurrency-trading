@@ -1,0 +1,29 @@
+FROM node:alpine
+
+RUN apk add git
+
+# 设置工作目录
+WORKDIR /app
+
+RUN git clone https://github.com/huiruo/code-platform-node-client.git
+
+# 进入代码目录
+WORKDIR /app/code-platform-node-client
+
+RUN npm install
+
+ENV PORT=3008
+
+EXPOSE 3008
+
+CMD [ "npm", "run","prod"]
+
+# “.”表示Dockerfile所在的当前目录
+# 方式1:docker build -f Dockerfile.node.client . -t node-client
+
+# 方式2:docker build -t node-client .
+
+# docker run -p 3008:3008 node-client
+# 查看build之后目录
+# docker run --rm node-client ls /app
+# docker exec -it node-client sh

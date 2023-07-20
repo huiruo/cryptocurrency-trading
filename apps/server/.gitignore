@@ -1,0 +1,21 @@
+# compiled output
+/dist
+/node_modules
+
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Tests
+/coverage
+/.nyc_output
+
+# secret
+.env
+config/env-dev/application-dev.env
+config/env-prod/application-prod.env
