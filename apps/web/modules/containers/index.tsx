@@ -1,7 +1,6 @@
 import React, { ReactNode, useEffect } from 'react'
 import { Button, message } from 'antd'
 import { Table as AntTable } from 'antd'
-import Layout from '@layouts/layout'
 import { codePlatformApi } from '@services/code.platform'
 import useListContainers from '@hooks/useListContainers'
 import { LoginSuccessPayload } from 'types'
@@ -159,20 +158,18 @@ export function Containers({ payload }: Props): ReactNode {
   if (loading) return null
 
   return (
-    <Layout>
-      <div className="App">
-        <AntTable
-          rowKey="Id"
-          columns={columns}
-          // 消除 TypeScript 中的警告
-          dataSource={data?.length ? data : undefined}
-          pagination={false}
-        />
-        <div>test: {count}</div>
-        <div>
-          <Button onClick={onAdd}>test add</Button>
-        </div>
+    <div className="App">
+      <AntTable
+        rowKey="Id"
+        columns={columns}
+        // 消除 TypeScript 中的警告
+        dataSource={data?.length ? data : undefined}
+        pagination={false}
+      />
+      <div>test: {count}</div>
+      <div>
+        <Button onClick={onAdd}>test add</Button>
       </div>
-    </Layout>
+    </div>
   )
 }

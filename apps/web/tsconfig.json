@@ -70,8 +70,8 @@
       "@editor/*": [
         "editor/*"
       ],
-      "@modals/*": [
-        "modals/*"
+      "@modules/*": [
+        "modules/*"
       ],
       "@drawers/*": [
         "drawers/*"

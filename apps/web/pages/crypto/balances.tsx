@@ -1,11 +1,11 @@
 import React from 'react'
 import Layout from '@layouts/layout'
-import { Image } from '@modules/images'
+import Balances from '@modules/crypto/balances'
 
-export default function ImagesPage() {
+export default function BalancesPage() {
   return (
     <Layout>
-      <Image />
+      <Balances />
     </Layout>
   )
 }

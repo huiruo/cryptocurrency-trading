@@ -5,13 +5,12 @@ import {
   loginRedirect,
   webRedirect,
 } from '@common/constants'
-import { handleGoogleAuthCodeApi } from '@services/nextApi'
+import { handleGoogleAuthCodeApi } from '@services/next.api'
 
 export default withIronSessionApiRoute(async (req, res) => {
   const { code } = req.query
   try {
     const result = await handleGoogleAuthCodeApi(code as string)
-    console.log('handleGoogleAuthCodeApi', result)
     req.session.loginStatus = 1
     req.session.payload = result.data
     await req.session.save()

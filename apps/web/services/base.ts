@@ -1,5 +1,10 @@
 import { deleteCookie, getCookie, setCookie } from 'cookies-next'
-import { ResType } from './types'
+
+export interface ResType<T> {
+  code: number
+  msg: string
+  data: T
+}
 
 interface FetchOptions<T> extends Omit<RequestInit, 'body'> {
   headers?: {

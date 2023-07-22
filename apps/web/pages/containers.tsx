@@ -1,5 +1,6 @@
 import React from 'react'
-import { Containers } from '../modules'
+import Layout from '@layouts/layout'
+import { Containers } from '@modules/containers'
 import { withIronSessionSsr } from 'iron-session/next'
 import { sessionOptions } from '@common/session'
 import { LoginSuccessPayload } from 'types'
@@ -11,9 +12,9 @@ interface Props {
 
 export default function Container({ payload }: Props) {
   return (
-    <>
+    <Layout>
       <Containers payload={payload} />
-    </>
+    </Layout>
   )
 }
 

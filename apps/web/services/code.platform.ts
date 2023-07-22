@@ -1,5 +1,5 @@
 import { apiPrefix } from '@common/constants'
-import { fetchWithAuth } from './base'
+import { ResType, fetchWithAuth } from './base'
 import {
   Api,
   BuildDockerImageOptions,
@@ -13,7 +13,6 @@ import {
   ListContainersOptions,
   ListContainersResponse,
   ListImgResponse,
-  ResType,
   RunCodeOptions,
   RunCodeResponse,
   RunningContainerOptions,
@@ -22,7 +21,7 @@ import {
   StartContainerResponse,
   StopContainerOptions,
   StopContainerResponse,
-} from './types'
+} from './code.platform.type'
 
 interface ApiConfig {
   codeList: string

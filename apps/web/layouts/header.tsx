@@ -42,10 +42,19 @@ export function Header() {
 
           <li className="li">
             <Link
-              href="/trade/future/order"
-              className={pathname === '/trade/future/order' ? 'nav-active' : ''}
+              href="/images"
+              className={pathname === '/images' ? 'nav-active' : ''}
             >
-              Future
+              Images
+            </Link>
+          </li>
+
+          <li className="li">
+            <Link
+              href="/crypto/balances"
+              className={pathname === '/crypto/balances' ? 'nav-active' : ''}
+            >
+              balances
             </Link>
           </li>
         </ul>

@@ -4,7 +4,7 @@ import { Button } from 'antd'
 import { ModalSign } from '@components/modalSign/ModalSign'
 import { withIronSessionSsr } from 'iron-session/next'
 import { sessionOptions } from '@common/session'
-import { verifyAuth } from '@services/nextApi'
+import { verifyAuth } from '@services/next.api'
 import { GetServerSideProps } from 'next'
 
 export default function Index() {
