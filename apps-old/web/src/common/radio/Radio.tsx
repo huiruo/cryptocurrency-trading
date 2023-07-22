@@ -22,14 +22,17 @@ export const Radio: FC<RadioProps> = forwardRef((props: RadioProps, ref) => {
     <Box
       as="label"
       className="bone-radio"
-      toCenterY
-      toLeft
+      // toCenterY
+      // toLeft
       cursorPointer={!disabled}
       cursorNotAllowed={disabled}
       opacity-50={disabled}
     >
       <input
-        className={cx('bone-radio-input', css('square0', 'opacity-0', 'hidden'))}
+        className={cx(
+          'bone-radio-input',
+          css('square0', 'opacity-0', 'hidden'),
+        )}
         ref={ref}
         type="radio"
         {...inputProps}
