@@ -62,3 +62,36 @@ nest g controller user
 ```
 nest g module user
 ```
+
+## crypto
+```bash
+nest g service market.center crypto/market-center
+
+nest g controller market.center crypto/market-center
+
+nest g module market.center crypto/market-center
+```
+
+```bash
+nest g service spot crypto/spot
+
+nest g controller spot crypto/spot
+
+nest g module spot crypto/spot
+```
+
+```bash
+nest g service future crypto/future
+
+nest g controller future crypto/future
+
+nest g module future crypto/future
+```
+
+```bash
+nest g service strategy.order crypto/strategy-order
+
+nest g controller strategy.order crypto/strategy-order
+
+nest g module strategy.order crypto/strategy-order
+```
