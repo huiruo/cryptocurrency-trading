@@ -1,5 +1,5 @@
 import type { IronSessionOptions } from 'iron-session'
-import { LoginSuccessPayload } from 'types'
+import { LoginSuccess } from 'types'
 
 export const sessionOptions: IronSessionOptions = {
   password: process.env.SECRET_COOKIE_PASSWORD as string,
@@ -15,7 +15,8 @@ export const sessionOptions: IronSessionOptions = {
 declare module 'iron-session' {
   interface IronSessionData {
     // user?: User
-    payload?: LoginSuccessPayload
+    // payload?: LoginSuccessPayload
+    payload?: LoginSuccess
     loginStatus?: number
   }
 }

@@ -1,5 +1,12 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require('path')
+/**
+ * office
+ * http://172.16.39.156
+ * home
+ * http://http://172.20.10.2
+ */
+const BASE_URL = 'http://172.20.10.2:3888'
 
 module.exports = {
   sassOptions: {
@@ -11,15 +18,9 @@ module.exports = {
   async rewrites() {
     return [
       {
-        // 接口前缀带上`/code-platform/`
+        // Interface prefix with `/code-platform/`
         source: '/code-platform/:path*',
-        // destination: 'http://localhost:3888/:path*'
-        // home
-        // destination: 'http://192.168.186.118:3888/:path*',
-        // home 2
-        destination: 'http://172.20.10.2:3888/:path*',
-        // office
-        // destination: 'http://172.16.39.156:3888/:path*'
+        destination: `${BASE_URL}/:path*`,
       },
     ]
   },

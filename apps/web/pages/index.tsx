@@ -5,10 +5,7 @@ import { ModalSign } from '@components/modalSign/ModalSign'
 import { withIronSessionSsr } from 'iron-session/next'
 import { sessionOptions } from '@common/session'
 import { verifyAuth } from '@services/nextApi'
-
-// interface IndexType {
-//  loginStatus: boolean
-// }
+import { GetServerSideProps } from 'next'
 
 export default function Index() {
   const onLogin = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -29,36 +26,37 @@ export default function Index() {
   )
 }
 
-export const getServerSideProps = withIronSessionSsr(async ({ req }) => {
-  const { payload } = req.session
-  const loginStatus = req.session?.loginStatus
-  console.log('index getServerSideProps', req.session)
-  console.log('loginStatus', loginStatus)
+export const getServerSideProps: GetServerSideProps = withIronSessionSsr(
+  async ({ req }) => {
+    const { payload } = req.session
+    const loginStatus = req.session?.loginStatus
+    console.log('index getServerSideProps', req.session)
 
-  if (payload?.token) {
-    const res = await verifyAuth(payload.token)
-    if (res.data?.username) {
-      console.log('通过验证==》1:', res)
-      return {
-        redirect: {
-          destination: '/containers',
-          permanent: false,
-        },
-        props: {
-          ...res.data,
-        },
-      }
-    } else {
-      console.log('不通过验证==》2:', loginStatus)
-      return {
-        props: {
-          loginStatus: loginStatus || 3,
-        },
+    if (payload?.token) {
+      const result = await verifyAuth(payload.token)
+      if (result.data?.username) {
+        console.log('The home page verified==》1:', result)
+        return {
+          redirect: {
+            destination: '/containers',
+            permanent: false,
+          },
+        }
+      } else {
+        console.log('The home page not verified==>:', loginStatus)
+        return {
+          props: {
+            loginStatus: loginStatus || 3,
+          },
+        }
       }
     }
-  }
 
-  return {
-    props: {},
-  }
-}, sessionOptions)
+    return {
+      props: {
+        payload,
+      },
+    }
+  },
+  sessionOptions,
+)

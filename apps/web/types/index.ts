@@ -1,4 +1,3 @@
-/** 登录成功返回给客户端的数据 */
 export type LoginSuccessPayload = {
   id: string
   email: string
@@ -11,6 +10,13 @@ export type LoginSuccessPayload = {
   token: string
 }
 
+export type LoginSuccess = {
+  username: string
+  email: string
+  avatar: string
+  token: string
+}
+
 export type VerifyAuthResType = {
   username: string
   email: string
@@ -19,7 +25,7 @@ export type VerifyAuthResType = {
 export interface ResultType<T> {
   statusCode: number
   message: string
-  data?: T
+  data: T
 }
 
 export interface Container {
