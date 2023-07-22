@@ -6,6 +6,8 @@
  */
 export const BASE_URL = 'http://172.20.10.2:3888'
 
+export const apiPrefix = '/code-platform'
+
 export const SUCCESS = 1
 
 export const FAIL = 0

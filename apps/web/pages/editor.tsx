@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 import { SourceCodeEditor } from '@editor/SourceCodeEditor'
-import { services } from '@services/api'
+import { codePlatformApi } from '@services/code.platform'
 import Layout from '@layouts/layout'
 
 type CodeEditorProps = {
@@ -29,27 +29,27 @@ export default function Web() {
   const onGetContainerStatus = async () => {
     const containerName = '1874f672f0a7'
     // const containerName = '173063551e6f' // nginx
-    const res = await services.getContainerStatus({ containerName })
+    const res = await codePlatformApi.getContainerStatus({ containerName })
     const data = await res.json()
     console.log('getRunningContainerApi', data)
   }
 
   const onGetRunningContainer = async () => {
-    const data = await services.getRunningContainer()
+    const data = await codePlatformApi.getRunningContainer()
     console.log('getRunningContainerApi', data)
   }
 
   const onStopContainer = async () => {
     // const containerName = '1874f672f0a7'
     const containerName = '173063551e6f' // nginx
-    const data = await services.stopContainer({ containerName })
+    const data = await codePlatformApi.stopContainer({ containerName })
     console.log('onStopContainer', data)
   }
 
   const onStartContainer = async () => {
     const containerName = '1874f672f0a7' // exited
     // const containerName = '173063551e6f' // nginx
-    const data = await services.startContainer({ containerName })
+    const data = await codePlatformApi.startContainer({ containerName })
     console.log('onStopContainer', data)
   }
 
@@ -58,7 +58,7 @@ export default function Web() {
       dockerfileName: 'node.client',
       imageName: 'node-client',
     }
-    const data = await services.buildDockerImage(params)
+    const data = await codePlatformApi.buildDockerImage(params)
     console.log('onStopContainer', data)
   }
 

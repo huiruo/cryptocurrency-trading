@@ -2,7 +2,7 @@ import React, { useState, useRef, useImperativeHandle, forwardRef } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 import Editor from '@monaco-editor/react'
 import type monaco from 'monaco-editor'
-import { services } from '@services/api'
+import { services } from '@services/code.platform'
 
 /**
 const langMap: Record<any, string> = {

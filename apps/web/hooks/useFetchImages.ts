@@ -1,4 +1,4 @@
-import { services } from '@services/api'
+import { codePlatformApi } from '@services/code.platform'
 import { useState, useEffect } from 'react'
 
 interface ImgType {
@@ -20,7 +20,7 @@ const useFetchImg = (): [ImgType[], boolean, Error | null] => {
 
       try {
         console.log('useFetchImg==>')
-        const data = await services.listImg()
+        const data = await codePlatformApi.listImg()
         if (data.code === 1) {
           setData(data.data)
         } else {

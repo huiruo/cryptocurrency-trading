@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { services } from '@services/api'
+import { codePlatformApi } from '@services/code.platform'
 import { message } from 'antd'
 import { getCookie, setCookie } from 'cookies-next'
 
@@ -14,7 +14,7 @@ const useListContainers = ({ loginToken }: ListContainersType) => {
   const listContainers = async (isRunning = false) => {
     const params = { isRunning }
     try {
-      const data = await services.listContainers(params)
+      const data = await codePlatformApi.listContainers(params)
       console.log('listContainers==>', data)
       if (data?.code === 1) {
         setData(data.data)

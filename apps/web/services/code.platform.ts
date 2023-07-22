@@ -1,4 +1,5 @@
-import { deleteCookie, getCookie, setCookie } from 'cookies-next'
+import { apiPrefix } from '@common/constants'
+import { fetchWithAuth } from './base'
 import {
   Api,
   BuildDockerImageOptions,
@@ -22,8 +23,6 @@ import {
   StopContainerOptions,
   StopContainerResponse,
 } from './types'
-
-const baseUrl = '/code-platform'
 
 interface ApiConfig {
   codeList: string
@@ -54,57 +53,11 @@ const apiConfig: ApiConfig = {
   getUser: '/user/auth/userId',
 }
 
-interface FetchOptions<T> extends Omit<RequestInit, 'body'> {
-  headers?: {
-    Authorization: string
-  }
-  body?: T | unknown
-}
-
-const fetchWithAuth = async <T>(
-  url: string,
-  options: FetchOptions<T> = {},
-  method = 'POST',
-): Promise<ResType<T>> => {
-  const token = getCookie('token')
-  try {
-    const response = await fetch(url, {
-      ...options,
-      method,
-      headers: {
-        ...options.headers,
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: method === 'POST' ? JSON.stringify(options.body) : null,
-    })
-
-    if (response.status === 401) {
-      sessionStorage.setItem('isTokenExpired', '0')
-      deleteCookie('token')
-      window.location.href = '/'
-      return { code: 0, msg: '请登录' } as ResType<T>
-    }
-
-    const newToken = response.headers.get('Authorization')
-    if (newToken) {
-      setCookie('token', newToken)
-    }
-
-    return response.json()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    console.log('fetchWithAuth error', error)
-
-    return { code: -1, msg: error.message as string, data: null } as ResType<T>
-  }
-}
-
-export const services: Api = {
+export const codePlatformApi: Api = {
   codeList: async (
     options: CodeListOptions = { test: 123 },
   ): Promise<ResType<CodeListResponse>> => {
-    const url = `${baseUrl}${apiConfig.codeList}`
+    const url = `${apiPrefix}${apiConfig.codeList}`
     const res = await fetchWithAuth<CodeListResponse>(
       url,
       { body: options },
@@ -120,57 +73,53 @@ export const services: Api = {
   runCode: async (
     options: RunCodeOptions = { test: 123 },
   ): Promise<ResType<RunCodeResponse>> => {
-    const url = `${baseUrl}${apiConfig.runCode}`
+    const url = `${apiPrefix}${apiConfig.runCode}`
     return fetchWithAuth(url, { body: options })
   },
   getContainerStatus: async (
     options: ContainerStatusOptions = { test: 123 },
   ): Promise<ResType<ContainerStatusResponse>> => {
-    const url = `${baseUrl}${apiConfig.getContainerStatus}`
+    const url = `${apiPrefix}${apiConfig.getContainerStatus}`
     return fetchWithAuth(url, { body: options })
   },
   getRunningContainer: async (
     options: RunningContainerOptions = { test: 123 },
   ): Promise<ResType<RunningContainerResponse>> => {
-    const url = `${baseUrl}${apiConfig.getRunningContainer}`
+    const url = `${apiPrefix}${apiConfig.getRunningContainer}`
     return fetchWithAuth(url, { body: options }, 'GET')
   },
   buildDockerImage: async (
     options: BuildDockerImageOptions = { test: 123 },
   ): Promise<ResType<BuildDockerImageResponse>> => {
-    const url = `${baseUrl}${apiConfig.buildDockerImage}`
+    const url = `${apiPrefix}${apiConfig.buildDockerImage}`
     return fetchWithAuth(url, { body: options })
   },
   listImg: async (): Promise<ResType<ListImgResponse>> => {
-    const url = `${baseUrl}${apiConfig.listImg}`
+    const url = `${apiPrefix}${apiConfig.listImg}`
     return fetchWithAuth(url, { body: {} }, 'GET')
   },
   listContainers: async (
     options: ListContainersOptions = { test: 123 },
   ): Promise<ResType<ListContainersResponse>> => {
-    const url = `${baseUrl}${apiConfig.listContainers}`
+    const url = `${apiPrefix}${apiConfig.listContainers}`
     return fetchWithAuth(url, { body: options })
   },
   startContainer: async (
     options: StartContainerOptions = { test: 123 },
   ): Promise<ResType<StartContainerResponse>> => {
-    const url = `${baseUrl}${apiConfig.startContainer}`
+    const url = `${apiPrefix}${apiConfig.startContainer}`
     return fetchWithAuth(url, { body: options })
   },
   stopContainer: async (
     options: StopContainerOptions = { test: 123 },
   ): Promise<ResType<StopContainerResponse>> => {
-    const url = `${baseUrl}${apiConfig.stopContainer}`
+    const url = `${apiPrefix}${apiConfig.stopContainer}`
     return fetchWithAuth(url, { body: options })
   },
   getUser: async (
     options: GetUserOptions = { test: 123 },
   ): Promise<ResType<GetUserResponse>> => {
-    const url = `${baseUrl}${apiConfig.getUser}`
+    const url = `${apiPrefix}${apiConfig.getUser}`
     return fetchWithAuth(url, { body: options })
   },
-}
-
-export function test(test): void {
-  console.log('test', test)
 }

@@ -2,7 +2,7 @@ import React, { ReactNode, useEffect } from 'react'
 import { Button, message } from 'antd'
 import { Table as AntTable } from 'antd'
 import Layout from '@layouts/layout'
-import { services } from '@services/api'
+import { codePlatformApi } from '@services/code.platform'
 import useListContainers from '@hooks/useListContainers'
 import { LoginSuccessPayload } from 'types'
 import { useAppSelector } from '@stores/hooks'
@@ -43,7 +43,7 @@ export function Containers({ payload }: Props): ReactNode {
   const onRunContainer = async (item: ContainerType) => {
     console.log('docker', item)
     const params = { ...item, containerName: item.Names?.[0] }
-    const data = await services.startContainer(params)
+    const data = await codePlatformApi.startContainer(params)
     console.log('onRunContainer-res', data)
     if (data.code === 1) {
       message.success(data.msg)
@@ -58,7 +58,7 @@ export function Containers({ payload }: Props): ReactNode {
 
   const onStopContainer = async (item: ContainerType) => {
     const params = { ...item, containerName: item.Names?.[0] }
-    const data = await services.stopContainer(params)
+    const data = await codePlatformApi.stopContainer(params)
     console.log('onStopContainer-res', data)
     if (data.code === 1) {
       message.success(data.msg)
