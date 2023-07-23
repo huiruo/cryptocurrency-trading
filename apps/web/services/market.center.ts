@@ -1,33 +1,28 @@
 import { apiPrefix } from '@common/constants'
 import { ResType, fetchWithAuth } from './base'
-import { Api, CodeListOptions, CodeListResponse } from './market.center.type'
+import { Api, StatisticsAccountResponse, Account } from './market.center.type'
 
 interface ApiConfig {
-  codeList: string
-
-  // Add more API endpoints here...
-  [key: string]: string
+  syncAccount: string
+  statisticsAccount: string
 }
 
 const apiConfig: ApiConfig = {
-  codeList: '/code-engine/codeList',
+  syncAccount: '/market.center/syncBalances',
+  statisticsAccount: '/market.center/statisticsAccount',
 }
 
 export const marketCenterApi: Api = {
-  codeList: async (
-    options: CodeListOptions = { test: 123 },
-  ): Promise<ResType<CodeListResponse>> => {
-    const url = `${apiPrefix}${apiConfig.codeList}`
-    const res = await fetchWithAuth<CodeListResponse>(
+  syncAccount: async (): Promise<ResType<Account>> => {
+    const url = `${apiPrefix}${apiConfig.syncAccount}`
+    return await fetchWithAuth<Account>(url, { body: {} }, 'GET')
+  },
+  statisticsAccount: async (): Promise<ResType<StatisticsAccountResponse>> => {
+    const url = `${apiPrefix}${apiConfig.statisticsAccount}`
+    return await fetchWithAuth<StatisticsAccountResponse>(
       url,
-      { body: options },
+      { body: {} },
       'GET',
     )
-    const data = res.data || []
-    return {
-      code: res.code,
-      msg: res.msg,
-      data,
-    }
   },
 }
