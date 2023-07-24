@@ -6,6 +6,16 @@ export interface ResType<T> {
   data: T
 }
 
+export interface PaginationType {
+  currentPage: number
+  pageSize: number
+}
+
+export interface PaginationResType<T> {
+  total: number
+  data: T
+}
+
 interface FetchOptions<T> extends Omit<RequestInit, 'body'> {
   headers?: {
     Authorization: string

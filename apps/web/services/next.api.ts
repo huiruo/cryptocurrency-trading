@@ -1,4 +1,4 @@
-import { BASE_URL, SUCCESS } from '@common/constants'
+import { BASE_URL, FAIL, SUCCESS } from '@common/constants'
 import { LoginSuccess, ResultType, VerifyAuthResType } from 'types'
 
 export async function handleGoogleAuthCodeApi(
@@ -20,7 +20,7 @@ export async function handleGoogleAuthCodeApi(
   } catch (error) {
     console.error('NetWork Error', error)
     return {
-      statusCode: 0,
+      statusCode: FAIL,
       message: error as string,
       data: {
         username: '',
