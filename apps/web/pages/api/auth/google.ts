@@ -1,6 +1,7 @@
 import { withIronSessionApiRoute } from 'iron-session/next'
 import { sessionOptions } from '@common/session'
 import {
+  SUCCESS,
   THIRD_PARTY_LOGIN_TAG,
   loginRedirect,
   webRedirect,
@@ -11,13 +12,17 @@ export default withIronSessionApiRoute(async (req, res) => {
   const { code } = req.query
   try {
     const result = await handleGoogleAuthCodeApi(code as string)
-    req.session.loginStatus = 1
-    req.session.payload = result.data
-    await req.session.save()
-
-    res.redirect(`${webRedirect}?from=${THIRD_PARTY_LOGIN_TAG}`)
+    if (result.statusCode === SUCCESS) {
+      req.session.loginStatus = 1
+      req.session.payload = result.data
+      await req.session.save()
+      res.redirect(`${webRedirect}?from=${THIRD_PARTY_LOGIN_TAG}`)
+    } else {
+      req.session.loginStatus = 2
+      await req.session.save()
+      res.redirect(`${loginRedirect}?isLoginSuccessful=${2}`)
+    }
   } catch (error: unknown) {
-    console.log('google auth error1:', error)
     req.session.loginStatus = 2
     await req.session.save()
     res.redirect(`${loginRedirect}?isLoginSuccessful=${2}`)
