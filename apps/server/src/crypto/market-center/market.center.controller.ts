@@ -1,8 +1,9 @@
-import { Controller, Get } from '@nestjs/common'
+import { Body, Controller, Get, Post } from '@nestjs/common'
 import { MarketCenterService } from './market.center.service'
-import { ResultWithData } from 'src/types'
+import { PaginationType, Result, ResultWithData } from 'src/types'
 import { Account } from 'binance-api-node'
-import { StatisticsAccountRes } from './market.center.type'
+import { AssetType, StatisticsAccountRes } from './market.center.type'
+import { TradeAsset } from '../entity/asset.entity'
 
 @Controller('market.center')
 export class MarketCenterController {
@@ -16,5 +17,17 @@ export class MarketCenterController {
   @Get('statisticsAccount')
   async statisticsAccount(): Promise<ResultWithData<StatisticsAccountRes>> {
     return await this.marketCenterService.statisticsAccount()
+  }
+
+  @Post('addAsset')
+  async addAsset(@Body() asset: AssetType): Promise<Result> {
+    return await this.marketCenterService.addAsset(asset)
+  }
+
+  @Post('assets')
+  async getAssets(
+    @Body() page: PaginationType,
+  ): Promise<ResultWithData<TradeAsset[]>> {
+    return await this.marketCenterService.getAssets(page)
   }
 }

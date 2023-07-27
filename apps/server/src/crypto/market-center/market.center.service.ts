@@ -1,19 +1,30 @@
 import { Injectable } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
 import { Account } from 'binance-api-node'
 import { success } from 'src/common/constant'
-import { ResultWithData } from 'src/types'
+import { PaginationType, Result, ResultWithData } from 'src/types'
 import { BinanceService } from '../common/binance-service'
-import { NewAssetBalance, StatisticsAccountRes } from './market.center.type'
+import {
+  AssetType,
+  NewAssetBalance,
+  StatisticsAccountRes,
+} from './market.center.type'
 import { generateRequestPriceArray } from './accountInfo.util'
 import { divide } from 'src/common/utils/boter-math'
 import { services } from 'src/common/utils/axios-request'
 import { calculateValue } from './calculate.util'
+import { TradeAsset } from '../entity/asset.entity'
+import { get, isEmpty } from 'lodash'
 
 @Injectable()
 export class MarketCenterService {
   private client: BinanceService
 
-  constructor() {
+  constructor(
+    @InjectRepository(TradeAsset)
+    private readonly tradeAssetRepo: Repository<TradeAsset>,
+  ) {
     this.initBinanceApi()
   }
 
@@ -185,5 +196,30 @@ export class MarketCenterService {
     } else {
       return null
     }
+  }
+
+  async addAsset(asset: AssetType): Promise<Result> {
+    const { name } = asset
+    const assetData = await this.getAsset(name)
+    if (isEmpty(assetData)) {
+      await this.tradeAssetRepo.save(asset)
+      return { code: success, msg: 'add asset successfully' }
+    } else {
+      return { code: 500, msg: 'Duplicate asset' }
+    }
+  }
+
+  private async getAsset(name: string): Promise<TradeAsset> {
+    const sql = `select * from asset where name='${name}'`
+    const symbolData = await this.tradeAssetRepo.query(sql)
+
+    return get(symbolData, '[0]', {})
+  }
+
+  async getAssets(page: PaginationType): Promise<ResultWithData<TradeAsset[]>> {
+    console.log('page', page)
+    const res = await this.tradeAssetRepo.find()
+
+    return { code: success, msg: 'add asset successfully', data: res }
   }
 }

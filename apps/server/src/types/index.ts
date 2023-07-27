@@ -11,6 +11,16 @@ export interface ResultWithData<T> {
   data: T
 }
 
+export interface PaginationType {
+  currentPage: number
+  pageSize: number
+}
+
+export interface PaginationResType<T> {
+  total: number
+  data: T
+}
+
 export interface GoogleAuthType {
   id: string
   email: string

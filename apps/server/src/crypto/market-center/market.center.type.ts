@@ -1,12 +1,5 @@
 import { AssetBalance } from 'binance-api-node'
 
-export interface SyncSpotOrderParams {
-  symbol: string
-  startTime: number
-  endTime: number
-  recvWindow?: number
-}
-
 export interface NewAssetBalance extends AssetBalance {
   /** 挂单的锁定 */
   locked: string
@@ -25,4 +18,11 @@ export interface StatisticsAccountRes {
   otherCoinValRatio: number
   maxOtherCoinRatio: number
   maxPositionRatio: number
+}
+
+export interface AssetType {
+  name: string
+  symbol: string
+  code?: string
+  tradeUrl?: string
 }
