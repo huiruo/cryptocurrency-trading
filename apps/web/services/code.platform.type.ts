@@ -35,13 +35,12 @@ export interface BuildDockerImageResponse {
   test: number
 }
 
-// export interface ListImgOptions { }
 export interface ListImgResponse {
   test: number
 }
 
 export interface ListContainersOptions {
-  test: number
+  isRunning: boolean
 }
 export interface ListContainersResponse {
   test: number
@@ -80,7 +79,6 @@ export interface Api {
   buildDockerImage: (
     options?: BuildDockerImageOptions,
   ) => Promise<ResType<BuildDockerImageResponse>>
-  // listImg: (options?: ListImgOptions) => Promise<ResType<ListImgResponse>>
   listImg: () => Promise<ResType<ListImgResponse>>
   listContainers: (
     options: ListContainersOptions,

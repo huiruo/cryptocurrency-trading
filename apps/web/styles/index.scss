@@ -1,3 +1,20 @@
 .img-start-btn {
   margin-right: 10px;
 }
+
+.spot-container {
+  width: 90%;
+  margin: 0 auto;
+}
+
+.table-box-container {
+  width: 100%;
+  border: 1px solid rgba(0, 0, 0, .06);
+  padding: 20px 20px 30px;
+  background: #fcfcfc;
+
+  .table-box {
+    width: 100%;
+    overflow: auto;
+  }
+}

@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import dayjs, { Dayjs } from 'dayjs'
-import { Button, DatePicker, Select } from 'antd'
+import { Button, DatePicker, Select, message } from 'antd'
 import AddAsset from './AddAsset'
 import useFetchAssets from './useFetchAssets'
 import { spotApi } from '@services/spot'
 import { GetSpotOrderParamsNoPage } from '@services/spot.type'
+import { SUCCESS } from '@common/constants'
 
 // 单位毫秒
 const startTimeDefault = dayjs().startOf('day')
@@ -31,6 +32,7 @@ export default function SpotOperation(props: Props) {
 
   const syncSpotOrder = async () => {
     const [startOfSelectedDay, endOfSelectedDay] = selectedDates
+    console.log('syncSpotOrder:', startOfSelectedDay, endOfSelectedDay)
     /*
     const params = {
       symbol: selectedAsset,
@@ -45,14 +47,11 @@ export default function SpotOperation(props: Props) {
       endTime: 1678031999999,
     }
     const res = await spotApi.syncSpotOrder(params)
-    console.log('syncSpotOrder==>', res)
-
-    console.log(
-      'handleRangePickerChange:',
-      startOfSelectedDay.valueOf(),
-      '===',
-      endOfSelectedDay.valueOf(),
-    )
+    if (res.code === SUCCESS) {
+      message.success(res.msg)
+    } else {
+      message.error(res.msg || 'error')
+    }
   }
 
   const onAddAsset = () => {

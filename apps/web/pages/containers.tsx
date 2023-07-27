@@ -7,10 +7,10 @@ import { LoginSuccessPayload } from 'types'
 
 interface Props {
   payload: LoginSuccessPayload
-  token: string
 }
 
-export default function Container({ payload }: Props) {
+export default function Container(props: Props) {
+  const { payload } = props
   return (
     <Layout>
       <Containers payload={payload} />
@@ -20,9 +20,7 @@ export default function Container({ payload }: Props) {
 
 export const getServerSideProps = withIronSessionSsr(async ({ req }) => {
   const { payload } = req.session
-
-  console.log('containers-getServerSideProps', payload)
-  console.log('====>B')
+  console.log('containers-getServerSideProps', { payload })
 
   if (payload) {
     return {

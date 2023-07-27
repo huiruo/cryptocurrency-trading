@@ -9,7 +9,7 @@ import { countState } from '@stores/appSlice'
 import { appStoreActions } from '@stores/appSlice'
 import { useDispatch } from 'react-redux'
 
-interface Props {
+export interface Props {
   payload: LoginSuccessPayload
 }
 
@@ -22,13 +22,9 @@ interface ContainerType {
   Status: string
 }
 
-export function Containers({ payload }: Props): ReactNode {
+export function Containers() {
   const count = useAppSelector(countState)
-  const {
-    loading,
-    data = [],
-    refetch,
-  } = useListContainers({ loginToken: payload.token })
+  const { loading, data = [], refetch } = useListContainers()
 
   // TODO: test
   const onAdd = (test): void => {

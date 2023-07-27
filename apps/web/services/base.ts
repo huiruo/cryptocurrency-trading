@@ -42,10 +42,19 @@ export const fetchWithAuth = async <T>(
     })
 
     if (response.status === 401) {
-      sessionStorage.setItem('isTokenExpired', '0')
+      // sessionStorage.setItem('isTokenExpired', '0')
       deleteCookie('token')
       window.location.href = '/'
+      console.log('请登录==>')
       return { code: 0, msg: '请登录' } as ResType<T>
+    }
+
+    if (response.status === 500) {
+      return {
+        code: response.status,
+        msg: response.statusText as string,
+        data: null,
+      } as ResType<T>
     }
 
     const newToken = response.headers.get('Authorization')

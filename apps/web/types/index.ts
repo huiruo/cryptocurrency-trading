@@ -1,20 +1,15 @@
 export type LoginSuccessPayload = {
-  id: string
   email: string
-  verified_email: boolean
-  name: string
-  given_name: string
-  family_name: string
-  picture: string
-  locale: string
   token: string
+  username: string
+  avatar: string
 }
 
 export type LoginSuccess = {
   username: string
   email: string
   avatar: string
-  token: string
+  token?: string
 }
 
 export type VerifyAuthResType = {

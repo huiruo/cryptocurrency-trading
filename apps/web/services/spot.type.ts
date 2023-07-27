@@ -1,4 +1,4 @@
-import { PaginationResType, PaginationType, ResType } from './base'
+import { PaginationType, ResType } from './base'
 
 export interface Api {
   addAsset: (assetType: AssetType) => Promise<ResType<null>>
@@ -8,7 +8,7 @@ export interface Api {
   ) => Promise<ResType<null>>
   getSpotOrders: (
     getSpotOrderParams: GetSpotOrderParams,
-  ) => Promise<ResType<PaginationResType<SpotOrder>>>
+  ) => Promise<ResType<SpotOrders>>
 }
 
 export interface AssetType {
@@ -53,4 +53,9 @@ export interface SpotOrder {
   time: number
   updatedAt: number
   createdAt: number
+}
+
+export interface SpotOrders {
+  data: SpotOrder[]
+  total: number
 }

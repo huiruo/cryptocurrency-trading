@@ -1,15 +1,10 @@
 import { apiPrefix } from '@common/constants'
-import {
-  PaginationResType,
-  PaginationType,
-  ResType,
-  fetchWithAuth,
-} from './base'
+import { PaginationType, ResType, fetchWithAuth } from './base'
 import {
   Api,
   AssetType,
   GetSpotOrderParams,
-  SpotOrder,
+  SpotOrders,
   SyncSpotOrderParams,
 } from './spot.type'
 
@@ -46,9 +41,9 @@ export const spotApi: Api = {
   },
   getSpotOrders: async (
     getSpotOrderParams: GetSpotOrderParams,
-  ): Promise<ResType<PaginationResType<SpotOrder>>> => {
+  ): Promise<ResType<SpotOrders>> => {
     const url = `${apiPrefix}${apiConfig.getSpotOrders}`
-    return await fetchWithAuth<PaginationResType<SpotOrder>>(
+    return await fetchWithAuth<SpotOrders>(
       url,
       { body: getSpotOrderParams },
       'POST',

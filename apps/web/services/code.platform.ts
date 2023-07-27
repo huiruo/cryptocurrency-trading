@@ -98,7 +98,7 @@ export const codePlatformApi: Api = {
     return fetchWithAuth(url, { body: {} }, 'GET')
   },
   listContainers: async (
-    options: ListContainersOptions = { test: 123 },
+    options: ListContainersOptions,
   ): Promise<ResType<ListContainersResponse>> => {
     const url = `${apiPrefix}${apiConfig.listContainers}`
     return fetchWithAuth(url, { body: options })

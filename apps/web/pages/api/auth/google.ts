@@ -14,9 +14,12 @@ export default withIronSessionApiRoute(async (req, res) => {
     const result = await handleGoogleAuthCodeApi(code as string)
     if (result.statusCode === SUCCESS) {
       req.session.loginStatus = 1
-      req.session.payload = result.data
+      const { avatar, email, username } = result.data
+      req.session.payload = { avatar, email, username }
       await req.session.save()
-      res.redirect(`${webRedirect}?from=${THIRD_PARTY_LOGIN_TAG}`)
+      res.redirect(
+        `${webRedirect}?from=${THIRD_PARTY_LOGIN_TAG}&codeToken=${result.data.token}`,
+      )
     } else {
       req.session.loginStatus = 2
       await req.session.save()

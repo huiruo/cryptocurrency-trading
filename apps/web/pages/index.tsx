@@ -30,12 +30,12 @@ export const getServerSideProps: GetServerSideProps = withIronSessionSsr(
   async ({ req }) => {
     const { payload } = req.session
     const loginStatus = req.session?.loginStatus
-    console.log('index getServerSideProps', req.session)
+    console.log('index getServerSideProps', payload)
 
     if (payload?.token) {
       const result = await verifyAuth(payload.token)
       if (result.data?.username) {
-        console.log('The home page verified==》1:', result)
+        console.log('The home page verified==》1:', { result, payload })
         return {
           redirect: {
             destination: '/containers',

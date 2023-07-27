@@ -18,7 +18,6 @@ export default function AddAsset(props: Props) {
     if (res.code === SUCCESS) {
       setTimeout(() => {
         addAssetCallBack(false, true)
-        message.success(res.msg)
       }, 500)
     } else {
       message.error(res.msg || 'Failed to add resource')
