@@ -42,6 +42,15 @@ export function Header() {
 
           <li className="li">
             <Link
+              href="/crypto/strategies"
+              className={pathname === '/crypto/strategies' ? 'nav-active' : ''}
+            >
+              strategies
+            </Link>
+          </li>
+
+          <li className="li">
+            <Link
               href="/crypto/spot-orders"
               className={pathname === '/crypto/spot-orders' ? 'nav-active' : ''}
             >
