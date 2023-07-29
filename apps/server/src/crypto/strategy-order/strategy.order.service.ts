@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { BinanceService } from '../common/binance-service'
-import { GetStraOrderParams } from './strategy.order.type'
+import { GetStraOrderParams, ResetStra } from './strategy.order.type'
 import { PaginationResType, Result, ResultWithData } from 'src/types'
 import { StrategyOrder } from '../entity/strategy-order.entity'
 import { get, isEmpty } from 'lodash'
@@ -91,96 +91,123 @@ export class StrategyOrderService {
     }
   }
 
-  async createSpotStra(spotOrders: SpotOrder[]): Promise<Result> {
-    console.log('createSpotStra', spotOrders)
-
-    // const firstOrder = get(spotOrders, '[0]', {}) as SpotOrder;
-    const firstOrder = spotOrders[0]
-    const { orderId, userId, time, symbol, isBuyer } = firstOrder
-    const strategyOrderId = await this.findStrategyOrderIdUtil(orderId)
-    if (isEmpty(strategyOrderId)) {
-      console.log('=== not exist strategy,insert... ===')
-      const strategyId = nanoid()
-
-      // get price from server
-      const spotPrices = await this.getSpotPrice(symbol)
-      const price = get(spotPrices, `${symbol}`, '')
-
-      const { qty, quoteQty, entryPrice, isTheSameSymbol } =
-        calculateSpotStrategiesOrder(spotOrders, symbol)
-      if (!isTheSameSymbol) {
-        return {
-          code: 500,
-          msg: 'The selected order not the same Symbol',
-        }
+  async resetStra(resetStra: ResetStra): Promise<Result> {
+    try {
+      const { strategyId, orderType } = resetStra
+      if (orderType === 'spot') {
+        const sql = `update spot_order set strategyId="",strategyStatus = 0  WHERE strategyId = "${strategyId}"`
+        await this.spotOrderRepo.query(sql)
       }
 
-      const realizedFree = 0
-      const spotFree = await this.getUserSpotFree(userId)
-      const { profit, profitRate, free } = await calculateStrategyProfit(
-        price,
-        entryPrice,
-        qty,
-        quoteQty,
-        userId,
-        realizedFree,
-        false,
-        Number(spotFree),
-      )
+      await this.deleteStrategyOrder(strategyId)
+      await this.deleteStrategyOrderId(strategyId)
 
-      const strategiesOrder = {
-        symbol,
-        price,
-        side: isBuyer,
-        orderType: 1,
-        leverage: 1,
-
-        entryPrice,
-        sellingPrice: '',
-        sellingTime: null,
-
-        qty,
-        quoteQty,
-        sellingQty: '',
-        sellingQuoteQty: '',
-
-        profit,
-        profitRate,
-        realizedProfit: 0,
-        realizedProfitRate: '',
-        free,
-
-        stopType: 0,
-        stopProfit: '',
-        stopLoss: '',
-        stopProfitPrice: '',
-        stopLossPrice: '',
-
-        note: '',
-        klineShots: '',
-
-        is_running: true,
-        userId: userId,
-        strategyId,
-        updatedAt: new Date().getTime(),
-        time,
+      return {
+        code: success,
+        msg: 'ok',
       }
-
-      await this.createStrategyOrderIdUtil({ userId, strategyId, orderId })
-
-      await this.createStrategyOrderUtil(strategiesOrder)
-      const running = 1
-      spotOrders.forEach((item) => {
-        const { id: idUpdate } = item
-        this.updateOrderStatus('spot', idUpdate, strategyId, running)
-      })
-    } else {
-      console.log('=== exist strategyOrderId,update... ===')
+    } catch (error) {
+      return {
+        code: fail,
+        msg: error,
+      }
     }
+  }
 
-    return {
-      code: success,
-      msg: 'ok',
+  async createSpotStra(spotOrders: SpotOrder[]): Promise<Result> {
+    try {
+      const firstOrder = spotOrders[0]
+      const { orderId, userId, time, symbol, isBuyer } = firstOrder
+      const strategyOrderId = await this.findStrategyOrderIdUtil(orderId)
+      if (isEmpty(strategyOrderId)) {
+        console.log('=== not exist strategy,insert... ===')
+        const strategyId = nanoid()
+
+        // get price from server
+        const spotPrices = await this.getSpotPrice(symbol)
+        const price = get(spotPrices, `${symbol}`, '')
+
+        const { qty, quoteQty, entryPrice, isTheSameSymbol } =
+          calculateSpotStrategiesOrder(spotOrders, symbol)
+        if (!isTheSameSymbol) {
+          return {
+            code: 500,
+            msg: 'The selected order not the same Symbol',
+          }
+        }
+
+        const realizedFree = 0
+        const spotFree = await this.getUserSpotFree(userId)
+        const { profit, profitRate, free } = await calculateStrategyProfit(
+          price,
+          entryPrice,
+          qty,
+          quoteQty,
+          userId,
+          realizedFree,
+          false,
+          Number(spotFree),
+        )
+
+        const strategiesOrder = {
+          symbol,
+          price,
+          side: isBuyer,
+          orderType: 1,
+          leverage: 1,
+
+          entryPrice,
+          sellingPrice: '',
+          sellingTime: null,
+
+          qty,
+          quoteQty,
+          sellingQty: '',
+          sellingQuoteQty: '',
+
+          profit,
+          profitRate,
+          realizedProfit: 0,
+          realizedProfitRate: '',
+          free,
+
+          stopType: 0,
+          stopProfit: '',
+          stopLoss: '',
+          stopProfitPrice: '',
+          stopLossPrice: '',
+
+          note: '',
+          klineShots: '',
+
+          is_running: true,
+          userId: userId,
+          strategyId,
+          updatedAt: new Date().getTime(),
+          time,
+        }
+
+        await this.createStrategyOrderIdUtil({ userId, strategyId, orderId })
+
+        await this.createStrategyOrderUtil(strategiesOrder)
+        const running = 1
+        spotOrders.forEach((item) => {
+          const { id: idUpdate } = item
+          this.updateOrderStatus('spot', idUpdate, strategyId, running)
+        })
+      } else {
+        console.log('=== exist strategyOrderId,update... ===')
+      }
+
+      return {
+        code: success,
+        msg: 'ok',
+      }
+    } catch (error) {
+      return {
+        code: fail,
+        msg: error,
+      }
     }
   }
 
@@ -243,5 +270,15 @@ export class StrategyOrderService {
     }
 
     return '0'
+  }
+
+  private async deleteStrategyOrder(strategyId: string): Promise<void> {
+    const sql = `delete from strategy_order WHERE strategyId = "${strategyId}"`
+    await this.strategyOrderIdRepo.query(sql)
+  }
+
+  private async deleteStrategyOrderId(strategyId: string): Promise<void> {
+    const sql = `delete from strategy_orderid WHERE strategyId = "${strategyId}"`
+    await this.strategyOrderIdRepo.query(sql)
   }
 }

@@ -6,6 +6,7 @@ export interface Api {
     straOrdersParams: StraOrdersParams,
   ) => Promise<ResType<StraOrders>>
   createSpotStra: (spotOrders: SpotOrder[]) => Promise<ResType<null>>
+  resetStra: (resetStraOrder: ResetStra) => Promise<ResType<null>>
 }
 
 export interface StraOrdersParams extends PaginationType {
@@ -50,4 +51,11 @@ export interface StraOrder {
   time: number
   updatedAt: number
   createdAt?: number
+}
+
+export type OrderType = 'future' | 'spot'
+
+export interface ResetStra {
+  strategyId: string
+  orderType: OrderType
 }

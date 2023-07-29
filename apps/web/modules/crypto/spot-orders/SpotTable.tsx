@@ -40,34 +40,15 @@ export default function SpotTable() {
   }
 
   const createStrategyUtil = async (order: SpotOrder[]) => {
-    console.log('order', order)
-
     const res = await strategyApi.createSpotStra(order)
-    console.log('createStrategyUtil-res', res)
-    /*
-    // const toaster = toast.loading('create strategy...', { showLayer: true })
-
-    const res = await traderApi.createSpotStrategyApi(order)
-    if (res.code === 200) {
-      const params = {
-        symbol: ''
-      }
-      // spotCallBack(params)
-      getSpotOrders(params)
+    if (res.code === SUCCESS) {
+      getSpotOrders({ symbol: '' })
       setSelectRowData([])
       setSelectedRowKeys([])
-
-      // toaster.update('create Strategy succeeded', {
-      //   type: 'success',
-      //   duration: 1000,
-      // })
-
+      message.success('create strategy succeeded')
     } else {
-      // toaster.update("Failed to create Strategy", {
-      //   type: 'error',
-      // })
+      message.error('Failed to create Strategy')
     }
-    */
   }
 
   const isStrategyRelatedOrderUtil = (selectRowData: SpotOrder[]): boolean => {
@@ -88,32 +69,24 @@ export default function SpotTable() {
   }
 
   const onRebuildOrderStatus = async (item: SpotOrder) => {
-    if (item.strategyStatus === 2) {
+    const { strategyStatus, strategyId } = item
+    if (strategyStatus === 2) {
       message.warning('Can not reset ended order')
       return
     }
 
-    // const toaster = toast.loading('Reset order...', { showLayer: true })
-    /*
-    const res = await traderApi.resetSpotOrderStatus(item)
-    if (res.code === 200) {
-      const params = {
-        symbol: ''
-      }
-      getSpotOrders(params)
+    const res = await strategyApi.resetStra({
+      strategyId,
+      orderType: 'spot',
+    })
+    if (res.code === SUCCESS) {
+      getSpotOrders({ symbol: '' })
       setSelectRowData([])
       setSelectedRowKeys([])
-
-      // toaster.update('Reset order succeeded', {
-      //   type: 'success',
-      //   duration: 1000,
-      // })
+      message.success('Reset order succeeded')
     } else {
-      // toaster.update("Failed to reset order", {
-      //   type: 'error',
-      // })
+      message.error('Failed to reset order')
     }
-    */
   }
 
   const onMergeStrategy = () => {

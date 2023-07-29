@@ -27,3 +27,10 @@ export interface StrategyProfit {
   free: number
   netProfitRate: string
 }
+
+export type OrderType = 'future' | 'spot'
+
+export interface ResetStra {
+  strategyId: string
+  orderType: OrderType
+}

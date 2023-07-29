@@ -1,7 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common'
 import { Result } from 'src/types'
 import { StrategyOrderService } from './strategy.order.service'
-import { GetStraOrderParams } from './strategy.order.type'
+import { GetStraOrderParams, ResetStra } from './strategy.order.type'
 import { SpotOrder } from '../entity/spot-order.entity'
 
 @Controller('strategy')
@@ -18,5 +18,10 @@ export class StrategyOrderController {
   @Post('createSpotStra')
   async createSpotStra(@Body() spotOrders: SpotOrder[]): Promise<Result> {
     return await this.strategyOrderService.createSpotStra(spotOrders)
+  }
+
+  @Post('resetStra')
+  async resetStra(@Body() resetStra: ResetStra): Promise<Result> {
+    return await this.strategyOrderService.resetStra(resetStra)
   }
 }
