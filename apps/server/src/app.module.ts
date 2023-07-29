@@ -12,6 +12,8 @@ import { SpotModule } from './crypto/spot/spot.module'
 import { FutureModule } from './crypto/future/future.module'
 import { StrategyOrderModule } from './crypto/strategy-order/strategy.order.module'
 import { getDirFilenames } from './common/utils/getDirFilenames'
+import { APP_GUARD } from '@nestjs/core'
+import { AuthGuard } from './user/auth.guard'
 
 @Module({
   imports: [
@@ -27,6 +29,12 @@ import { getDirFilenames } from './common/utils/getDirFilenames'
     StrategyOrderModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+  ],
 })
 export class AppModule {}

@@ -95,3 +95,28 @@ nest g controller strategy.order crypto/strategy-order
 
 nest g module strategy.order crypto/strategy-order
 ```
+
+## 注意拦截器只有一个，多个可能会有性能问题
+```js
+import { Module } from '@nestjs/common'
+import { MarketCenterController } from './market.center.controller'
+import { APP_GUARD } from '@nestjs/core'
+import { AuthGuard } from 'src/user/auth.guard'
+import { MarketCenterService } from './market.center.service'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { TradeAsset } from '../entity/asset.entity'
+
+@Module({
+  imports: [TypeOrmModule.forFeature([TradeAsset])],
+  controllers: [MarketCenterController],
+  providers: [
+    MarketCenterService,
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: AuthGuard,
+    // },
+  ],
+  exports: [MarketCenterService],
+})
+export class MarketCenterModule {}
+```

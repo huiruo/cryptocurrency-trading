@@ -19,3 +19,9 @@ export const googleApiBaseUrl = 'https://www.googleapis.com'
 export const webRedirect = 'http://localhost:3800/containers'
 
 export const notLoginRedirect = 'http://localhost:3800/'
+
+export const jwtConstants = {
+  // expiresIn: '60s', // test
+  // expiresIn: '120s', // test
+  expiresIn: '3600s', // nornal
+}

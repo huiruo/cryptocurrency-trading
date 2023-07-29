@@ -18,13 +18,13 @@ export class AuthGuard implements CanActivate {
   */
 
   // Renewal in less than 30/20 minutes
-  // private readonly JWT_EXPIRATION_THRESHOLD = 1800
-  private readonly JWT_EXPIRATION_THRESHOLD = 1200
+  private readonly JWT_EXPIRATION_THRESHOLD = 1800
+  // private readonly JWT_EXPIRATION_THRESHOLD = 1200
   /**
    * nomal: 3600
    */
-  // private readonly JWT_EXPIRATION = 3600
-  private readonly JWT_EXPIRATION = 300
+  private readonly JWT_EXPIRATION = 3600
+  // private readonly JWT_EXPIRATION = 300
 
   constructor(
     private jwtService: JwtService,
@@ -58,26 +58,25 @@ export class AuthGuard implements CanActivate {
         secret: env('jwt_secret'),
       })
 
-      // to renews tart
+      // To renews tart
       // expiresIn Expiration Time
       const expiresIn = Math.floor(payload.exp - Date.now() / 1000)
       if (expiresIn >= 0 && expiresIn <= this.JWT_EXPIRATION_THRESHOLD) {
-        console.log(
-          'After updating the JWT with an expiration time of xx, renewing...',
-        )
         const { username, email, googleId } = payload
         const token = await this.jwtService.signAsync(
           { username, email, googleId },
           { expiresIn: this.JWT_EXPIRATION },
         )
+        console.log(
+          `Request ${request.method} ${request.url},After updating the JWT with an expiration time of xx, renewing...,${token}`,
+        )
         request.headers.authorization = `Bearer ${token}`
         response.setHeader('Authorization', `${token}`)
       } else {
-        console.log('Not to renew')
-        // fix cache
-        response.setHeader('Authorization', 0)
+        console.log(`Request ${request.method} ${request.url}:Not to renew`)
+        // fix cache // response.setHeader('Authorization', 0)
       }
-      // to renews end
+      // To renews end
 
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers

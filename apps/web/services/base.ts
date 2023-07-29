@@ -42,9 +42,8 @@ export const fetchWithAuth = async <T>(
     })
 
     if (response.status === 401) {
-      // sessionStorage.setItem('isTokenExpired', '0')
       deleteCookie('token')
-      window.location.href = '/'
+      // window.location.href = '/'
       console.log('请登录==>')
       return { code: 0, msg: '请登录' } as ResType<T>
     }
@@ -58,7 +57,7 @@ export const fetchWithAuth = async <T>(
     }
 
     const newToken = response.headers.get('Authorization')
-    if (newToken !== '0' && newToken) {
+    if (newToken) {
       setCookie('token', newToken)
     }
 
