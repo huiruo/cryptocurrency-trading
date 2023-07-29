@@ -12,19 +12,18 @@ import { env } from 'src/common/env-unit'
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  /* test Renew in less than 2 minutes
-  private readonly JWT_EXPIRATION_THRESHOLD = 2 * 60
+  /**
+   * Renewal in less than 30/20 minutes
+   * nomal JWT_EXPIRATION_THRESHOLD = 1800
+   * nomal JWT_EXPIRATION = 3600
+   */
+  private readonly JWT_EXPIRATION_THRESHOLD = 1800
+  private readonly JWT_EXPIRATION = 3600
+
+  /* test
+  private readonly JWT_EXPIRATION_THRESHOLD = 100
   private readonly JWT_EXPIRATION = 140 
   */
-
-  // Renewal in less than 30/20 minutes
-  private readonly JWT_EXPIRATION_THRESHOLD = 1800
-  // private readonly JWT_EXPIRATION_THRESHOLD = 1200
-  /**
-   * nomal: 3600
-   */
-  private readonly JWT_EXPIRATION = 3600
-  // private readonly JWT_EXPIRATION = 300
 
   constructor(
     private jwtService: JwtService,
@@ -68,13 +67,16 @@ export class AuthGuard implements CanActivate {
           { expiresIn: this.JWT_EXPIRATION },
         )
         console.log(
-          `Request ${request.method} ${request.url},After updating the JWT with an expiration time of xx, renewing...,${token}`,
+          `Request ${request.method} ${request.url},After updating the JWT with an expiration time of ${expiresIn}, renewing...,${token}`,
         )
         request.headers.authorization = `Bearer ${token}`
         response.setHeader('Authorization', `${token}`)
       } else {
-        console.log(`Request ${request.method} ${request.url}:Not to renew`)
-        // fix cache // response.setHeader('Authorization', 0)
+        console.log(`Request ${request.method} ${request.url}:Not to renew`, {
+          expiresIn,
+        })
+        // fix cache
+        response.setHeader('Authorization', '')
       }
       // To renews end
 
