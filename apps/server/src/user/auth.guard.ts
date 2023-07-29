@@ -12,12 +12,12 @@ import { env } from 'src/common/env-unit'
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  /* test 小于2分钟续签
+  /* test Renew in less than 2 minutes
   private readonly JWT_EXPIRATION_THRESHOLD = 2 * 60
   private readonly JWT_EXPIRATION = 140 
   */
 
-  // 小于30/20分钟续签
+  // Renewal in less than 30/20 minutes
   // private readonly JWT_EXPIRATION_THRESHOLD = 1800
   private readonly JWT_EXPIRATION_THRESHOLD = 1200
   /**
@@ -31,8 +31,10 @@ export class AuthGuard implements CanActivate {
     private reflector: Reflector,
   ) {}
 
-  /**使用拦截器（Interceptor）来验证 JWT 并在 JWT 过期时重定向用户。
-   * 拦截器是 NestJS 框架中的一个特殊类型的中间件，它可以在控制器方法执行之前或之后对请求和响应进行处理。 */
+  /**
+   * Use an Interceptor to validate the JWT and redirect the user when the JWT expires.
+   * Interceptors are a special type of middleware in the NestJS framework that can process requests and responses before or after controller methods execute.
+   *  */
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
@@ -56,12 +58,13 @@ export class AuthGuard implements CanActivate {
         secret: env('jwt_secret'),
       })
 
-      // 续签start
-      // expiresIn 过期时间
+      // to renews tart
+      // expiresIn Expiration Time
       const expiresIn = Math.floor(payload.exp - Date.now() / 1000)
-      // console.log('续签start',expiresIn)
       if (expiresIn >= 0 && expiresIn <= this.JWT_EXPIRATION_THRESHOLD) {
-        console.log('更新 JWT 的过期时间为 xx 后,正在续签...')
+        console.log(
+          'After updating the JWT with an expiration time of xx, renewing...',
+        )
         const { username, email, googleId } = payload
         const token = await this.jwtService.signAsync(
           { username, email, googleId },
@@ -70,9 +73,11 @@ export class AuthGuard implements CanActivate {
         request.headers.authorization = `Bearer ${token}`
         response.setHeader('Authorization', `${token}`)
       } else {
-        console.log('不续签')
+        console.log('Not to renew')
+        // fix cache
+        response.setHeader('Authorization', 0)
       }
-      // 续签end
+      // to renews end
 
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers

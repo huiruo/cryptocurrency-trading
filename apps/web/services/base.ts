@@ -58,7 +58,7 @@ export const fetchWithAuth = async <T>(
     }
 
     const newToken = response.headers.get('Authorization')
-    if (newToken) {
+    if (newToken !== '0' && newToken) {
       setCookie('token', newToken)
     }
 
