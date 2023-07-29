@@ -57,7 +57,10 @@ export const fetchWithAuth = async <T>(
     }
 
     const newToken = response.headers.get('Authorization')
-    if (newToken) {
+    console.log('token=services/base.ts-1', newToken, typeof newToken)
+    // TODO:cache
+    if (newToken && newToken !== '0') {
+      console.log('token=services/base.ts-2', newToken)
       setCookie('token', newToken)
     }
 

@@ -35,13 +35,7 @@ const useListContainers = () => {
       return
     }
 
-    /*
-    const isExpired = sessionStorage.getItem('isTokenExpired')
-    if (isExpired !== '1' && !cookieToken) {
-    */
-
     if (loginToken && loginToken !== cookieToken) {
-      // sessionStorage.setItem('isTokenExpired', '1')
       setCookie('token', loginToken)
     }
 

@@ -28,11 +28,11 @@ export default function Index() {
 
 export const getServerSideProps: GetServerSideProps = withIronSessionSsr(
   async ({ req }) => {
-    const { payload } = req.session
+    const payload = req.session.payload
     const loginStatus = req.session?.loginStatus
     console.log('index getServerSideProps', payload)
 
-    if (payload?.token) {
+    if (payload && payload?.token) {
       const result = await verifyAuth(payload.token)
       if (result.data?.username) {
         console.log('The home page verified==》1:', { result, payload })

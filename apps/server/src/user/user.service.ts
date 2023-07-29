@@ -141,16 +141,11 @@ export class UserService {
   }
 
   private async findUserByEmail(email: string): Promise<User[]> {
-    const users = await this.userRepo.find({
+    return await this.userRepo.find({
       where: {
         email,
       },
     })
-
-    if (!users.length) {
-      throw new HttpException(`指定 email=${email} 的用户不存在`, 404)
-    }
-    return users
   }
 
   private async saveGoogleUser(userInfo: GoogleAuthType): Promise<User> {
@@ -169,6 +164,7 @@ export class UserService {
     user.planType = null
     user.githubId = null
     user.googleId = id
+
     return await this.userRepo.save(user)
   }
 }
