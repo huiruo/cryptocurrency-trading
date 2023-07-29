@@ -1,9 +1,11 @@
 import { PaginationType, ResType } from './base'
+import { SpotOrder } from './spot.type'
 
 export interface Api {
   getStrategyOrders: (
     straOrdersParams: StraOrdersParams,
   ) => Promise<ResType<StraOrders>>
+  createSpotStra: (spotOrders: SpotOrder[]) => Promise<ResType<null>>
 }
 
 export interface StraOrdersParams extends PaginationType {

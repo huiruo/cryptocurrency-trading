@@ -8,6 +8,7 @@ import { SUCCESS, strategyStatusMap } from '@common/constants'
 import { isEmpty } from 'lodash'
 import { spotApi } from '@services/spot'
 import store from '@stores/index'
+import { strategyApi } from '@services/strategy'
 
 export default function SpotTable() {
   const { total, data } = useAppSelector(spotOrdersState)
@@ -40,6 +41,9 @@ export default function SpotTable() {
 
   const createStrategyUtil = async (order: SpotOrder[]) => {
     console.log('order', order)
+
+    const res = await strategyApi.createSpotStra(order)
+    console.log('createStrategyUtil-res', res)
     /*
     // const toaster = toast.loading('create strategy...', { showLayer: true })
 

@@ -1,12 +1,20 @@
 import { Injectable } from '@nestjs/common'
 import { BinanceService } from '../common/binance-service'
 import { GetStraOrderParams } from './strategy.order.type'
-import { PaginationResType, ResultWithData } from 'src/types'
+import { PaginationResType, Result, ResultWithData } from 'src/types'
 import { StrategyOrder } from '../entity/strategy-order.entity'
-import { get } from 'lodash'
+import { get, isEmpty } from 'lodash'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { success } from 'src/common/constant'
+import { fail, success } from 'src/common/constant'
+import { SpotOrder } from '../entity/spot-order.entity'
+import { StrategyOrderId } from '../entity/strategy-orderid.entity'
+import {
+  calculateSpotStrategiesOrder,
+  calculateStrategyProfit,
+} from './strategy.util'
+import { nanoid } from 'nanoid'
+import { TraderApi } from '../entity/api.entity'
 
 @Injectable()
 export class StrategyOrderService {
@@ -15,6 +23,15 @@ export class StrategyOrderService {
   constructor(
     @InjectRepository(StrategyOrder)
     private readonly strategyOrderRepo: Repository<StrategyOrder>,
+
+    @InjectRepository(StrategyOrderId)
+    private readonly strategyOrderIdRepo: Repository<StrategyOrderId>,
+
+    @InjectRepository(SpotOrder)
+    private readonly spotOrderRepo: Repository<SpotOrder>,
+
+    @InjectRepository(TraderApi)
+    private readonly traderApiRepo: Repository<TraderApi>,
   ) {
     this.initBinanceApi()
   }
@@ -72,5 +89,159 @@ export class StrategyOrderService {
         data: res,
       },
     }
+  }
+
+  async createSpotStra(spotOrders: SpotOrder[]): Promise<Result> {
+    console.log('createSpotStra', spotOrders)
+
+    // const firstOrder = get(spotOrders, '[0]', {}) as SpotOrder;
+    const firstOrder = spotOrders[0]
+    const { orderId, userId, time, symbol, isBuyer } = firstOrder
+    const strategyOrderId = await this.findStrategyOrderIdUtil(orderId)
+    if (isEmpty(strategyOrderId)) {
+      console.log('=== not exist strategy,insert... ===')
+      const strategyId = nanoid()
+
+      // get price from server
+      const spotPrices = await this.getSpotPrice(symbol)
+      const price = get(spotPrices, `${symbol}`, '')
+
+      const { qty, quoteQty, entryPrice, isTheSameSymbol } =
+        calculateSpotStrategiesOrder(spotOrders, symbol)
+      if (!isTheSameSymbol) {
+        return {
+          code: 500,
+          msg: 'The selected order not the same Symbol',
+        }
+      }
+
+      const realizedFree = 0
+      const spotFree = await this.getUserSpotFree(userId)
+      const { profit, profitRate, free } = await calculateStrategyProfit(
+        price,
+        entryPrice,
+        qty,
+        quoteQty,
+        userId,
+        realizedFree,
+        false,
+        Number(spotFree),
+      )
+
+      const strategiesOrder = {
+        symbol,
+        price,
+        side: isBuyer,
+        orderType: 1,
+        leverage: 1,
+
+        entryPrice,
+        sellingPrice: '',
+        sellingTime: null,
+
+        qty,
+        quoteQty,
+        sellingQty: '',
+        sellingQuoteQty: '',
+
+        profit,
+        profitRate,
+        realizedProfit: 0,
+        realizedProfitRate: '',
+        free,
+
+        stopType: 0,
+        stopProfit: '',
+        stopLoss: '',
+        stopProfitPrice: '',
+        stopLossPrice: '',
+
+        note: '',
+        klineShots: '',
+
+        is_running: true,
+        userId: userId,
+        strategyId,
+        updatedAt: new Date().getTime(),
+        time,
+      }
+
+      await this.createStrategyOrderIdUtil({ userId, strategyId, orderId })
+
+      await this.createStrategyOrderUtil(strategiesOrder)
+      const running = 1
+      spotOrders.forEach((item) => {
+        const { id: idUpdate } = item
+        this.updateOrderStatus('spot', idUpdate, strategyId, running)
+      })
+    } else {
+      console.log('=== exist strategyOrderId,update... ===')
+    }
+
+    return {
+      code: success,
+      msg: 'ok',
+    }
+  }
+
+  private async findStrategyOrderIdUtil(
+    orderId: number,
+  ): Promise<StrategyOrderId> {
+    const sql = `select strategyId,orderId from strategy_orderid where orderId='${orderId}'`
+
+    return await this.strategyOrderIdRepo.query(sql)
+  }
+
+  /**
+   * { BTCUSDT: '19376.16000000' }
+   */
+  async getSpotPrice(symbol: string): Promise<{ [index: string]: string }> {
+    return await this.client.prices({ symbol })
+  }
+
+  private async createStrategyOrderIdUtil(
+    strategyOrderId: StrategyOrderId,
+  ): Promise<StrategyOrderId> {
+    return await this.strategyOrderIdRepo.save(strategyOrderId)
+  }
+
+  private async createStrategyOrderUtil(
+    strategyOrder: StrategyOrder,
+  ): Promise<StrategyOrder> {
+    return await this.strategyOrderRepo.save(strategyOrder)
+  }
+
+  private async updateOrderStatus(
+    type: string,
+    id: number,
+    strategyId: string,
+    strategyStatus: number,
+  ): Promise<Result> {
+    try {
+      if (type === 'spot') {
+        const sql = `update spot_order set strategyId="${strategyId}",strategyStatus = "${strategyStatus}"  WHERE id = "${id}"`
+        await this.spotOrderRepo.query(sql)
+      }
+
+      // /*
+      if (type === 'future') {
+        // const sql = `update futures_order set strategyId="${strategyId}",strategyStatus = "${strategyStatus}"  WHERE id = "${id}"`;
+        // await this.futuresOrderRepo.query(sql);
+      }
+      // */
+
+      return { code: success, msg: 'add asset successfully' }
+    } catch (error) {
+      return { code: fail, msg: 'updateOrderStatus error' }
+    }
+  }
+
+  async getUserSpotFree(userId: number): Promise<string> {
+    const res = await this.traderApiRepo.find({ where: { userId } })
+    if (res.length) {
+      return res[0].spotFree
+    }
+
+    return '0'
   }
 }
