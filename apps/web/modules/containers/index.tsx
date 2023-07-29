@@ -135,7 +135,7 @@ export function Containers() {
             {item.State === 'exited' && (
               <Button
                 type="primary"
-                className="img-start-btn"
+                className="common-right-mg"
                 onClick={() => onRunContainer(item)}
               >
                 运行

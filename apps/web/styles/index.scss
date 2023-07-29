@@ -1,11 +1,107 @@
-.img-start-btn {
+.common-left-mg{
+  margin-left: 10px;
+}
+
+.common-right-mg{
   margin-right: 10px;
 }
 
+.common-x-mg{
+  margin: 0 10px;
+}
+
+.common-y-mg{
+  margin: 10px 0;
+}
+
+.common-bottom-mg{
+  margin-bottom: 10px;
+}
+
+.common-top2-mg{
+  margin-top: 20px;
+}
+
+.flex-between{
+  display: flex;
+  justify-content: space-between;
+}
+
+.flex-xcenter{
+  justify-content: center;
+}
+
+.flex-ycenter{
+  align-items: center;
+}
+
+.warm-btn{
+  color: #f5c504;
+  border-color: #f5c504;
+}
+
+.warm-btn:hover{
+  border-color: #b08e04 !important;
+  color: #b08e04 !important;
+}
+
+.bright-btn{
+  color:#042ff5;
+  border-color: #042ff5;
+}
+
+.bright-btn:hover{
+  color:#042ff5;
+  border-color: #042ff5;
+}
+
+.neutral-btn{
+  border-color: #000000b0;
+  color: #000000b0;
+}
+
+.neutral-btn:hover{
+  color: #000000e0 !important;
+  border-color: #000000e0 !important;
+}
+
+.primary-btn{
+  color: #1677ff;
+  border-color: #2b77e1;
+}
+
+/** spot start*/
+/** spot start*/
 .spot-container {
   width: 90%;
   margin: 0 auto;
+
+  .spot-operation{
+    padding: 20px 0;
+    .merge-btn{
+      margin: 0 10px;
+    }
+  }
 }
+
+/** spot end*/
+/** spot end*/
+
+/** strategies start*/
+/** strategies start*/
+.strategy-container{
+  width: 90%;
+  margin: 0 auto;
+  .action1{
+    width: 160px;
+  }
+  .action2{
+    width: 120px;
+  }
+}
+
+/** strategies end*/
+/** strategies end*/
 
 .table-box-container {
   width: 100%;

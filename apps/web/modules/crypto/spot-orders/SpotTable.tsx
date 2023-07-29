@@ -39,6 +39,7 @@ export default function SpotTable() {
   }
 
   const createStrategyUtil = async (order: SpotOrder[]) => {
+    console.log('order', order)
     /*
     // const toaster = toast.loading('create strategy...', { showLayer: true })
 
@@ -220,15 +221,25 @@ export default function SpotTable() {
         return (
           <>
             {item.strategyStatus === 0 && (
-              <button onClick={() => createStrategyUtil([item])}>Create</button>
+              <Button
+                onClick={() => createStrategyUtil([item])}
+                className="bright-btn"
+              >
+                Create
+              </Button>
             )}
             {item.strategyStatus === 1 && (
-              <button onClick={() => onRebuildOrderStatus(item)}>
+              <Button
+                onClick={() => onRebuildOrderStatus(item)}
+                className="warm-btn"
+              >
                 Rebuild
-              </button>
+              </Button>
             )}
             {item.strategyStatus === 2 && (
-              <button onClick={() => onResetOrderStatus(item)}>Reset</button>
+              <Button danger onClick={() => onResetOrderStatus(item)}>
+                Reset
+              </Button>
             )}
           </>
         )
@@ -371,8 +382,6 @@ export default function SpotTable() {
     getSpotOrders(params)
   }, [])
 
-  console.log('pageSize', pageSize)
-
   return (
     <div className="table-box-container">
       <Table
@@ -383,10 +392,19 @@ export default function SpotTable() {
         className="table-box"
         pagination={false}
       />
-      <div>
-        <Button onClick={() => oncreateStrategy()}>Create strategy</Button>
-        <Button onClick={() => onMergeStrategy()}>Merge strategy</Button>
-        <Button onClick={() => onCloseStrategy()}>Close strategy</Button>
+      <div className="spot-operation">
+        <Button onClick={() => oncreateStrategy()} className="bright-btn">
+          Create strategy
+        </Button>
+        <Button
+          onClick={() => onMergeStrategy()}
+          className="merge-btn neutral-btn"
+        >
+          Merge strategy
+        </Button>
+        <Button danger onClick={() => onCloseStrategy()}>
+          Close strategy
+        </Button>
       </div>
 
       {/* <MergeStrategyModal id='mergeStrategyModal' mergeOrders={selectRowData} spotTableCallBack={() => spotTableCallBack()} />

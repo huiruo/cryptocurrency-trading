@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { appStoreActions, countState, straOrdersState } from '@stores/appSlice'
+import { appStoreActions, straOrdersState } from '@stores/appSlice'
 import { useAppSelector } from '@stores/hooks'
 import { Button, Pagination, Table, message } from 'antd'
 import { GetSpotOrderParamsNoPage } from '@services/spot.type'
@@ -12,8 +12,6 @@ import { StraOrder } from '@services/strategy.type'
 
 export default function StraTable() {
   const { total, data } = useAppSelector(straOrdersState)
-  const count = useAppSelector(countState)
-
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
   const [selectRowData, setSelectRowData] = useState<StraOrder[]>([])
   const [pageSize, setPageSize] = useState<number>(10)
@@ -31,111 +29,8 @@ export default function StraTable() {
     console.log('onStopLostProfit', order)
   }
 
-  const oncreateStrategy = async () => {
-    if (!selectedRowKeys.length) {
-      message.warning('select empty')
-
-      return
-    }
-
-    selectRowData.sort((a: StraOrder, b: StraOrder) => {
-      return Number(a.time) - Number(b.time)
-    })
-
-    const isStrategyRelatedOrder = isStrategyRelatedOrderUtil(selectRowData)
-    if (isStrategyRelatedOrder) {
-      message.warning('Can not select closed order to create')
-
-      return
-    }
-
-    createStrategyUtil(selectRowData)
-  }
-
-  const createStrategyUtil = async (order: StraOrder[]) => {
-    /*
-    // const toaster = toast.loading('create strategy...', { showLayer: true })
-
-    const res = await traderApi.createSpotStrategyApi(order)
-    if (res.code === 200) {
-      const params = {
-        symbol: ''
-      }
-      // spotCallBack(params)
-      getSpotOrders(params)
-      setSelectRowData([])
-      setSelectedRowKeys([])
-
-      // toaster.update('create Strategy succeeded', {
-      //   type: 'success',
-      //   duration: 1000,
-      // })
-
-    } else {
-      // toaster.update("Failed to create Strategy", {
-      //   type: 'error',
-      // })
-    }
-    */
-  }
-
-  const isStrategyRelatedOrderUtil = (selectRowData: StraOrder[]): boolean => {
-    let isStrategyRelatedOrder = false
-    selectRowData.forEach((item) => {
-      const { strategyId } = item
-      if (strategyId) {
-        isStrategyRelatedOrder = true
-      }
-    })
-
-    return isStrategyRelatedOrder
-  }
-
-  const onMergeStrategy = () => {
-    if (!selectedRowKeys.length) {
-      message.warning('select empty')
-
-      return
-    }
-
-    const isStrategyRelatedOrder = isStrategyRelatedOrderUtil(selectRowData)
-    if (isStrategyRelatedOrder) {
-      message.warning('Can not select closed order to merge')
-      return
-    }
-
-    selectRowData.sort((a: StraOrder, b: StraOrder) => {
-      return Number(b.time) - Number(a.time)
-    })
-
-    // NiceModal.show('mergeStrategyModal')
-
-    /*
-    NiceModal.show(MergeStrategyModal, selectRowData).then((selectRowData) => {
-      // userModal.show(MergeStrategyModal,selectRowData).then((selectRowData) => {
-      // setUsers([newUser, ...users]);
-    });
-    */
-  }
-
-  const onCloseStrategy = async () => {
-    if (!selectedRowKeys.length) {
-      message.warning('select empty')
-
-      return
-    }
-
-    const isStrategyRelatedOrder = isStrategyRelatedOrderUtil(selectRowData)
-    if (isStrategyRelatedOrder) {
-      message.warning('Can not select closed order to close')
-      return
-    }
-
-    selectRowData.sort((a: StraOrder, b: StraOrder) => {
-      return Number(a.time) - Number(b.time)
-    })
-
-    // NiceModal.show('closeStrategyModal')
+  const onSyncPrice = async () => {
+    console.log('onSyncPrice')
   }
 
   /*
@@ -214,9 +109,19 @@ export default function StraTable() {
       width: 100,
       render(item: StraOrder) {
         return (
-          <div>
-            <button onClick={() => syncPriceUtil([item])}>Update</button>
-            <button onClick={() => onKline(item)}>Kline</button>
+          <div className="action1">
+            <Button
+              onClick={() => syncPriceUtil([item])}
+              className="bright-btn"
+            >
+              Update
+            </Button>
+            <Button
+              onClick={() => onKline(item)}
+              className="warm-btn common-left-mg"
+            >
+              Kline
+            </Button>
           </div>
         )
       },
@@ -323,8 +228,13 @@ export default function StraTable() {
       width: 200,
       render(item: StraOrder) {
         return (
-          <div>
-            <button onClick={() => onStopLostProfit(item)}>Trade plan</button>
+          <div className="action2">
+            <Button
+              onClick={() => onStopLostProfit(item)}
+              className="bright-btn"
+            >
+              Trade plan
+            </Button>
           </div>
         )
       },
@@ -399,10 +309,10 @@ export default function StraTable() {
     getSpotOrders(params)
   }, [])
 
-  console.log('StraTable->render', { data, count })
+  console.log('StraTable->render', { selectRowData })
 
   return (
-    <div className="table-box-container">
+    <div className="table-box-container common-top2-mg">
       <Table
         rowSelection={rowSelection}
         rowKey="id"
@@ -411,10 +321,11 @@ export default function StraTable() {
         className="table-box"
         pagination={false}
       />
-      <div>
-        <Button onClick={() => oncreateStrategy()}>Create strategy</Button>
-        <Button onClick={() => onMergeStrategy()}>Merge strategy</Button>
-        <Button onClick={() => onCloseStrategy()}>Close strategy</Button>
+
+      <div className="common-y-mg">
+        <Button onClick={() => onSyncPrice()} className="neutral-btn">
+          Sync price
+        </Button>
       </div>
 
       {/* <MergeStrategyModal id='mergeStrategyModal' mergeOrders={selectRowData} spotTableCallBack={() => spotTableCallBack()} />

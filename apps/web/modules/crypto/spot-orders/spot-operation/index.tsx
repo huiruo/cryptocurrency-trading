@@ -7,7 +7,7 @@ import { spotApi } from '@services/spot'
 import { GetSpotOrderParamsNoPage } from '@services/spot.type'
 import { SUCCESS } from '@common/constants'
 
-// 单位毫秒
+// in milliseconds
 const startTimeDefault = dayjs().startOf('day')
 const endTimeDefault = dayjs().endOf('day')
 const dateFormat = 'YYYY-MM-DD HH:mm:ss'
@@ -84,32 +84,35 @@ export default function SpotOperation(props: Props) {
 
   return (
     <div>
-      <Select
-        showSearch
-        placeholder="Select a asset"
-        optionFilterProp="children"
-        onChange={(e) => onChangeAssetValue(e, 1)}
-        filterOption={(input, option) =>
-          (option?.name ?? '').toLowerCase().includes(input.toLowerCase())
-        }
-        value={syncAssetValue}
-        fieldNames={{ label: 'name', value: 'name' }}
-        options={assets}
-        style={{ width: '150px' }}
-      />
+      <div className="flex-between common-top2-mg">
+        <div className="common-bottom-mg">
+          <Select
+            showSearch
+            placeholder="Select a asset"
+            optionFilterProp="children"
+            onChange={(e) => onChangeAssetValue(e, 1)}
+            filterOption={(input, option) =>
+              (option?.name ?? '').toLowerCase().includes(input.toLowerCase())
+            }
+            value={syncAssetValue}
+            fieldNames={{ label: 'name', value: 'name' }}
+            options={assets}
+            style={{ width: '150px' }}
+          />
+          <RangePicker
+            value={selectedDates}
+            onChange={handleRangePickerChange}
+            format={dateFormat}
+            className="common-x-mg"
+          />
 
-      <RangePicker
-        value={selectedDates}
-        onChange={handleRangePickerChange}
-        format={dateFormat}
-      />
+          <Button onClick={() => syncSpotOrder()}>Sync spot orders</Button>
+        </div>
 
-      <Button onClick={() => syncSpotOrder()}>Sync spot orders</Button>
-      <Button onClick={onAddAsset}>Add code</Button>
+        <Button onClick={onAddAsset}>Add code</Button>
+      </div>
 
-      <AddAsset isModalOpen={isModalOpen} addAssetCallBack={addAssetCallBack} />
-
-      <div>
+      <div className="common-bottom-mg">
         <Select
           showSearch
           placeholder="Select a asset"
@@ -124,8 +127,15 @@ export default function SpotOperation(props: Props) {
           style={{ width: '150px' }}
         />
 
-        <Button onClick={onSearchSpotOrder}>Search</Button>
+        <Button
+          onClick={onSearchSpotOrder}
+          className="search-btn common-left-mg"
+        >
+          Search
+        </Button>
       </div>
+
+      <AddAsset isModalOpen={isModalOpen} addAssetCallBack={addAssetCallBack} />
     </div>
   )
 }

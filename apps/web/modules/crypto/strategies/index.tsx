@@ -27,7 +27,7 @@ export default function Strategies() {
   }, [])
 
   return (
-    <div className="spot-container">
+    <div className="strategy-container">
       <StraTable />
     </div>
   )

@@ -55,7 +55,7 @@ export function Image() {
           <>
             <Button
               type="primary"
-              className="img-start-btn"
+              className="common-right-mg"
               onClick={() => onRunImg(item)}
             >
               运行
