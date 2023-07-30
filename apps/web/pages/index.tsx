@@ -54,7 +54,7 @@ export const getServerSideProps: GetServerSideProps = withIronSessionSsr(
 
     return {
       props: {
-        payload,
+        payload: payload || {},
       },
     }
   },
