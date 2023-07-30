@@ -18,6 +18,8 @@ export interface PaginationType {
 
 export interface PaginationResType<T> {
   total: number
+  currentPage: number
+  pageSize: number
   data: T
 }
 

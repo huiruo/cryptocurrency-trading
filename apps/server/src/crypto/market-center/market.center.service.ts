@@ -220,6 +220,6 @@ export class MarketCenterService {
     console.log('page', page)
     const res = await this.tradeAssetRepo.find()
 
-    return { code: success, msg: 'add asset successfully', data: res }
+    return { code: success, msg: 'ok', data: res }
   }
 }

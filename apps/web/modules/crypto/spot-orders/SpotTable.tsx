@@ -9,10 +9,11 @@ import { isEmpty } from 'lodash'
 import { spotApi } from '@services/spot'
 import store from '@stores/index'
 import { strategyApi } from '@services/strategy'
+import NiceModal from '@common/nice-modal'
+import { StraCloseModal } from '../strategies/CloseModal'
 
 export default function SpotTable() {
   const { total, data } = useAppSelector(spotOrdersState)
-
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
   const [selectRowData, setSelectRowData] = useState<SpotOrder[]>([])
   const [pageSize, setPageSize] = useState<number>(10)
@@ -40,7 +41,7 @@ export default function SpotTable() {
   }
 
   const createStrategyUtil = async (order: SpotOrder[]) => {
-    const res = await strategyApi.createSpotStra(order)
+    const res = await strategyApi.createSpotStg(order)
     if (res.code === SUCCESS) {
       getSpotOrders({ symbol: '' })
       setSelectRowData([])
@@ -75,7 +76,7 @@ export default function SpotTable() {
       return
     }
 
-    const res = await strategyApi.resetStra({
+    const res = await strategyApi.resetStg({
       strategyId,
       orderType: 'spot',
     })
@@ -133,19 +134,14 @@ export default function SpotTable() {
       return Number(a.time) - Number(b.time)
     })
 
-    // NiceModal.show('closeStrategyModal')
+    NiceModal.show('closeStrategyModal')
   }
 
-  /*
-  const spotTableCallBack = () => {
-    const params = {
-      symbol: ''
-    }
-    getSpotOrders(params)
+  const modalCallBack = () => {
+    getSpotOrders({ symbol: '' })
     setSelectRowData([])
     setSelectedRowKeys([])
   }
-  */
 
   const columns = [
     {
@@ -200,7 +196,7 @@ export default function SpotTable() {
             {item.strategyStatus === 0 && (
               <Button
                 onClick={() => createStrategyUtil([item])}
-                className="bright-btn"
+                className="green-btn"
               >
                 Create
               </Button>
@@ -337,6 +333,8 @@ export default function SpotTable() {
     const res = await spotApi.getSpotOrders({ pageSize, currentPage, symbol })
     if (res.code === SUCCESS) {
       store.dispatch(appStoreActions.setSpotOrders(res.data))
+      setCurrentPage(res.data.currentPage)
+      setPageSize(res.data.pageSize)
     } else {
       message.error(res.msg || 'error')
     }
@@ -370,7 +368,7 @@ export default function SpotTable() {
         pagination={false}
       />
       <div className="spot-operation">
-        <Button onClick={() => oncreateStrategy()} className="bright-btn">
+        <Button onClick={() => oncreateStrategy()} className="green-btn">
           Create strategy
         </Button>
         <Button
@@ -385,7 +383,13 @@ export default function SpotTable() {
       </div>
 
       {/* <MergeStrategyModal id='mergeStrategyModal' mergeOrders={selectRowData} spotTableCallBack={() => spotTableCallBack()} />
-        <CloseStrategyModal id='closeStrategyModal' closeOrders={selectRowData} spotTableCallBack={() => spotTableCallBack()} /> */}
+       */}
+      <StraCloseModal
+        id="closeStrategyModal"
+        closeOrders={selectRowData}
+        title="Close strategy"
+        modalCallBack={modalCallBack}
+      />
 
       <Pagination
         current={currentPage}

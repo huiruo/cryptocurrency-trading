@@ -1,15 +1,19 @@
 import { PaginationType } from 'src/types'
+import { SpotOrder } from '../entity/spot-order.entity'
+import { StrategyOrder } from '../entity/strategy-order.entity'
 
-export interface SyncSpotOrderParams {
-  symbol: string
-  startTime: number
-  endTime: number
-  recvWindow?: number
-}
-
-export interface GetStraOrderParams extends PaginationType {
+export interface StgOrderParams extends PaginationType {
   symbol?: string
   is_running: string | number
+}
+
+export interface SyncStgPriceType {
+  symbol: string
+  qty: string
+  entryPrice: string
+  quoteQty: string
+  userId: number
+  strategyId: string
 }
 
 export interface CalculateStrategiesOrderType {
@@ -30,7 +34,25 @@ export interface StrategyProfit {
 
 export type OrderType = 'future' | 'spot'
 
-export interface ResetStra {
+export interface ResetStg {
   strategyId: string
   orderType: OrderType
+}
+
+export interface SpotStgOperation {
+  spotOrders: SpotOrder[]
+  stgOrder: StrategyOrder
+}
+
+export interface CalculateCloseStrategyOrderType {
+  sellingQty: string
+  sellingQuoteQty: string
+  sellingPrice: string
+  realizedProfit: number
+  realizedProfitRate: string
+  isTheSameSymbol: boolean
+  isTheSameSide: boolean
+  free: number
+  // netProfit: number
+  // netProfitRate: string
 }

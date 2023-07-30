@@ -21,7 +21,8 @@ interface Props {
 export default function SpotOperation(props: Props) {
   const { searchCallBack } = props
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [searchAssetValue, setSearchAssetValue] = useState<string>('')
+  // test MKRUSDT ARUSDT
+  const [searchAssetValue, setSearchAssetValue] = useState<string>('MKRUSDT')
   const [syncAssetValue, setSyncAssetValue] = useState<string>('')
   const [assets] = useFetchAssets()
 
@@ -33,18 +34,23 @@ export default function SpotOperation(props: Props) {
   const syncSpotOrder = async () => {
     const [startOfSelectedDay, endOfSelectedDay] = selectedDates
     console.log('syncSpotOrder:', startOfSelectedDay, endOfSelectedDay)
-    /*
-    const params = {
-      symbol: selectedAsset,
-      startTime: startOfSelectedDay.valueOf(),
-      endTime: endOfSelectedDay.valueOf(),
-    }
-    */
+    // const params = {
+    //   symbol: syncAssetValue,
+    //   startTime: startOfSelectedDay.valueOf(),
+    //   endTime: endOfSelectedDay.valueOf(),
+    // }
     // TODO:test
+    /*
     const params = {
       symbol: 'BTCUSDT',
       startTime: 1677945600000,
       endTime: 1678031999999,
+    }
+    */
+    const params = {
+      endTime: 1677513599999,
+      startTime: 1677427200000,
+      symbol: 'ARUSDT',
     }
     const res = await spotApi.syncSpotOrder(params)
     if (res.code === SUCCESS) {
@@ -86,6 +92,7 @@ export default function SpotOperation(props: Props) {
     <div>
       <div className="flex-between common-top2-mg">
         <div className="common-bottom-mg">
+          <span>symbol: </span>
           <Select
             showSearch
             placeholder="Select a asset"
@@ -106,13 +113,16 @@ export default function SpotOperation(props: Props) {
             className="common-x-mg"
           />
 
-          <Button onClick={() => syncSpotOrder()}>Sync spot orders</Button>
+          <Button onClick={() => syncSpotOrder()} className="bright-btn">
+            Sync spot orders
+          </Button>
         </div>
 
-        <Button onClick={onAddAsset}>Add code</Button>
+        <Button onClick={onAddAsset}>Add symbol</Button>
       </div>
 
       <div className="common-bottom-mg">
+        <span>symbol: </span>
         <Select
           showSearch
           placeholder="Select a asset"
@@ -129,7 +139,7 @@ export default function SpotOperation(props: Props) {
 
         <Button
           onClick={onSearchSpotOrder}
-          className="search-btn common-left-mg"
+          className="bright-btn search-btn common-left-mg"
         >
           Search
         </Button>

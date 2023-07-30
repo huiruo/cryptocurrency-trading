@@ -43,7 +43,7 @@ export const fetchWithAuth = async <T>(
 
     if (response.status === 401) {
       deleteCookie('token')
-      // window.location.href = '/'
+      window.location.href = '/'
       console.log('请登录==>')
       return { code: 0, msg: '请登录' } as ResType<T>
     }

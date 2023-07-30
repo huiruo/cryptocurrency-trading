@@ -35,7 +35,7 @@ export function calculateSpotStrategiesOrder(
   }
 }
 
-export async function calculateStrategyProfit(
+export function calculateStrategyProfit(
   price: string,
   entryPrice: string,
   qty: string,
@@ -44,7 +44,7 @@ export async function calculateStrategyProfit(
   realizedFree: number,
   isUpdate = false,
   spotFree: number,
-): Promise<StrategyProfit> {
+): StrategyProfit {
   const currentPrice = Number(price)
   const costPriceInt = Number(entryPrice)
   const qtyInt = Number(qty)

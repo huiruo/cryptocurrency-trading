@@ -14,8 +14,8 @@ export class SpotOrder {
   @Column({ comment: 'commissionAsset' }) commissionAsset: string
   @Column({ comment: 'isBuyer' }) isBuyer: number
   @Column({ comment: 'strategyStatus' }) strategyStatus?: number
-  @Column({ comment: 'isMaker' }) isMaker: boolean
-  @Column({ comment: 'isBestMatch' }) isBestMatch: boolean
+  @Column({ comment: 'isMaker' }) isMaker: number
+  @Column({ comment: 'isBestMatch' }) isBestMatch: number
   @Column({ comment: 'time' }) time: number
   @Column('bigint', { comment: 'updatedAt' }) updatedAt?: number
   @Column('bigint', { comment: 'createdAt' }) createdAt?: number

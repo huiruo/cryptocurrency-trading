@@ -16,16 +16,14 @@ export default function AddAsset(props: Props) {
   const onFinish = async (values: AssetType) => {
     const res = await spotApi.addAsset(values)
     if (res.code === SUCCESS) {
+      message.success(res.msg)
       setTimeout(() => {
         addAssetCallBack(false, true)
+        formRef.current?.resetFields()
       }, 500)
     } else {
       message.error(res.msg || 'Failed to add resource')
     }
-  }
-
-  const handleOk = () => {
-    // setIsModalOpen(false)
   }
 
   const onCancel = () => {
@@ -35,10 +33,9 @@ export default function AddAsset(props: Props) {
 
   return (
     <Modal
-      title="Add Asset"
+      title="Add symbol"
       footer={null}
       open={isModalOpen}
-      onOk={handleOk}
       onCancel={onCancel}
     >
       <Form
@@ -54,29 +51,31 @@ export default function AddAsset(props: Props) {
         <Form.Item
           label="symbol"
           name="symbol"
-          rules={[{ required: true, message: 'Please input symbol' }]}
+          rules={[{ required: true, message: 'such as BTC or ETH' }]}
         >
-          <Input placeholder="Please input symbol" />
+          <Input placeholder="such as BTC or ETH" />
         </Form.Item>
 
         <Form.Item
           label="asset"
           name="name"
-          rules={[{ required: true, message: 'Input asset,like XXXUSDT' }]}
+          rules={[
+            { required: true, message: 'symbol + asset,such as BTCUSDT' },
+          ]}
         >
-          <Input placeholder="Input asset,like XXXUSDT" />
+          <Input placeholder="symbol + asset,such as BTCUSDT" />
         </Form.Item>
 
-        <Form.Item
+        {/* <Form.Item
           label="tradeUrl"
           name="tradeUrl"
-          rules={[{ required: false, message: 'Please input tradeUrl' }]}
+          rules={[{ required: true, message: 'Please input tradeUrl,like ' }]}
         >
           <Input placeholder="Please input tradeUrl" />
-        </Form.Item>
+        </Form.Item> */}
 
         <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-          <Button type="primary" htmlType="submit">
+          <Button className="bright-btn" htmlType="submit">
             Submit
           </Button>
         </Form.Item>

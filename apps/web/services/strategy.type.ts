@@ -2,24 +2,37 @@ import { PaginationType, ResType } from './base'
 import { SpotOrder } from './spot.type'
 
 export interface Api {
-  getStrategyOrders: (
-    straOrdersParams: StraOrdersParams,
-  ) => Promise<ResType<StraOrders>>
-  createSpotStra: (spotOrders: SpotOrder[]) => Promise<ResType<null>>
-  resetStra: (resetStraOrder: ResetStra) => Promise<ResType<null>>
+  getStgOrders: (
+    StgOrdersParams: StgOrdersParams,
+  ) => Promise<ResType<StgOrders>>
+  createSpotStg: (spotOrders: SpotOrder[]) => Promise<ResType<null>>
+  resetStg: (resetStg: ResetStg) => Promise<ResType<null>>
+  closeStg: (spotStgOperation: SpotStgOperation) => Promise<ResType<null>>
+  syncStgPrice: (syncStgPriceType: SyncStgPriceType[]) => Promise<ResType<null>>
 }
 
-export interface StraOrdersParams extends PaginationType {
+export interface SyncStgPriceType {
+  symbol: string
+  qty: string
+  entryPrice: string
+  quoteQty: string
+  userId: number
+  strategyId: string
+}
+
+export interface StgOrdersParams extends PaginationType {
   is_running: number
   symbol: string
 }
 
-export interface StraOrders {
-  data: StraOrder[]
+export interface StgOrders {
+  data: StgOrder[]
   total: number
+  currentPage: number
+  pageSize: number
 }
 
-export interface StraOrder {
+export interface StgOrder {
   id: number
   symbol: string
   price: string
@@ -55,7 +68,12 @@ export interface StraOrder {
 
 export type OrderType = 'future' | 'spot'
 
-export interface ResetStra {
+export interface ResetStg {
   strategyId: string
   orderType: OrderType
+}
+
+export interface SpotStgOperation {
+  spotOrders: SpotOrder[]
+  stgOrder: StgOrder
 }

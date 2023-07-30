@@ -58,4 +58,6 @@ export interface SpotOrder {
 export interface SpotOrders {
   data: SpotOrder[]
   total: number
+  currentPage: number
+  pageSize: number
 }

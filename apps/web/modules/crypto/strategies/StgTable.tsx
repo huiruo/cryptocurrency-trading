@@ -1,48 +1,61 @@
 import React, { useEffect, useState } from 'react'
-import { appStoreActions, straOrdersState } from '@stores/appSlice'
+import { appStoreActions, stgOrdersState } from '@stores/appSlice'
 import { useAppSelector } from '@stores/hooks'
 import { Button, Pagination, Table, message } from 'antd'
-import { GetSpotOrderParamsNoPage } from '@services/spot.type'
-import { formatUnixTime } from '@common/utils'
+import { formatUnixTime, generateBianceUri } from '@common/utils'
 import { SUCCESS } from '@common/constants'
 import { isEmpty } from 'lodash'
-import { spotApi } from '@services/spot'
 import store from '@stores/index'
-import { StraOrder } from '@services/strategy.type'
+import { StgOrder, StgOrdersParams } from '@services/strategy.type'
+import { strategyApi } from '@services/strategy'
 
-export default function StraTable() {
-  const { total, data } = useAppSelector(straOrdersState)
+export function StgTable() {
+  const { total, data } = useAppSelector(stgOrdersState)
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
-  const [selectRowData, setSelectRowData] = useState<StraOrder[]>([])
+  const [selectRowData, setSelectRowData] = useState<StgOrder[]>([])
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
   const [pageSize, setPageSize] = useState<number>(10)
   const [currentPage, setCurrentPage] = useState<number>(1)
 
-  const syncPriceUtil = (orders: StraOrder[]) => {
-    console.log('syncPriceUtil', orders)
+  const onKline = (order: StgOrder) => {
+    const { assetUri } = generateBianceUri(order.symbol)
+    if (assetUri) {
+      window.open(assetUri, '_blank')
+    } else {
+      alert('No link')
+    }
   }
 
-  const onKline = (order: StraOrder) => {
-    console.log('onKline', order)
-  }
-
-  const onStopLostProfit = (order: StraOrder) => {
+  const onStopLostProfit = (order: StgOrder) => {
     console.log('onStopLostProfit', order)
   }
 
-  const onSyncPrice = async () => {
-    console.log('onSyncPrice')
-  }
+  const onSyncPrice = async (orders: StgOrder[]) => {
+    const stgOrder = orders.map((item) => {
+      return {
+        symbol: item.symbol,
+        qty: item.qty,
+        entryPrice: item.entryPrice,
+        quoteQty: item.quoteQty,
+        userId: item.userId,
+        strategyId: item.strategyId,
+      }
+    })
 
-  /*
-  const spotTableCallBack = () => {
-    const params = {
-      symbol: ''
+    console.log('onSyncPrice', { orders, stgOrder })
+    const res = await strategyApi.syncStgPrice(stgOrder)
+    if (res.code) {
+      message.success(res.msg)
+      getStgOrdersUtil({
+        symbol: '',
+        is_running: 1,
+        pageSize: 10,
+        currentPage: 1,
+      })
+    } else {
+      message.error(res.msg)
     }
-    getSpotOrders(params)
-    setSelectRowData([])
-    setSelectedRowKeys([])
   }
-  */
 
   const columns = [
     {
@@ -51,7 +64,7 @@ export default function StraTable() {
       dataIndex: '',
       key: 'time',
       width: 100,
-      render(item: StraOrder) {
+      render(item: StgOrder) {
         return (
           <div>
             <div>begin:{formatUnixTime(Number(item.time))}</div>
@@ -77,7 +90,7 @@ export default function StraTable() {
       dataIndex: '',
       key: 'side',
       width: 100,
-      render(item: StraOrder) {
+      render(item: StgOrder) {
         return <>{item.side ? <span>Long</span> : <span>Short</span>}</>
       },
     },
@@ -87,7 +100,7 @@ export default function StraTable() {
       dataIndex: '',
       key: 'is_running',
       width: 100,
-      render(item: StraOrder) {
+      render(item: StgOrder) {
         return <>{item.is_running ? <div>Running</div> : <div>Ended</div>}</>
       },
     },
@@ -97,7 +110,7 @@ export default function StraTable() {
       dataIndex: '',
       key: 'price',
       width: 100,
-      render(item: StraOrder) {
+      render(item: StgOrder) {
         return <span>{item.price ? item.price : '-'} </span>
       },
     },
@@ -107,13 +120,10 @@ export default function StraTable() {
       dataIndex: '',
       key: 'action',
       width: 100,
-      render(item: StraOrder) {
+      render(item: StgOrder) {
         return (
           <div className="action1">
-            <Button
-              onClick={() => syncPriceUtil([item])}
-              className="bright-btn"
-            >
+            <Button onClick={() => onSyncPrice([item])} className="bright-btn">
               Update
             </Button>
             <Button
@@ -132,7 +142,7 @@ export default function StraTable() {
       dataIndex: '',
       key: 'profit',
       width: 100,
-      render(item: StraOrder) {
+      render(item: StgOrder) {
         return (
           <div>
             {item.is_running ? (
@@ -152,7 +162,7 @@ export default function StraTable() {
       dataIndex: '',
       key: 'profit',
       width: 200,
-      render(item: StraOrder) {
+      render(item: StgOrder) {
         return (
           <>
             <span>
@@ -175,7 +185,7 @@ export default function StraTable() {
       dataIndex: '',
       key: 'entryPrice',
       width: 100,
-      render(item: StraOrder) {
+      render(item: StgOrder) {
         return (
           <div>
             <div>{item.entryPrice}</div>
@@ -190,7 +200,7 @@ export default function StraTable() {
       dataIndex: '',
       key: 'qty',
       width: 100,
-      render(item: StraOrder) {
+      render(item: StgOrder) {
         return (
           <div>
             <div>{item.qty}</div>
@@ -205,7 +215,7 @@ export default function StraTable() {
       dataIndex: '',
       key: 'sellingQty',
       width: 100,
-      render(item: StraOrder) {
+      render(item: StgOrder) {
         return (
           <div>
             {item.is_running ? (
@@ -226,7 +236,7 @@ export default function StraTable() {
       dataIndex: '',
       key: 'trade',
       width: 200,
-      render(item: StraOrder) {
+      render(item: StgOrder) {
         return (
           <div className="action2">
             <Button
@@ -260,9 +270,10 @@ export default function StraTable() {
       currentPage: page,
       pageSize: pageSize,
       symbol: '',
+      is_running: 1,
     }
     setCurrentPage(page)
-    getSpotOrders(params)
+    getStgOrdersUtil(params)
   }
 
   const onShowSizeChange = (page: number, pageSize: number) => {
@@ -272,21 +283,20 @@ export default function StraTable() {
 
   const rowSelection = {
     selectedRowKeys,
-    onChange: (selectedRowKeys: React.Key[], selectedRows: StraOrder[]) => {
+    onChange: (selectedRowKeys: React.Key[], selectedRows: StgOrder[]) => {
       // console.log(`${selectedRowKeys}`, '--', 'selectedRows: ', selectedRows);
       setSelectedRowKeys(selectedRowKeys)
       setSelectRowData(selectedRows)
     },
   }
 
-  const getSpotOrders = async ({
-    symbol,
-    pageSize = 10,
-    currentPage = 1,
-  }: GetSpotOrderParamsNoPage) => {
-    const res = await spotApi.getSpotOrders({ pageSize, currentPage, symbol })
+  const getStgOrdersUtil = async (strategyOrdersParams: StgOrdersParams) => {
+    const res = await strategyApi.getStgOrders(strategyOrdersParams)
     if (res.code === SUCCESS) {
-      store.dispatch(appStoreActions.setSpotOrders(res.data))
+      store.dispatch(appStoreActions.setStraOrders(res.data))
+      setCurrentPage(strategyOrdersParams.currentPage)
+      setCurrentPage(res.data.currentPage)
+      setPageSize(res.data.pageSize)
     } else {
       message.error(res.msg || 'error')
     }
@@ -300,13 +310,12 @@ export default function StraTable() {
   }, [data])
 
   useEffect(() => {
-    const params = {
-      currentPage: 1,
-      pageSize: pageSize,
+    getStgOrdersUtil({
       symbol: '',
-    }
-
-    getSpotOrders(params)
+      is_running: 1,
+      pageSize: 10,
+      currentPage: 1,
+    })
   }, [])
 
   console.log('StraTable->render', { selectRowData })
@@ -323,13 +332,10 @@ export default function StraTable() {
       />
 
       <div className="common-y-mg">
-        <Button onClick={() => onSyncPrice()} className="neutral-btn">
+        <Button onClick={() => onSyncPrice(data)} className="neutral-btn">
           Sync price
         </Button>
       </div>
-
-      {/* <MergeStrategyModal id='mergeStrategyModal' mergeOrders={selectRowData} spotTableCallBack={() => spotTableCallBack()} />
-        <CloseStrategyModal id='closeStrategyModal' closeOrders={selectRowData} spotTableCallBack={() => spotTableCallBack()} /> */}
 
       <Pagination
         current={currentPage}

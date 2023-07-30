@@ -1,6 +1,12 @@
 import { Injectable } from '@nestjs/common'
 import { BinanceService } from '../common/binance-service'
-import { GetStraOrderParams, ResetStra } from './strategy.order.type'
+import {
+  StgOrderParams,
+  ResetStg,
+  SpotStgOperation,
+  CalculateCloseStrategyOrderType,
+  SyncStgPriceType,
+} from './strategy.order.type'
 import { PaginationResType, Result, ResultWithData } from 'src/types'
 import { StrategyOrder } from '../entity/strategy-order.entity'
 import { get, isEmpty } from 'lodash'
@@ -15,6 +21,9 @@ import {
 } from './strategy.util'
 import { nanoid } from 'nanoid'
 import { TraderApi } from '../entity/api.entity'
+import { DailyProfit } from '../entity/daily.profit.entity'
+import { ProfitStatistics } from '../entity/profit.statistics.entity'
+import { formatTimestamp } from 'src/common/utils'
 
 @Injectable()
 export class StrategyOrderService {
@@ -32,6 +41,12 @@ export class StrategyOrderService {
 
     @InjectRepository(TraderApi)
     private readonly traderApiRepo: Repository<TraderApi>,
+
+    @InjectRepository(DailyProfit)
+    private readonly dailyProfitRepo: Repository<DailyProfit>,
+
+    @InjectRepository(ProfitStatistics)
+    private readonly profitStatisticsRepo: Repository<ProfitStatistics>,
   ) {
     this.initBinanceApi()
   }
@@ -40,12 +55,11 @@ export class StrategyOrderService {
     this.client = BinanceService.getInstance()
   }
 
-  async getStraOrder(
-    getStraOrderParams: GetStraOrderParams,
+  async getStgOrder(
+    stgOrderParams: StgOrderParams,
   ): Promise<ResultWithData<PaginationResType<StrategyOrder>>> {
-    console.log('', getStraOrderParams)
-
-    const { currentPage, pageSize, symbol, is_running } = getStraOrderParams
+    const { currentPage, pageSize, symbol, is_running } = stgOrderParams
+    console.log('stgOrderParams==>', stgOrderParams)
     let sql = ''
     let pageSql = ''
     if (symbol) {
@@ -87,13 +101,15 @@ export class StrategyOrderService {
       data: {
         total: Number(get(pageRes, '[0].total', 0)),
         data: res,
+        currentPage,
+        pageSize,
       },
     }
   }
 
-  async resetStra(resetStra: ResetStra): Promise<Result> {
+  async resetStg(ResetStg: ResetStg): Promise<Result> {
     try {
-      const { strategyId, orderType } = resetStra
+      const { strategyId, orderType } = ResetStg
       if (orderType === 'spot') {
         const sql = `update spot_order set strategyId="",strategyStatus = 0  WHERE strategyId = "${strategyId}"`
         await this.spotOrderRepo.query(sql)
@@ -114,7 +130,124 @@ export class StrategyOrderService {
     }
   }
 
-  async createSpotStra(spotOrders: SpotOrder[]): Promise<Result> {
+  async closeStg(spotStgOperation: SpotStgOperation): Promise<Result> {
+    try {
+      console.log('SpotStgOperation', spotStgOperation)
+      const { spotOrders, stgOrder } = spotStgOperation
+
+      const ordersLength = spotOrders.length
+      const lastOrder = get(
+        spotOrders,
+        `[${ordersLength - 1}]`,
+        {},
+      ) as SpotOrder
+
+      const {
+        sellingQty,
+        sellingQuoteQty,
+        sellingPrice,
+        realizedProfit,
+        realizedProfitRate,
+        isTheSameSymbol,
+        isTheSameSide,
+        free,
+      } = await this.calculateSpotOrderCloseStrategy(spotOrders, stgOrder)
+      if (!isTheSameSymbol) {
+        return {
+          code: 500,
+          msg: 'The selected order not the same Symbol',
+        }
+      }
+
+      if (isTheSameSide) {
+        return {
+          code: 500,
+          msg: 'The selected order is not opposite to the strategy',
+        }
+      }
+
+      const { userId, strategyId, symbol, time } = stgOrder
+      const sellingTime = Number(lastOrder.time)
+      const strategiesOrder = {
+        symbol,
+        price: '',
+        side: 1,
+        orderType: 1,
+        leverage: 1,
+
+        entryPrice: '',
+        sellingPrice,
+        sellingTime,
+
+        qty: null,
+        quoteQty: null,
+        sellingQty,
+        sellingQuoteQty,
+
+        profit: 0,
+        profitRate: '',
+        realizedProfit,
+        realizedProfitRate,
+        free,
+
+        stopType: 0,
+        stopProfit: '',
+        stopLoss: '',
+        stopProfitPrice: '',
+        stopLossPrice: '',
+
+        note: '',
+        klineShots: '',
+
+        is_running: false,
+        userId,
+        strategyId,
+        time,
+        updatedAt: new Date().getTime(),
+      }
+
+      // update daily profit start
+      const calculateRes = await this.calculateAmountByClose(
+        sellingTime,
+        realizedProfit,
+        userId,
+      )
+      if (calculateRes.code !== 200) {
+        return { code: 500, msg: calculateRes.msg }
+      }
+      // update daily profit end
+
+      const res = await this.updateCloseStrategyOrderUtil(strategiesOrder)
+      if (calculateRes.code !== 200) {
+        return { code: 500, msg: res.msg }
+      }
+
+      // update order spot order strategyStatus
+      const ended = 2
+      const sql = `update spot_order set strategyStatus = ${ended} WHERE strategyId = "${strategyId}"`
+      await this.spotOrderRepo.query(sql)
+      // end
+
+      // update close spot order
+      spotOrders.forEach((item) => {
+        const { id: idUpdate } = item
+        this.updateOrderStatus('spot', idUpdate, strategyId, ended)
+      })
+      // end
+
+      return {
+        code: success,
+        msg: 'ok',
+      }
+    } catch (error) {
+      return {
+        code: fail,
+        msg: error,
+      }
+    }
+  }
+
+  async createSpotStg(spotOrders: SpotOrder[]): Promise<Result> {
     try {
       const firstOrder = spotOrders[0]
       const { orderId, userId, time, symbol, isBuyer } = firstOrder
@@ -138,7 +271,7 @@ export class StrategyOrderService {
 
         const realizedFree = 0
         const spotFree = await this.getUserSpotFree(userId)
-        const { profit, profitRate, free } = await calculateStrategyProfit(
+        const { profit, profitRate, free } = calculateStrategyProfit(
           price,
           entryPrice,
           qty,
@@ -280,5 +413,213 @@ export class StrategyOrderService {
   private async deleteStrategyOrderId(strategyId: string): Promise<void> {
     const sql = `delete from strategy_orderid WHERE strategyId = "${strategyId}"`
     await this.strategyOrderIdRepo.query(sql)
+  }
+
+  private async calculateSpotOrderCloseStrategy(
+    spotOrders: SpotOrder[],
+    strategyOrder: StrategyOrder,
+  ): Promise<CalculateCloseStrategyOrderType> {
+    const {
+      symbol,
+      side,
+      entryPrice,
+      userId,
+      free: realizedFree,
+    } = strategyOrder
+    let qtyTotal = 0
+    let quoteQtyTotal = 0
+    let isTheSameSymbol = true
+    const targetSymbol = symbol
+    let isTheSameSide = false
+
+    spotOrders.forEach((item) => {
+      const { qty, quoteQty, symbol, isBuyer } = item
+      // /*
+      if (targetSymbol !== symbol) {
+        isTheSameSymbol = false
+      }
+      // */
+
+      if (side === isBuyer) {
+        isTheSameSide = true
+      }
+
+      qtyTotal = Number(qty) + qtyTotal
+      quoteQtyTotal = Number(quoteQty) + quoteQtyTotal
+    })
+
+    const sellingPrice = (quoteQtyTotal / qtyTotal).toFixed(8)
+    const sellingQty = qtyTotal.toString()
+    const sellingQuoteQty = quoteQtyTotal.toString()
+
+    const spotFree = await this.getUserSpotFree(userId)
+    const { profit, profitRate, netProfit, netProfitRate, free } =
+      calculateStrategyProfit(
+        sellingPrice,
+        entryPrice,
+        sellingQty,
+        sellingQuoteQty,
+        userId,
+        realizedFree,
+        false,
+        Number(spotFree),
+      )
+
+    console.log('calculateSpotOrderCloseStrategy==>', { profit, profitRate })
+
+    return {
+      sellingQty,
+      sellingQuoteQty,
+      sellingPrice,
+      realizedProfit: netProfit,
+      realizedProfitRate: netProfitRate,
+      isTheSameSymbol,
+      isTheSameSide,
+      free,
+      // netProfit,
+      // netProfitRate
+    }
+  }
+
+  private async calculateAmountByClose(
+    time: number,
+    profit: number,
+    userId: number,
+  ): Promise<Result> {
+    const res = await this.client.getAccountInfo()
+    const balances = get(res, 'balances', [])
+    for (let index = 0; index < balances.length; index++) {
+      const element = balances[index]
+      if (element.asset === 'USDT') {
+        const dayStr = formatTimestamp(time, false)
+        const timeStr = formatTimestamp(time)
+        const tradeCountList = await this.getTradeCountByDay(dayStr, userId)
+        const amount = element.free
+        if (isEmpty(tradeCountList)) {
+          const calAmount = Number(amount) + profit
+          const profitRate =
+            parseFloat(((profit / calAmount) * 100).toFixed(2)) + '%'
+          const tradeCount = {
+            userId,
+            profit: profit,
+            profitRate,
+            amount,
+            time: timeStr,
+          }
+
+          try {
+            await this.dailyProfitRepo.save(tradeCount)
+            return { code: 200, msg: 'Calculate amount succeeded' }
+          } catch (error) {
+            console.log('error:', error)
+            return { code: 500, msg: 'calculate amount error' }
+          }
+        } else {
+          const { profit: itemProfit, id } = tradeCountList[0]
+          const calProfit = profit + itemProfit
+          const calAmount = Number(amount) + calProfit
+          console.log(
+            'update:',
+            profit,
+            '-',
+            itemProfit,
+            '',
+            calProfit,
+            '-',
+            calAmount,
+          )
+          const profitRate =
+            parseFloat(((calProfit / calAmount) * 100).toFixed(2)) + '%'
+          const sql = `update daily_profit set profit = ${calProfit},profitRate = '${profitRate}',time='${timeStr}' WHERE id = ${id}`
+          try {
+            await this.spotOrderRepo.query(sql)
+            return { code: 200, msg: 'Calculate amount update succeeded' }
+          } catch (error) {
+            console.log('error:', error)
+            return { code: 500, msg: 'calculate amount update error' }
+          }
+        }
+        // break
+      }
+    }
+  }
+
+  private async getTradeCountByDay(
+    day: string,
+    userId: number,
+  ): Promise<DailyProfit[]> {
+    const sql = `SELECT * FROM daily_profit WHERE userId=${userId} AND DATE_FORMAT(time, '%Y-%m-%d') = '${day}'`
+    return await this.dailyProfitRepo.query(sql)
+  }
+
+  private async updateCloseStrategyOrderUtil(
+    strategiesOrder: StrategyOrder,
+  ): Promise<Result> {
+    const {
+      strategyId,
+      is_running,
+      sellingQty,
+      sellingQuoteQty,
+      sellingPrice,
+      realizedProfit,
+      realizedProfitRate,
+      sellingTime,
+      free,
+      updatedAt,
+    } = strategiesOrder
+
+    const sql = `update strategy_order set sellingQty = "${sellingQty}",sellingQuoteQty = "${sellingQuoteQty}",sellingPrice="${sellingPrice}",
+    realizedProfit="${realizedProfit}",realizedProfitRate="${realizedProfitRate}",free="${free}",sellingTime="${sellingTime}",is_running=${is_running},updatedAt="${updatedAt}" WHERE strategyId = "${strategyId}"`
+    try {
+      await this.strategyOrderIdRepo.query(sql)
+
+      return { code: 200, msg: 'Calculate amount update succeeded' }
+    } catch (error) {
+      return { code: 500, msg: 'updateCloseStrategyOrder error' }
+    }
+  }
+
+  async syncStgPrice(stgOrders: SyncStgPriceType[]): Promise<Result> {
+    try {
+      console.log('syncStgPrice', stgOrders)
+      const updatedAt = new Date().getTime()
+      for (let index = 0; index < stgOrders.length; index++) {
+        const item = stgOrders[index]
+
+        const { symbol, entryPrice, quoteQty, qty, strategyId, userId } = item
+        const spotPrice = await this.getSpotPrice(symbol)
+
+        const price = get(spotPrice, `${symbol}`, '')
+        const realizedFree = 0
+        if (!price) {
+          return { code: 500, msg: 'get symbol price error' }
+        }
+
+        const isUpdate = true
+        const spotFree = await this.getUserSpotFree(userId)
+        const { profit, profitRate } = calculateStrategyProfit(
+          price,
+          entryPrice,
+          qty,
+          quoteQty,
+          userId,
+          realizedFree,
+          isUpdate,
+          Number(spotFree),
+        )
+
+        const sql = `update strategy_order set price = "${price}",profitRate = "${profitRate}",
+    profit = "${profit}",updatedAt="${updatedAt}" WHERE strategyId = "${strategyId}"`
+
+        await this.strategyOrderIdRepo.query(sql)
+      }
+
+      return { code: success, msg: 'sync strategy price successfully' }
+    } catch (error) {
+      return {
+        code: fail,
+        msg: error.sqlMessage || 'sync strategy price failed',
+      }
+    }
   }
 }

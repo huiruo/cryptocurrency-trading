@@ -55,6 +55,26 @@
   border-color: #042ff5;
 }
 
+.purple-btn{
+  color:#9d04f5;
+  border-color: #9d04f5;
+}
+
+.purple-btn:hover{
+  color:#042ff5;
+  border-color: #042ff5;
+}
+
+.green-btn{
+  color:#36d964;
+  border-color: #36d964;
+}
+
+.green-btn:hover{
+  color:#49f179!important;
+  border-color: #aff2c2 !important;
+}
+
 .neutral-btn{
   border-color: #000000b0;
   color: #000000b0;
@@ -102,6 +122,14 @@
 
 /** strategies end*/
 /** strategies end*/
+
+.modal-stg-table{
+  max-width: 100%;
+  .table-box{
+    width: 100%;
+    overflow: auto;
+  }
+}
 
 .table-box-container {
   width: 100%;

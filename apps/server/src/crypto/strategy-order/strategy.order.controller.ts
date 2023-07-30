@@ -1,27 +1,40 @@
 import { Body, Controller, Post } from '@nestjs/common'
 import { Result } from 'src/types'
 import { StrategyOrderService } from './strategy.order.service'
-import { GetStraOrderParams, ResetStra } from './strategy.order.type'
+import {
+  StgOrderParams,
+  ResetStg,
+  SpotStgOperation,
+  SyncStgPriceType,
+} from './strategy.order.type'
 import { SpotOrder } from '../entity/spot-order.entity'
 
-@Controller('strategy')
+@Controller('stg')
 export class StrategyOrderController {
   constructor(private readonly strategyOrderService: StrategyOrderService) {}
 
-  @Post('straOrder')
-  async getStraOrder(
-    @Body() getStraOrderParams: GetStraOrderParams,
-  ): Promise<Result> {
-    return await this.strategyOrderService.getStraOrder(getStraOrderParams)
+  @Post('order')
+  async getStgOrder(@Body() stgOrderParams: StgOrderParams): Promise<Result> {
+    return await this.strategyOrderService.getStgOrder(stgOrderParams)
   }
 
-  @Post('createSpotStra')
+  @Post('createSpotStg')
   async createSpotStra(@Body() spotOrders: SpotOrder[]): Promise<Result> {
-    return await this.strategyOrderService.createSpotStra(spotOrders)
+    return await this.strategyOrderService.createSpotStg(spotOrders)
   }
 
-  @Post('resetStra')
-  async resetStra(@Body() resetStra: ResetStra): Promise<Result> {
-    return await this.strategyOrderService.resetStra(resetStra)
+  @Post('reset')
+  async resetStg(@Body() resetStg: ResetStg): Promise<Result> {
+    return await this.strategyOrderService.resetStg(resetStg)
+  }
+
+  @Post('close')
+  async closeStg(@Body() spotStgOperation: SpotStgOperation): Promise<Result> {
+    return await this.strategyOrderService.closeStg(spotStgOperation)
+  }
+
+  @Post('syncPrice')
+  async syncStgPrice(@Body() stgOrders: SyncStgPriceType[]): Promise<Result> {
+    return await this.strategyOrderService.syncStgPrice(stgOrders)
   }
 }
