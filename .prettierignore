@@ -3,6 +3,8 @@
 **/*.ejs
 **/*.html
 package.json
+desktop
+apps/desktop
 node_modules
 js-run-test
 dist

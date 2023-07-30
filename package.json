@@ -18,7 +18,7 @@
   "lint-staged": {
     "apps/**/*.{js,jsx,ts,tsx}": "eslint --fix",
     "*.{js,jsx,tsx,ts}": [
-      "prettier --write"
+      "prettier --write --ignore-path .prettierignore ."
     ]
   },
   "devDependencies": {
