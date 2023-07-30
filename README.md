@@ -1,31 +1,10 @@
-### Project introduction
+## Word
+The key is to act, don't be a giant of thinking and a dwarf of action.
+
+## Project introduction
 A cryptocurrency quantitative trading system.
 With the help of program-assisted trading, through continuous iteration, continuous trial and error to improve the transaction.
 The goal is to explore profitable trading.
-
-### Project directory
-```
-cryptocurrency-trading
-├── app
-|   |
-|   ├──server (Node service,project main service)
-│       ├── config
-│       ├── doc
-│       ├── src
-│       │   ├──binance-connector (Binance api connector)
-│       │   ├──common
-│       │   ├──mock
-│       │   ├──trader (main Module)
-│       │   ├──app.controller.spec.ts
-│       │   ├──app.controller.ts
-│       │   ├──app.module.ts
-│       │   ├──app.service.ts
-│       │   ├──main.ts
-│       ├── ...
-│       │  
-|   ├── web (Browser application)
-├── trading-strategy (Trading straregy)
-```
 
 ## config
 In the apps\server\config\env-dev directory,rename application-dev.env_example to application-dev.env,and set your 
@@ -35,14 +14,32 @@ binanceApiKey=test
 binanceSecretKey=test
 coinBaseURL=https://example.com
 ```
-In the apps\server\ directory,rename .env_example to .env,and set your mysql.
+
+In the apps\server\ directory,rename .env_example to .env,and set your mysql;
 ```
-host_dev=localhost
+host_prod=localhost
+port_prod=3306
+username_prod=xx
+password_prod=xx
+database_prod=code-platform
+
+host_dev=127.0.0.1
 port_dev=3306
-username_dev=xxxx
-password_dev=xxxxx
-database_dev=trader
+username_dev=xx
+password_dev=xx
+database_dev=code-platform
+
+jwt_secret=xx
 ```
+
+web: .env_example --> .env
+```
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=xx
+NEXT_PUBLIC_DEV_HOST=http://localhost:3888
+NEXT_PUBLIC_PROD_HOST=http://localhost:3888
+SECRET_COOKIE_PASSWORD=xx
+```
+
 
 ## Run
 ```
@@ -51,13 +48,8 @@ yarn install
 
 cd apps/web
 yarn dev
-```
 
-## Build
-
-To build all apps and packages, run the following command:
-
-```
-cd .
-yarn run build
+cd apps/server
+yarn install
+yarn dev
 ```
