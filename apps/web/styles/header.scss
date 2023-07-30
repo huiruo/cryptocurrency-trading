@@ -3,7 +3,9 @@
 }
 
 .nav-box-shadow {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, .08), 0 0 4px rgba(0, 0, 0, .08);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.08),
+    0 0 4px rgba(0, 0, 0, 0.08);
 }
 
 .header-container {
@@ -73,6 +75,6 @@ header {
   .li {
     font-weight: 500;
     list-style: none;
-    padding-left: .5rem;
+    padding-left: 0.5rem;
   }
 }

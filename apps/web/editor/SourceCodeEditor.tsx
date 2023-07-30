@@ -14,7 +14,7 @@ const langMap: Record<any, string> = {
  * 
 */
 
-const test = 'console.log(\'hello world\')'
+const test = "console.log('hello world')"
 
 export const SourceCodeEditor = forwardRef((props, ref) => {
   const [value, setValue] = useState<string>(test || '')

@@ -1,21 +1,11 @@
 {
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx"
-  ],
-  "exclude": [
-    "node_modules"
-  ],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"],
   "compileOnSave": true,
   "compilerOptions": {
     "baseUrl": ".",
     "target": "ES6",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "outDir": "./",
     "composite": false,
     "inlineSources": false,
@@ -40,42 +30,18 @@
     "esModuleInterop": true,
     "importHelpers": true,
     "paths": {
-      "react": [
-        "../../node_modules/@types/react"
-      ],
-      "@typings/*": [
-        "typings/*"
-      ],
-      "@hooks/*": [
-        "hooks/*"
-      ],
-      "@utils/*": [
-        "utils/*"
-      ],
-      "@services/*": [
-        "services/*"
-      ],
-      "@stores/*": [
-        "stores/*"
-      ],
-      "@common/*": [
-        "common/*"
-      ],
-      "@layouts/*": [
-        "layouts/*"
-      ],
-      "@components/*": [
-        "components/*"
-      ],
-      "@editor/*": [
-        "editor/*"
-      ],
-      "@modules/*": [
-        "modules/*"
-      ],
-      "@drawers/*": [
-        "drawers/*"
-      ]
+      "react": ["../../node_modules/@types/react"],
+      "@typings/*": ["typings/*"],
+      "@hooks/*": ["hooks/*"],
+      "@utils/*": ["utils/*"],
+      "@services/*": ["services/*"],
+      "@stores/*": ["stores/*"],
+      "@common/*": ["common/*"],
+      "@layouts/*": ["layouts/*"],
+      "@components/*": ["components/*"],
+      "@editor/*": ["editor/*"],
+      "@modules/*": ["modules/*"],
+      "@drawers/*": ["drawers/*"]
     },
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,

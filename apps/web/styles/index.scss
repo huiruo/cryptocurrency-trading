@@ -1,91 +1,91 @@
-.common-left-mg{
+.common-left-mg {
   margin-left: 10px;
 }
 
-.common-right-mg{
+.common-right-mg {
   margin-right: 10px;
 }
 
-.common-x-mg{
+.common-x-mg {
   margin: 0 10px;
 }
 
-.common-y-mg{
+.common-y-mg {
   margin: 10px 0;
 }
 
-.common-bottom-mg{
+.common-bottom-mg {
   margin-bottom: 10px;
 }
 
-.common-top2-mg{
+.common-top2-mg {
   margin-top: 20px;
 }
 
-.flex-between{
+.flex-between {
   display: flex;
   justify-content: space-between;
 }
 
-.flex-xcenter{
+.flex-xcenter {
   justify-content: center;
 }
 
-.flex-ycenter{
+.flex-ycenter {
   align-items: center;
 }
 
-.warm-btn{
+.warm-btn {
   color: #f5c504;
   border-color: #f5c504;
 }
 
-.warm-btn:hover{
+.warm-btn:hover {
   border-color: #b08e04 !important;
   color: #b08e04 !important;
 }
 
-.bright-btn{
-  color:#042ff5;
+.bright-btn {
+  color: #042ff5;
   border-color: #042ff5;
 }
 
-.bright-btn:hover{
-  color:#042ff5;
+.bright-btn:hover {
+  color: #042ff5;
   border-color: #042ff5;
 }
 
-.purple-btn{
-  color:#9d04f5;
+.purple-btn {
+  color: #9d04f5;
   border-color: #9d04f5;
 }
 
-.purple-btn:hover{
-  color:#042ff5;
+.purple-btn:hover {
+  color: #042ff5;
   border-color: #042ff5;
 }
 
-.green-btn{
-  color:#36d964;
+.green-btn {
+  color: #36d964;
   border-color: #36d964;
 }
 
-.green-btn:hover{
-  color:#49f179!important;
+.green-btn:hover {
+  color: #49f179 !important;
   border-color: #aff2c2 !important;
 }
 
-.neutral-btn{
+.neutral-btn {
   border-color: #000000b0;
   color: #000000b0;
 }
 
-.neutral-btn:hover{
+.neutral-btn:hover {
   color: #000000e0 !important;
   border-color: #000000e0 !important;
 }
 
-.primary-btn{
+.primary-btn {
   color: #1677ff;
   border-color: #2b77e1;
 }
@@ -96,9 +96,9 @@
   width: 90%;
   margin: 0 auto;
 
-  .spot-operation{
+  .spot-operation {
     padding: 20px 0;
-    .merge-btn{
+    .merge-btn {
       margin: 0 10px;
     }
   }
@@ -109,13 +109,13 @@
 
 /** strategies start*/
 /** strategies start*/
-.strategy-container{
+.strategy-container {
   width: 90%;
   margin: 0 auto;
-  .action1{
+  .action1 {
     width: 160px;
   }
-  .action2{
+  .action2 {
     width: 120px;
   }
 }
@@ -123,9 +123,9 @@
 /** strategies end*/
 /** strategies end*/
 
-.modal-stg-table{
+.modal-stg-table {
   max-width: 100%;
-  .table-box{
+  .table-box {
     width: 100%;
     overflow: auto;
   }
@@ -133,7 +133,7 @@
 
 .table-box-container {
   width: 100%;
-  border: 1px solid rgba(0, 0, 0, .06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
   padding: 20px 20px 30px;
   background: #fcfcfc;
 
