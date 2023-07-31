@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { User } from './user.entity'
 import { GoogleAuthType, ResultWithData } from 'src/types'
-import { success } from 'src/common/constant'
+import { fail, success } from 'src/common/constant'
 
 @Injectable()
 export class UserService {
@@ -78,22 +78,30 @@ export class UserService {
   async handlerGoogleAuth(
     userInfo: GoogleAuthType,
   ): Promise<ResultWithData<User>> {
-    const { email } = userInfo
-    const users = await this.findUserByEmail(email)
-    if (users.length === 0) {
-      const saveUserRes = await this.saveGoogleUser(userInfo)
-      console.log('saveUserRes===>', saveUserRes)
+    try {
+      const { email } = userInfo
+      const users = await this.findUserByEmail(email)
+      if (users.length === 0) {
+        const saveUserRes = await this.saveGoogleUser(userInfo)
+        console.log('saveUserRes===>', saveUserRes)
+        return {
+          code: success,
+          msg: 'Sign in successfully with google,saved',
+          data: saveUserRes,
+        }
+      }
+
       return {
         code: success,
-        msg: 'Sign in successfully with google,saved',
-        data: saveUserRes,
+        msg: 'Sign in successfully with google,saved before',
+        data: null,
       }
-    }
-
-    return {
-      code: success,
-      msg: 'Sign in successfully with google,saved before',
-      data: null,
+    } catch (error) {
+      return {
+        code: fail,
+        msg: error.sqlMessage || 'handlerGoogleAuth error',
+        data: null,
+      }
     }
   }
 

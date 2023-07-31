@@ -25,7 +25,7 @@ import {
 import { AuthService } from './auth.service'
 import { AuthGuard } from './auth.guard'
 import { Public } from 'src/common/decorators/public.decorator'
-import { success } from 'src/common/constant'
+import { fail, success } from 'src/common/constant'
 import { User } from './user.entity'
 
 @Controller('user')
@@ -81,6 +81,10 @@ export class UserController {
     */
     const result = await this.userService.handlerGoogleAuth(userInfo)
     console.log('拿到 google 账户信息,处理好注册和登录返回:', result)
+    if (result.code === fail) {
+      res.status(500).json({ message: result.msg })
+      return
+    }
 
     const { email, given_name, id, picture } = userInfo
     const token = await this.authService.signInWithGoogle(given_name, email, id)
