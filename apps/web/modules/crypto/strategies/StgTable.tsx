@@ -18,8 +18,7 @@ export function StgTable() {
   const { total, data } = useAppSelector(stgOrdersState)
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
   const [selectRowData, setSelectRowData] = useState<StgOrder[]>([])
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
-  const [pageSize, setPageSize] = useState<number>(10)
+  const [, setPageSize] = useState<number>(10)
   const [currentPage, setCurrentPage] = useState<number>(1)
 
   const onKline = (order: StgOrder) => {
@@ -264,10 +263,10 @@ export function StgTable() {
     },
   ]
 
-  const onChangePage = (page: number, pageSize: number) => {
-    setCurrentPage(page)
+  const onChangePage = (current: number, pageSize: number) => {
+    setCurrentPage(current)
     getStgOrdersUtil({
-      current: page,
+      current,
       page: pageSize,
     })
   }

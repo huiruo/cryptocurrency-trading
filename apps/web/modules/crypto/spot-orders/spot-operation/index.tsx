@@ -4,8 +4,11 @@ import { Button, DatePicker, Select, message } from 'antd'
 import AddAsset from './AddAsset'
 import useFetchAssets from './useFetchAssets'
 import { spotApi } from '@services/spot'
-import { GetSpotOrderParamsNoPage } from '@services/spot.type'
 import { SUCCESS } from '@common/constants'
+import store from '@stores/index'
+import { appStoreActions, spotFilterState } from '@stores/appSlice'
+import { fetchSpotOrders } from '@stores/thunkAction'
+import { useAppSelector } from '@stores/hooks'
 
 // in milliseconds
 const startTimeDefault = dayjs().startOf('day')
@@ -14,16 +17,10 @@ const dateFormat = 'YYYY-MM-DD HH:mm:ss'
 
 const { RangePicker } = DatePicker
 
-interface Props {
-  searchCallBack: (getSpotOrderParams: GetSpotOrderParamsNoPage) => void
-}
-
-export default function SpotOperation(props: Props) {
-  const { searchCallBack } = props
+export default function SpotOperation() {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  // test MKRUSDT ARUSDT
-  const [searchAssetValue, setSearchAssetValue] = useState<string>('MKRUSDT')
-  const [syncAssetValue, setSyncAssetValue] = useState<string>('')
+  const { symbol } = useAppSelector(spotFilterState)
+  const [syncAssetValue, setSyncAssetValue] = useState<string>('ARUSDT')
   const [assets] = useFetchAssets()
 
   const [selectedDates, setSelectedDates] = useState<[Dayjs, Dayjs]>([
@@ -50,11 +47,13 @@ export default function SpotOperation(props: Props) {
     const params = {
       endTime: 1677513599999,
       startTime: 1677427200000,
-      symbol: 'ARUSDT',
+      symbol: syncAssetValue,
     }
     const res = await spotApi.syncSpotOrder(params)
     if (res.code === SUCCESS) {
       message.success(res.msg)
+      store.dispatch(appStoreActions.setSpotFilter({ symbol: syncAssetValue }))
+      await store.dispatch(fetchSpotOrders({}))
     } else {
       message.error(res.msg || 'error')
     }
@@ -72,12 +71,17 @@ export default function SpotOperation(props: Props) {
     if (type === 1) {
       setSyncAssetValue(value)
     } else {
-      setSearchAssetValue(value)
+      store.dispatch(appStoreActions.setSpotFilter({ symbol: value }))
     }
   }
 
   const onSearchSpotOrder = () => {
-    searchCallBack({ symbol: searchAssetValue })
+    store.dispatch(
+      fetchSpotOrders({
+        current: 1,
+        page: 10,
+      }),
+    )
   }
 
   const handleRangePickerChange = (dates: null | (Dayjs | null)[]) => {
@@ -132,7 +136,7 @@ export default function SpotOperation(props: Props) {
             (option?.name ?? '').toLowerCase().includes(input.toLowerCase())
           }
           fieldNames={{ label: 'name', value: 'name' }}
-          value={searchAssetValue}
+          value={symbol}
           options={assets}
           style={{ width: '150px' }}
         />

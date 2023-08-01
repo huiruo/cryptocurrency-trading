@@ -2,12 +2,16 @@ import { configureStore, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from './index'
 import { SpotOrders } from '@services/spot.type'
 import { StgOrders } from '@services/strategy.type'
-import { fetchStgOrders } from './thunkAction'
+import { fetchSpotOrders, fetchStgOrders } from './thunkAction'
 import { ResType } from '@services/base'
 
 interface StgFilter {
   status: number
   asset: string
+}
+
+interface SpotFilter {
+  symbol: string
 }
 
 export interface AppState {
@@ -17,6 +21,7 @@ export interface AppState {
   spotOrders: SpotOrders
   stgOrders: StgOrders
   stgFilter: StgFilter
+  spotFilter: SpotFilter
 }
 
 const initialState: AppState = {
@@ -32,6 +37,10 @@ const initialState: AppState = {
   stgFilter: {
     status: 1,
     asset: '',
+  },
+  spotFilter: {
+    // test MKRUSDT ARUSDT
+    symbol: 'MKRUSDT',
   },
   stgOrders: {
     data: [],
@@ -55,13 +64,13 @@ const appStoreSlice = createSlice({
       console.log('store==>setCount:', action.payload)
       state.count = action.payload
     },
-    setSpotOrders(state, action: PayloadAction<SpotOrders>) {
-      console.log('store==>setSpotOrders:', action.payload)
-      state.spotOrders = action.payload
-    },
     setStgFilter(state, action: PayloadAction<StgFilter>) {
       console.log('store==>setStgFilter:', action.payload)
       state.stgFilter = action.payload
+    },
+    setSpotFilter(state, action: PayloadAction<SpotFilter>) {
+      console.log('store==>SpotFilter:', action.payload)
+      state.spotFilter = action.payload
     },
   },
   extraReducers(builder) {
@@ -80,6 +89,23 @@ const appStoreSlice = createSlice({
       state.loading = false
       state.error = action.error.message || 'error'
     })
+    // spot
+    builder.addCase(fetchSpotOrders.pending, (state) => {
+      state.loading = true
+      state.error = null
+    })
+    builder.addCase(
+      fetchSpotOrders.fulfilled,
+      (state, action: PayloadAction<ResType<SpotOrders>>) => {
+        state.loading = false
+        state.spotOrders = action.payload.data
+      },
+    )
+    builder.addCase(fetchSpotOrders.rejected, (state, action) => {
+      state.loading = false
+      state.error = action.error.message || 'error'
+    })
+    // spot end
   },
 })
 
@@ -93,5 +119,6 @@ export const countState = (state: RootState) => state.appStore.count
 export const spotOrdersState = (state: RootState) => state.appStore.spotOrders
 export const stgOrdersState = (state: RootState) => state.appStore.stgOrders
 export const stgFilterState = (state: RootState) => state.appStore.stgFilter
+export const spotFilterState = (state: RootState) => state.appStore.spotFilter
 
 export default appStoreSlice.reducer

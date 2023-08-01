@@ -1,22 +1,26 @@
 import React, { useEffect, useState } from 'react'
-import { appStoreActions, spotOrdersState } from '@stores/appSlice'
+import { spotOrdersState } from '@stores/appSlice'
 import { useAppSelector } from '@stores/hooks'
 import { Button, Pagination, Table, message } from 'antd'
-import { GetSpotOrderParamsNoPage, SpotOrder } from '@services/spot.type'
+import { SpotOrder } from '@services/spot.type'
 import { formatUnixTime } from '@common/utils'
 import { SUCCESS, strategyStatusMap } from '@common/constants'
 import { isEmpty } from 'lodash'
-import { spotApi } from '@services/spot'
 import store from '@stores/index'
 import { strategyApi } from '@services/strategy'
 import NiceModal from '@common/nice-modal'
 import { StraCloseModal } from '../strategies/CloseModal'
+import {
+  FetchSpotOrdersAction,
+  SpotOrdersParams,
+  fetchSpotOrders,
+} from '@stores/thunkAction'
 
 export default function SpotTable() {
   const { total, data } = useAppSelector(spotOrdersState)
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
   const [selectRowData, setSelectRowData] = useState<SpotOrder[]>([])
-  const [pageSize, setPageSize] = useState<number>(10)
+  const [, setPageSize] = useState<number>(10)
   const [currentPage, setCurrentPage] = useState<number>(1)
 
   const oncreateStrategy = async () => {
@@ -43,7 +47,7 @@ export default function SpotTable() {
   const createStrategyUtil = async (order: SpotOrder[]) => {
     const res = await strategyApi.createSpotStg(order)
     if (res.code === SUCCESS) {
-      getSpotOrders({ symbol: '' })
+      getSpotOrdersUtil({})
       setSelectRowData([])
       setSelectedRowKeys([])
       message.success('create strategy succeeded')
@@ -81,7 +85,7 @@ export default function SpotTable() {
       orderType: 'spot',
     })
     if (res.code === SUCCESS) {
-      getSpotOrders({ symbol: '' })
+      getSpotOrdersUtil({})
       setSelectRowData([])
       setSelectedRowKeys([])
       message.success('Reset order succeeded')
@@ -138,7 +142,10 @@ export default function SpotTable() {
   }
 
   const modalCallBack = () => {
-    getSpotOrders({ symbol: '' })
+    getSpotOrdersUtil({
+      current: 1,
+      page: 10,
+    })
     setSelectRowData([])
     setSelectedRowKeys([])
   }
@@ -301,14 +308,24 @@ export default function SpotTable() {
     },
   ]
 
-  const onChangePage = (page: number, pageSize: number) => {
-    const params = {
-      currentPage: page,
-      pageSize: pageSize,
-      symbol: '',
+  const onChangePage = (current: number, pageSize: number) => {
+    setCurrentPage(current)
+    getSpotOrdersUtil({
+      current,
+      page: pageSize,
+    })
+  }
+
+  const getSpotOrdersUtil = async (spotOrdersParams: SpotOrdersParams) => {
+    const { payload } = (await store.dispatch(
+      fetchSpotOrders(spotOrdersParams),
+    )) as FetchSpotOrdersAction
+    if (payload.code === SUCCESS) {
+      setCurrentPage(payload.data.currentPage)
+      setPageSize(payload.data.pageSize)
+    } else {
+      message.error(payload.msg || 'error')
     }
-    setCurrentPage(page)
-    getSpotOrders(params)
   }
 
   const onShowSizeChange = (page: number, pageSize: number) => {
@@ -325,21 +342,6 @@ export default function SpotTable() {
     },
   }
 
-  const getSpotOrders = async ({
-    symbol,
-    pageSize = 10,
-    currentPage = 1,
-  }: GetSpotOrderParamsNoPage) => {
-    const res = await spotApi.getSpotOrders({ pageSize, currentPage, symbol })
-    if (res.code === SUCCESS) {
-      store.dispatch(appStoreActions.setSpotOrders(res.data))
-      setCurrentPage(res.data.currentPage)
-      setPageSize(res.data.pageSize)
-    } else {
-      message.error(res.msg || 'error')
-    }
-  }
-
   useEffect(() => {
     if (!isEmpty(selectedRowKeys)) {
       console.log('clear selected')
@@ -348,13 +350,7 @@ export default function SpotTable() {
   }, [data])
 
   useEffect(() => {
-    const params = {
-      currentPage: 1,
-      pageSize: pageSize,
-      symbol: '',
-    }
-
-    getSpotOrders(params)
+    getSpotOrdersUtil({})
   }, [])
 
   return (
