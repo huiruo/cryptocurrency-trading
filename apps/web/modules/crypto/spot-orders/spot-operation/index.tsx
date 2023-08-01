@@ -68,7 +68,7 @@ export default function SpotOperation(props: Props) {
     setIsModalOpen(isModalOpen)
   }
 
-  const onChangeAssetValue = (value: string, type: number) => {
+  const onChangeAsset = (value: string, type: number) => {
     if (type === 1) {
       setSyncAssetValue(value)
     } else {
@@ -97,7 +97,7 @@ export default function SpotOperation(props: Props) {
             showSearch
             placeholder="Select a asset"
             optionFilterProp="children"
-            onChange={(e) => onChangeAssetValue(e, 1)}
+            onChange={(e) => onChangeAsset(e, 1)}
             filterOption={(input, option) =>
               (option?.name ?? '').toLowerCase().includes(input.toLowerCase())
             }
@@ -127,7 +127,7 @@ export default function SpotOperation(props: Props) {
           showSearch
           placeholder="Select a asset"
           optionFilterProp="children"
-          onChange={(e) => onChangeAssetValue(e, 2)}
+          onChange={(e) => onChangeAsset(e, 2)}
           filterOption={(input, option) =>
             (option?.name ?? '').toLowerCase().includes(input.toLowerCase())
           }

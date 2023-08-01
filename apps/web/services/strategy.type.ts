@@ -11,6 +11,11 @@ export interface Api {
   syncStgPrice: (syncStgPriceType: SyncStgPriceType[]) => Promise<ResType<null>>
 }
 
+export interface SelectStatusType {
+  label: string
+  name: string | number
+}
+
 export interface SyncStgPriceType {
   symbol: string
   qty: string

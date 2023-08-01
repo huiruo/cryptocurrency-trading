@@ -1,5 +1,9 @@
 import { combineReducers } from '@reduxjs/toolkit'
-import appReducer from './appSlice'
+import appReducer, { AppState } from './appSlice'
+
+export type RootState = {
+  appStore: AppState
+}
 
 const rootReducer = combineReducers({
   appStore: appReducer,

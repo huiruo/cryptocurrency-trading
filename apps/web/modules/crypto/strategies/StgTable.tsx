@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from 'react'
-import { appStoreActions, stgOrdersState } from '@stores/appSlice'
+import { stgOrdersState } from '@stores/appSlice'
 import { useAppSelector } from '@stores/hooks'
 import { Button, Pagination, Table, message } from 'antd'
 import { formatUnixTime, generateBianceUri } from '@common/utils'
 import { SUCCESS } from '@common/constants'
 import { isEmpty } from 'lodash'
 import store from '@stores/index'
-import { StgOrder, StgOrdersParams } from '@services/strategy.type'
+import { StgOrder } from '@services/strategy.type'
 import { strategyApi } from '@services/strategy'
+import {
+  FetchStgOrdersAction,
+  StgOrdersParams,
+  fetchStgOrders,
+} from '@stores/thunkAction'
 
 export function StgTable() {
   const { total, data } = useAppSelector(stgOrdersState)
@@ -42,16 +47,10 @@ export function StgTable() {
       }
     })
 
-    console.log('onSyncPrice', { orders, stgOrder })
     const res = await strategyApi.syncStgPrice(stgOrder)
     if (res.code) {
       message.success(res.msg)
-      getStgOrdersUtil({
-        symbol: '',
-        is_running: 1,
-        pageSize: 10,
-        currentPage: 1,
-      })
+      getStgOrdersUtil({})
     } else {
       message.error(res.msg)
     }
@@ -266,14 +265,11 @@ export function StgTable() {
   ]
 
   const onChangePage = (page: number, pageSize: number) => {
-    const params = {
-      currentPage: page,
-      pageSize: pageSize,
-      symbol: '',
-      is_running: 1,
-    }
     setCurrentPage(page)
-    getStgOrdersUtil(params)
+    getStgOrdersUtil({
+      current: page,
+      page: pageSize,
+    })
   }
 
   const onShowSizeChange = (page: number, pageSize: number) => {
@@ -290,15 +286,15 @@ export function StgTable() {
     },
   }
 
-  const getStgOrdersUtil = async (strategyOrdersParams: StgOrdersParams) => {
-    const res = await strategyApi.getStgOrders(strategyOrdersParams)
-    if (res.code === SUCCESS) {
-      store.dispatch(appStoreActions.setStraOrders(res.data))
-      setCurrentPage(strategyOrdersParams.currentPage)
-      setCurrentPage(res.data.currentPage)
-      setPageSize(res.data.pageSize)
+  const getStgOrdersUtil = async (stgOrdersParams: StgOrdersParams) => {
+    const { payload } = (await store.dispatch(
+      fetchStgOrders(stgOrdersParams),
+    )) as FetchStgOrdersAction
+    if (payload.code === SUCCESS) {
+      setCurrentPage(payload.data.currentPage)
+      setPageSize(payload.data.pageSize)
     } else {
-      message.error(res.msg || 'error')
+      message.error(payload.msg || 'error')
     }
   }
 
@@ -308,15 +304,6 @@ export function StgTable() {
       setSelectedRowKeys([])
     }
   }, [data])
-
-  useEffect(() => {
-    getStgOrdersUtil({
-      symbol: '',
-      is_running: 1,
-      pageSize: 10,
-      currentPage: 1,
-    })
-  }, [])
 
   console.log('StraTable->render', { selectRowData })
 

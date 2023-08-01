@@ -12,13 +12,20 @@ export async function handleGoogleAuthCodeApi(
       },
     })
 
+    if (res.status === 200) {
+      return {
+        statusCode: SUCCESS,
+        message: 'OK',
+        data: await res.json(),
+      }
+    }
+
     return {
-      statusCode: SUCCESS,
-      message: 'OK',
+      statusCode: FAIL,
+      message: res.statusText,
       data: await res.json(),
     }
   } catch (error) {
-    console.error('NetWork Error', error)
     return {
       statusCode: FAIL,
       message: error as string,

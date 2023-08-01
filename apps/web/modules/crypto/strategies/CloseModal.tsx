@@ -16,7 +16,7 @@ interface Props {
 export const StraCloseModal = NiceModal.create((props: Props) => {
   const { closeOrders, title, modalCallBack } = props
   const { visible, hide, remove } = useModal()
-  const [straOrders, setStraOrders] = useState<StgOrders>({
+  const [straOrders, setStgOrders] = useState<StgOrders>({
     data: [],
     total: 0,
     currentPage: 1,
@@ -29,7 +29,7 @@ export const StraCloseModal = NiceModal.create((props: Props) => {
   const getSpotOrdersUtil = async (strategyOrdersParams: StgOrdersParams) => {
     const res = await strategyApi.getStgOrders(strategyOrdersParams)
     if (res.code === SUCCESS) {
-      setStraOrders(res.data)
+      setStgOrders(res.data)
     } else {
       message.error(res.msg || 'error')
     }
