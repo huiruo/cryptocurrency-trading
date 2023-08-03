@@ -212,13 +212,14 @@ export class StrategyOrderService {
         realizedProfit,
         userId,
       )
-      if (calculateRes.code !== 200) {
+
+      if (calculateRes.code !== success) {
         return { code: 500, msg: calculateRes.msg }
       }
       // update daily profit end
 
       const res = await this.updateCloseStrategyOrderUtil(strategiesOrder)
-      if (calculateRes.code !== 200) {
+      if (calculateRes.code !== success) {
         return { code: 500, msg: res.msg }
       }
 
@@ -240,9 +241,10 @@ export class StrategyOrderService {
         msg: 'ok',
       }
     } catch (error) {
+      console.log('close error', error)
       return {
         code: fail,
-        msg: error,
+        msg: error.toString(),
       }
     }
   }
@@ -487,7 +489,12 @@ export class StrategyOrderService {
     userId: number,
   ): Promise<Result> {
     const res = await this.client.getAccountInfo()
-    const balances = get(res, 'balances', [])
+    if (res.code !== success) {
+      return { code: 500, msg: 'getAccountInfo amount error' }
+    }
+
+    const balances = get(res.data, 'balances', [])
+
     for (let index = 0; index < balances.length; index++) {
       const element = balances[index]
       if (element.asset === 'USDT') {
@@ -509,10 +516,10 @@ export class StrategyOrderService {
 
           try {
             await this.dailyProfitRepo.save(tradeCount)
-            return { code: 200, msg: 'Calculate amount succeeded' }
+            return { code: success, msg: 'Calculate amount succeeded' }
           } catch (error) {
             console.log('error:', error)
-            return { code: 500, msg: 'calculate amount error' }
+            return { code: 500, msg: error.toString() }
           }
         } else {
           const { profit: itemProfit, id } = tradeCountList[0]
@@ -533,15 +540,16 @@ export class StrategyOrderService {
           const sql = `update daily_profit set profit = ${calProfit},profitRate = '${profitRate}',time='${timeStr}' WHERE id = ${id}`
           try {
             await this.spotOrderRepo.query(sql)
-            return { code: 200, msg: 'Calculate amount update succeeded' }
+            return { code: success, msg: 'Calculate amount update succeeded' }
           } catch (error) {
-            console.log('error:', error)
-            return { code: 500, msg: 'calculate amount update error' }
+            return { code: 500, msg: error.toString() }
           }
         }
         // break
       }
     }
+
+    return { code: 500, msg: 'Incorrectly calculated amount' }
   }
 
   private async getTradeCountByDay(
@@ -573,7 +581,7 @@ export class StrategyOrderService {
     try {
       await this.strategyOrderIdRepo.query(sql)
 
-      return { code: 200, msg: 'Calculate amount update succeeded' }
+      return { code: success, msg: 'Calculate amount update succeeded' }
     } catch (error) {
       return { code: 500, msg: 'updateCloseStrategyOrder error' }
     }

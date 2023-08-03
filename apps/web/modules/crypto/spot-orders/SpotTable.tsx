@@ -9,7 +9,7 @@ import { isEmpty } from 'lodash'
 import store from '@stores/index'
 import { strategyApi } from '@services/strategy'
 import NiceModal from '@common/nice-modal'
-import { StraCloseModal } from '../strategies/CloseModal'
+import { StgCloseModal } from '../strategies/StgCloseModal'
 import {
   FetchSpotOrdersAction,
   SpotOrdersParams,
@@ -380,7 +380,7 @@ export default function SpotTable() {
 
       {/* <MergeStrategyModal id='mergeStrategyModal' mergeOrders={selectRowData} spotTableCallBack={() => spotTableCallBack()} />
        */}
-      <StraCloseModal
+      <StgCloseModal
         id="closeStrategyModal"
         closeOrders={selectRowData}
         title="Close strategy"

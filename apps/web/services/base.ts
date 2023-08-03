@@ -43,7 +43,7 @@ export const fetchWithAuth = async <T>(
 
     if (response.status === 401) {
       deleteCookie('token')
-      window.location.href = '/'
+      // window.location.href = '/'
       console.log('请登录==>')
       return { code: 0, msg: '请登录' } as ResType<T>
     }
@@ -62,8 +62,10 @@ export const fetchWithAuth = async <T>(
       console.log('token=services/base.ts-2')
       setCookie('token', newToken)
     }
+    const res1 = await response.json()
+    console.log('base-res-->', res1)
 
-    return response.json()
+    return res1
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.log('fetchWithAuth error', error)

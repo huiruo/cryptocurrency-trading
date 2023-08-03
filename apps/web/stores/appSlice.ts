@@ -4,6 +4,7 @@ import { SpotOrders } from '@services/spot.type'
 import { StgOrders } from '@services/strategy.type'
 import { fetchSpotOrders, fetchStgOrders } from './thunkAction'
 import { ResType } from '@services/base'
+import { SUCCESS } from '@common/constants'
 
 interface StgFilter {
   status: number
@@ -82,7 +83,9 @@ const appStoreSlice = createSlice({
       fetchStgOrders.fulfilled,
       (state, action: PayloadAction<ResType<StgOrders>>) => {
         state.loading = false
-        state.stgOrders = action.payload.data
+        if (action.payload.code === SUCCESS) {
+          state.stgOrders = action.payload.data
+        }
       },
     )
     builder.addCase(fetchStgOrders.rejected, (state, action) => {
@@ -98,7 +101,9 @@ const appStoreSlice = createSlice({
       fetchSpotOrders.fulfilled,
       (state, action: PayloadAction<ResType<SpotOrders>>) => {
         state.loading = false
-        state.spotOrders = action.payload.data
+        if (action.payload.code === SUCCESS) {
+          state.spotOrders = action.payload.data
+        }
       },
     )
     builder.addCase(fetchSpotOrders.rejected, (state, action) => {

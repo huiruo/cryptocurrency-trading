@@ -16,3 +16,6 @@
 
 ## 7. close stg
 2023.07.31
+
+## 8. improve query
+2023.08.1

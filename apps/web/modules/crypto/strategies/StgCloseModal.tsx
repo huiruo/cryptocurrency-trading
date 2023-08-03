@@ -13,7 +13,7 @@ interface Props {
   closeOrders: SpotOrder[]
 }
 
-export const StraCloseModal = NiceModal.create((props: Props) => {
+export const StgCloseModal = NiceModal.create((props: Props) => {
   const { closeOrders, title, modalCallBack } = props
   const { visible, hide, remove } = useModal()
   const [straOrders, setStgOrders] = useState<StgOrders>({
@@ -97,11 +97,9 @@ export const StraCloseModal = NiceModal.create((props: Props) => {
     })
 
     if (res.code === SUCCESS) {
-      console.log('hide==>1')
       message.success(res.msg)
       modalCallBack()
       setTimeout(() => {
-        console.log('hide==>')
         hide()
       }, 1000)
     } else {

@@ -106,7 +106,7 @@ export class UserController {
   async findOneUser(@Param('id') id: number): Promise<ResultWithData<User[]>> {
     console.log('userId==>findOneUser-->', id)
     const data = await this.userService.findUser(id)
-    return { code: 200, msg: '查询成功', data }
+    return { code: success, msg: '查询成功', data }
   }
 
   @Get('auth/verify')

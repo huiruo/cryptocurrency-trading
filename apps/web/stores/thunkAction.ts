@@ -1,7 +1,6 @@
 import { SUCCESS } from '@common/constants'
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import { strategyApi } from '@services/strategy'
-import { message } from 'antd'
 import { RootState } from './rootReducer'
 import { StgOrders } from '@services/strategy.type'
 import { ResType } from '@services/base'
@@ -44,8 +43,9 @@ export const fetchStgOrders = createAsyncThunk(
     if (res.code === SUCCESS) {
       return res
     } else {
-      message.error(res.msg || 'error')
-      throw new Error(res.msg || 'error')
+      // message.error(res.msg || 'error')
+      // throw new Error(res.msg || 'error')
+      return res
     }
   },
 )
@@ -67,8 +67,10 @@ export const fetchSpotOrders = createAsyncThunk(
     if (res.code === SUCCESS) {
       return res
     } else {
-      message.error(res.msg || 'error')
-      throw new Error(res.msg || 'error')
+      console.log('fetchSpotOrders error:', res)
+      // message.error(res.msg || 'error')
+      // throw new Error(res.msg || 'error')
+      return res
     }
   },
 )
