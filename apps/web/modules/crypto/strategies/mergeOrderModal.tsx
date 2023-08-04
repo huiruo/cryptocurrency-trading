@@ -10,11 +10,11 @@ import { strategyApi } from '@services/strategy'
 interface Props {
   modalCallBack(): void
   title: string
-  closeOrders: SpotOrder[]
+  mergeOrders: SpotOrder[]
 }
 
-export const StgCloseModal = NiceModal.create((props: Props) => {
-  const { closeOrders, title, modalCallBack } = props
+export const MergeOrderModal = NiceModal.create((props: Props) => {
+  const { mergeOrders, title, modalCallBack } = props
   const { visible, hide, remove } = useModal()
   const [straOrders, setStgOrders] = useState<StgOrders>({
     data: [],
@@ -69,8 +69,8 @@ export const StgCloseModal = NiceModal.create((props: Props) => {
     setSelectRowData(selectedRows)
   }
 
-  const onCloseStrategy = async () => {
-    console.log('onCloseStrategy:')
+  const onMergeOrder = async () => {
+    console.log('onMergeOrder-->:')
 
     if (!selectedRowKeys.length) {
       message.warning('Select empty')
@@ -91,8 +91,8 @@ export const StgCloseModal = NiceModal.create((props: Props) => {
       return
     }
 
-    const res = await strategyApi.closeStg({
-      spotOrders: closeOrders,
+    const res = await strategyApi.mergeOrder({
+      spotOrders: mergeOrders,
       stgOrder: selectRow,
     })
 
@@ -107,6 +107,8 @@ export const StgCloseModal = NiceModal.create((props: Props) => {
     }
   }
 
+  console.log('mergeOrders-render:', mergeOrders)
+
   return (
     <Modal
       title={title}
@@ -119,8 +121,8 @@ export const StgCloseModal = NiceModal.create((props: Props) => {
       width="80%"
     >
       <div className="modal-stg-table">
-        <Button onClick={onCloseStrategy} danger className="common-bottom-mg">
-          Close strategy
+        <Button onClick={onMergeOrder} danger className="common-bottom-mg">
+          Merge Order
         </Button>
         <ModalTable
           onChangeCallback={onChangeCallback}

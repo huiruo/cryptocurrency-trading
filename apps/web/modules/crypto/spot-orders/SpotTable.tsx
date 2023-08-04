@@ -15,6 +15,7 @@ import {
   SpotOrdersParams,
   fetchSpotOrders,
 } from '@stores/thunkAction'
+import { MergeOrderModal } from '../strategies/mergeOrderModal'
 
 export default function SpotTable() {
   const { total, data } = useAppSelector(spotOrdersState)
@@ -111,11 +112,11 @@ export default function SpotTable() {
       return Number(b.time) - Number(a.time)
     })
 
-    // NiceModal.show('mergeStrategyModal')
+    NiceModal.show('mergeOrderModal')
 
     /*
-    NiceModal.show(MergeStrategyModal, selectRowData).then((selectRowData) => {
-      // userModal.show(MergeStrategyModal,selectRowData).then((selectRowData) => {
+    NiceModal.show(mergeOrderModal, selectRowData).then((selectRowData) => {
+      // userModal.show(mergeOrderModal,selectRowData).then((selectRowData) => {
       // setUsers([newUser, ...users]);
     });
     */
@@ -371,19 +372,24 @@ export default function SpotTable() {
           onClick={() => onMergeStrategy()}
           className="merge-btn neutral-btn"
         >
-          Merge strategy
+          Merge Order
         </Button>
         <Button danger onClick={() => onCloseStrategy()}>
           Close strategy
         </Button>
       </div>
 
-      {/* <MergeStrategyModal id='mergeStrategyModal' mergeOrders={selectRowData} spotTableCallBack={() => spotTableCallBack()} />
-       */}
+      <MergeOrderModal
+        id="mergeOrderModal"
+        mergeOrders={selectRowData}
+        title="Close strategy"
+        modalCallBack={modalCallBack}
+      />
+
       <StgCloseModal
         id="closeStrategyModal"
         closeOrders={selectRowData}
-        title="Close strategy"
+        title="Merge order"
         modalCallBack={modalCallBack}
       />
 

@@ -15,6 +15,7 @@ interface ApiConfig {
   createSpotStg: string
   resetStg: string
   closeStg: string
+  mergeOrder: string
   syncStgPrice: string
 }
 
@@ -23,6 +24,7 @@ const apiConfig: ApiConfig = {
   createSpotStg: '/stg/createSpotStg',
   resetStg: '/stg/reset',
   closeStg: '/stg/close',
+  mergeOrder: '/stg/mergeOrder',
   syncStgPrice: '/stg/syncPrice',
 }
 
@@ -49,6 +51,12 @@ export const strategyApi: Api = {
     spotStgOperation: SpotStgOperation,
   ): Promise<ResType<null>> => {
     const url = `${apiPrefix}${apiConfig.closeStg}`
+    return await fetchWithAuth<null>(url, { body: spotStgOperation }, 'POST')
+  },
+  mergeOrder: async (
+    spotStgOperation: SpotStgOperation,
+  ): Promise<ResType<null>> => {
+    const url = `${apiPrefix}${apiConfig.mergeOrder}`
     return await fetchWithAuth<null>(url, { body: spotStgOperation }, 'POST')
   },
   syncStgPrice: async (

@@ -33,6 +33,13 @@ export class StrategyOrderController {
     return await this.strategyOrderService.closeStg(spotStgOperation)
   }
 
+  @Post('mergeOrder')
+  async mergeOrder(
+    @Body() spotStgOperation: SpotStgOperation,
+  ): Promise<Result> {
+    return await this.strategyOrderService.mergeOrder(spotStgOperation)
+  }
+
   @Post('syncPrice')
   async syncStgPrice(@Body() stgOrders: SyncStgPriceType[]): Promise<Result> {
     return await this.strategyOrderService.syncStgPrice(stgOrders)

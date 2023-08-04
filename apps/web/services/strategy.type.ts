@@ -8,6 +8,7 @@ export interface Api {
   createSpotStg: (spotOrders: SpotOrder[]) => Promise<ResType<null>>
   resetStg: (resetStg: ResetStg) => Promise<ResType<null>>
   closeStg: (spotStgOperation: SpotStgOperation) => Promise<ResType<null>>
+  mergeOrder: (spotStgOperation: SpotStgOperation) => Promise<ResType<null>>
   syncStgPrice: (syncStgPriceType: SyncStgPriceType[]) => Promise<ResType<null>>
 }
 

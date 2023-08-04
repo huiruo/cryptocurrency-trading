@@ -6,6 +6,7 @@ import {
   SpotStgOperation,
   CalculateCloseStrategyOrderType,
   SyncStgPriceType,
+  CalculateStrategiesOrderType,
 } from './strategy.order.type'
 import { PaginationResType, Result, ResultWithData } from 'src/types'
 import { StrategyOrder } from '../entity/strategy-order.entity'
@@ -77,7 +78,7 @@ export class StrategyOrderService {
         pageSql = `select count(1) as total from strategy_order where symbol ="${symbol}"`
       }
     } else {
-      if (is_running !== 3) {
+      if (is_running !== 2) {
         sql = `select * from strategy_order where is_running ="${is_running}" order by createdAt desc limit ${
           (currentPage - 1) * pageSize
         },${pageSize}`
@@ -130,11 +131,97 @@ export class StrategyOrderService {
     }
   }
 
+  async mergeOrder(spotStgOperation: SpotStgOperation): Promise<Result> {
+    try {
+      const { spotOrders, stgOrder } = spotStgOperation
+      const { userId, strategyId, symbol, time, side } = stgOrder
+      /*
+      const spotPrice = await this.getSpotPrice(symbol);
+      const price = get(spotPrice, `${symbol}`, '');
+      if (!price) {
+        return { code: 500, message: 'error', data: null };
+      }
+      */
+
+      const {
+        qty,
+        quoteQty,
+        entryPrice,
+        isTheSameSymbol,
+        free = 0,
+      } = await this.calculateSpotOrderMergeStrategy(spotOrders, stgOrder)
+      if (!isTheSameSymbol) {
+        return {
+          code: 500,
+          msg: 'The selected order not the same Symbol',
+        }
+      }
+
+      const strategiesOrder = {
+        symbol,
+        price: '',
+        side,
+        orderType: 1,
+        leverage: 1,
+
+        entryPrice,
+        sellingPrice: '',
+        sellingTime: null,
+
+        qty,
+        quoteQty,
+        sellingQty: '',
+        sellingQuoteQty: '',
+
+        profit: 0,
+        profitRate: '',
+        realizedProfit: 0,
+        realizedProfitRate: '',
+        free,
+
+        stopType: 0,
+        stopProfit: '',
+        stopLoss: '',
+        stopProfitPrice: '',
+        stopLossPrice: '',
+
+        note: '',
+        klineShots: '',
+
+        is_running: true,
+        time,
+        updatedAt: new Date().getTime(),
+        userId,
+        strategyId,
+      }
+
+      const updateStgOrderRes = await this.updateStgOrderUtil(strategiesOrder)
+      if (updateStgOrderRes.code !== success) {
+        return updateStgOrderRes
+      }
+
+      const running = 1
+      spotOrders.forEach((item) => {
+        const { id: idUpdate } = item
+        this.updateOrderStatus('spot', idUpdate, strategyId, running)
+      })
+
+      return {
+        code: success,
+        msg: 'ok',
+      }
+    } catch (error) {
+      console.log('close error', error)
+      return {
+        code: fail,
+        msg: error.toString(),
+      }
+    }
+  }
+
   async closeStg(spotStgOperation: SpotStgOperation): Promise<Result> {
     try {
-      console.log('SpotStgOperation', spotStgOperation)
       const { spotOrders, stgOrder } = spotStgOperation
-
       const ordersLength = spotOrders.length
       const lastOrder = get(
         spotOrders,
@@ -436,11 +523,9 @@ export class StrategyOrderService {
 
     spotOrders.forEach((item) => {
       const { qty, quoteQty, symbol, isBuyer } = item
-      // /*
       if (targetSymbol !== symbol) {
         isTheSameSymbol = false
       }
-      // */
 
       if (side === isBuyer) {
         isTheSameSide = true
@@ -628,6 +713,66 @@ export class StrategyOrderService {
         code: fail,
         msg: error.sqlMessage || 'sync strategy price failed',
       }
+    }
+  }
+
+  private async calculateSpotOrderMergeStrategy(
+    spotOrders: SpotOrder[],
+    strategyOrder: StrategyOrder,
+  ): Promise<CalculateStrategiesOrderType> {
+    const { symbol, qty, quoteQty, userId, free: realizedFree } = strategyOrder
+    let qtyTotal = 0
+    let free = 0
+    let quoteQtyTotal = 0
+    let isTheSameSymbol = true
+    const targetSymbol = symbol
+
+    const spotFree = await this.getUserSpotFree(userId)
+
+    spotOrders.forEach((item) => {
+      const { qty: qtyItem, quoteQty: quoteQtyItem, symbol, isBuyer } = item
+      const qtyItemInt = Number(qtyItem)
+      const quoteQtyItemInt = Number(quoteQtyItem)
+      if (targetSymbol !== symbol) {
+        isTheSameSymbol = false
+      }
+
+      free = quoteQtyItemInt * Number(spotFree) + free
+
+      if (isBuyer) {
+        qtyTotal = qtyItemInt + qtyTotal
+        quoteQtyTotal = quoteQtyItemInt + quoteQtyTotal
+      } else {
+        qtyTotal = qtyTotal - qtyItemInt
+        quoteQtyTotal = quoteQtyTotal - quoteQtyItemInt
+      }
+    })
+
+    const finalqty = Number(qty) + qtyTotal
+    const finalQuoteQty = Number(quoteQty) + quoteQtyTotal
+    const finalFree = realizedFree + free
+    const entryPrice = (finalQuoteQty / finalqty).toFixed(8)
+
+    return {
+      qty: finalqty.toString(),
+      quoteQty: finalQuoteQty.toString(),
+      entryPrice,
+      isTheSameSymbol,
+      free: finalFree,
+    }
+  }
+
+  private async updateStgOrderUtil(
+    strategiesOrder: StrategyOrder,
+  ): Promise<Result> {
+    try {
+      const { strategyId, qty, quoteQty, entryPrice, updatedAt, free } =
+        strategiesOrder
+      const sql = `update strategy_order set qty = "${qty}",free="${free}",quoteQty = "${quoteQty}",entryPrice="${entryPrice}",updatedAt="${updatedAt}" WHERE strategyId = "${strategyId}"`
+      await this.strategyOrderRepo.query(sql)
+      return { code: success, msg: 'update strategy order succeeded' }
+    } catch (error) {
+      return { code: fail, msg: 'update strategy order  error' }
     }
   }
 }
