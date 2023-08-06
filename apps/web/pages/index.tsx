@@ -38,7 +38,7 @@ export const getServerSideProps: GetServerSideProps = withIronSessionSsr(
         console.log('The home page verified==》1:', { result, payload })
         return {
           redirect: {
-            destination: '/containers',
+            destination: '/crypto/strategies',
             permanent: false,
           },
         }

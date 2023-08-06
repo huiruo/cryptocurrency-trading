@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, Modal, message } from 'antd'
 import NiceModal, { useModal } from '@common/nice-modal'
 import { SpotOrder } from '@services/spot.type'
@@ -106,6 +106,10 @@ export const StgCloseModal = NiceModal.create((props: Props) => {
       message.error(res.msg)
     }
   }
+
+  useEffect(() => {
+    console.log('strategies-5')
+  }, [])
 
   return (
     <Modal

@@ -107,8 +107,6 @@ export const MergeOrderModal = NiceModal.create((props: Props) => {
     }
   }
 
-  console.log('mergeOrders-render:', mergeOrders)
-
   return (
     <Modal
       title={title}

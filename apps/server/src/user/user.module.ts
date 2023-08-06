@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt'
 import { AuthService } from './auth.service'
 import { env } from 'src/common/env-unit'
 import { jwtConstants } from 'src/common/auth-config'
+import { ConfigModule } from '@nestjs/config'
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { jwtConstants } from 'src/common/auth-config'
       secret: env('jwt_secret'),
       signOptions: { expiresIn: jwtConstants.expiresIn },
     }),
+    ConfigModule,
   ],
   controllers: [UserController],
   providers: [UserService, AuthService],

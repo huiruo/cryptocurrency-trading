@@ -1,3 +1,4 @@
+import { getParameterByName } from '@common/utils'
 import { deleteCookie, getCookie, setCookie } from 'cookies-next'
 
 export interface ResType<T> {
@@ -28,7 +29,14 @@ export const fetchWithAuth = async <T>(
   options: FetchOptions<T> = {},
   method = 'POST',
 ): Promise<ResType<T>> => {
-  const token = getCookie('token')
+  let token = getCookie('token')
+  if (!token) {
+    console.log('test-1:', token)
+    token = getParameterByName('codeToken', window.location.href)
+    if (token) setCookie('token', token)
+  }
+  console.log('test-2:', token)
+
   try {
     const response = await fetch(url, {
       ...options,
@@ -57,15 +65,11 @@ export const fetchWithAuth = async <T>(
     }
 
     const newToken = response.headers.get('Authorization')
-    console.log('token=services/base.ts-1', newToken)
     if (newToken && newToken !== token) {
-      console.log('token=services/base.ts-2')
       setCookie('token', newToken)
     }
-    const res1 = await response.json()
-    console.log('base-res-->', res1)
 
-    return res1
+    return await response.json()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.log('fetchWithAuth error', error)

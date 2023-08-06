@@ -16,12 +16,7 @@ import { UserService } from './user.service'
 import { Request, Response } from 'express'
 import { GoogleAuthType, ResultWithData } from '../types'
 import axios from 'axios'
-import {
-  googleApiBaseUrl,
-  googleOauth,
-  googleRedirectUriDev2,
-  webRedirect,
-} from 'src/common/auth-config'
+import { googleApiBaseUrl, googleRedirectUriDev2 } from 'src/common/auth-config'
 import { AuthService } from './auth.service'
 import { AuthGuard } from './auth.guard'
 import { Public } from 'src/common/decorators/public.decorator'
@@ -54,41 +49,40 @@ export class UserController {
     @Req() req: Request,
     @Res() res: Response,
   ): Promise<void> {
-    // 向Google服务器发出POST请求以获取访问令牌
+    const { client_id, client_secret } =
+      this.authService.getGoogleOauth_clientID()
+    if (!client_id || !client_secret) {
+      res.status(500).json({ message: 'googleOauth error' })
+      return
+    }
+    // Send a POST request to the Google server to get an access token
     const response = await axios.post(`${googleApiBaseUrl}/oauth2/v4/token`, {
       code,
-      client_id: googleOauth.clientID,
-      client_secret: googleOauth.clientSecret,
+      client_id,
+      client_secret,
       redirect_uri: googleRedirectUriDev2,
       grant_type: 'authorization_code',
     })
 
     const accessToken = response.data.access_token
 
-    // 使用访问令牌向Google API发出请求以获取用户信息
-    const userInfoResponse = await axios.get(
+    // Use access tokens to make requests to the Google API to get user information
+    const { data: userInfo } = await axios.get(
       `${googleApiBaseUrl}/oauth2/v1/userinfo?access_token=${accessToken}`,
     )
-
-    // 解析响应以获取用户信息
-    const userInfo = userInfoResponse.data as GoogleAuthType
-    console.log('解析响应获取的用户信息:', userInfo)
-
     /*
-      在这里处理用户信息，检查用户是否已经注册过，如果没有，则将其保存到数据库
-      例如将其存储在数据库中并创建JWT令牌以进行身份验证
-      执行登录逻辑，并将用户数据保存在会话或数据库中，以便将来的请求可以使用它
+      User information is processed here, checking if the user is already registered and if not, storing it in the database
+      e.g. store it in the database and create a JWT token for authentication purposes
+      Perform login logic and save user data in session or database so that future requests can use it
     */
     const result = await this.userService.handlerGoogleAuth(userInfo)
-    console.log('拿到 google 账户信息,处理好注册和登录返回:', result)
     if (result.code === fail) {
       res.status(500).json({ message: result.msg })
       return
     }
 
-    const { email, given_name, id, picture } = userInfo
+    const { email, given_name, id, picture } = userInfo as GoogleAuthType
     const token = await this.authService.signInWithGoogle(given_name, email, id)
-    console.log('登录成功:', `${webRedirect}?token=${token}`)
 
     res.setHeader(
       'Set-Cookie',
@@ -116,7 +110,6 @@ export class UserController {
     @Res() res: Response,
   ): Promise<void> {
     const authorization = req.headers['authorization']
-    console.log('======>verifyAuth')
     try {
       let authToken = ''
       if (authorization) {
@@ -126,7 +119,6 @@ export class UserController {
       }
 
       const userRes = await this.authService.getUserFromToken(authToken)
-      console.log('======>verifyAuth 2:', userRes)
       // TODO: 不用查询
       /*
       const users = await this.userService.findOneByEmail(userRes.data.email)

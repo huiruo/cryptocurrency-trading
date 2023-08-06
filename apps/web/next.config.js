@@ -7,8 +7,8 @@ const path = require('path')
  * home
  * http://172.20.10.2
  */
-const BASE_URL = 'http://172.16.39.156:3888'
-// const BASE_URL = 'http://172.20.10.2:3888'
+// const BASE_URL = 'http://172.16.39.156:3888'
+const BASE_URL = 'http://172.20.10.2:3888'
 
 module.exports = {
   sassOptions: {

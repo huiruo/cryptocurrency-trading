@@ -1,14 +1,10 @@
 import { useState, useEffect } from 'react'
 import { codePlatformApi } from '@services/code.platform'
 import { message } from 'antd'
-import { getCookie, setCookie } from 'cookies-next'
-import { useRouter } from 'next/router'
 
 const useListContainers = () => {
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState(null)
-  const router = useRouter()
-  const { codeToken: loginToken } = router.query
 
   const listContainers = async (isRunning = false) => {
     const params = { isRunning }
@@ -30,15 +26,6 @@ const useListContainers = () => {
   }
 
   useEffect(() => {
-    const cookieToken = getCookie('token')
-    if (!loginToken && !cookieToken) {
-      return
-    }
-
-    if (loginToken && loginToken !== cookieToken) {
-      setCookie('token', loginToken)
-    }
-
     setLoading(true)
     listContainers()
   }, [])

@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from 'react'
+import React, { ReactNode } from 'react'
 import { Button, message } from 'antd'
 import { Table as AntTable } from 'antd'
 import { codePlatformApi } from '@services/code.platform'
@@ -146,10 +146,6 @@ export function Containers() {
       },
     },
   ]
-
-  useEffect(() => {
-    console.log('containers-component-useEffect')
-  }, [])
 
   if (loading) return null
 

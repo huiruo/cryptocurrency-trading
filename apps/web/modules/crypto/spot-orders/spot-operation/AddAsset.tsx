@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { Modal, Button, Form, Input, FormInstance, message } from 'antd'
 import { AssetType } from '@services/spot.type'
 import { spotApi } from '@services/spot'
@@ -30,6 +30,10 @@ export default function AddAsset(props: Props) {
     addAssetCallBack(false)
     formRef.current?.resetFields()
   }
+
+  useEffect(() => {
+    console.log('SpotTable.tsx-2')
+  }, [])
 
   return (
     <Modal

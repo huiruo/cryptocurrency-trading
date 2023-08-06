@@ -4,8 +4,8 @@
  * home
  * http://172.20.10.2
  */
-export const BASE_URL = 'http://172.16.39.156:3888'
-// export const BASE_URL = 'http://172.20.10.2:3888'
+// export const BASE_URL = 'http://172.16.39.156:3888'
+export const BASE_URL = 'http://172.20.10.2:3888'
 
 export const apiPrefix = '/code-platform'
 
@@ -15,7 +15,7 @@ export const FAIL = 0
 
 export const THIRD_PARTY_LOGIN_TAG = 't'
 
-export const webRedirect = 'http://localhost:3800/containers'
+export const webRedirect = 'http://localhost:3800/crypto/strategies'
 
 export const loginRedirect = 'http://localhost:3800'
 

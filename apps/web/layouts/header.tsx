@@ -3,6 +3,33 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
 
+const routers = [
+  {
+    patch: '/editor',
+    name: 'Home',
+  },
+  {
+    patch: '/crypto/strategies',
+    name: 'strategies',
+  },
+  {
+    patch: '/crypto/spot-orders',
+    name: 'spot',
+  },
+  {
+    patch: '/crypto/balances',
+    name: 'balances',
+  },
+  {
+    patch: '/containers',
+    name: 'Containers',
+  },
+  {
+    patch: '/images',
+    name: 'Images',
+  },
+]
+
 export function Header() {
   const { pathname } = useRouter()
   console.log('Header pathname', pathname)
@@ -13,59 +40,18 @@ export function Header() {
     <header>
       <nav className="header-container nav-div-shadow">
         <ul className="left-ul">
-          <li className="li">
-            <Link
-              href="/editor"
-              className={pathname === '/editor' ? 'nav-active' : ''}
-            >
-              Home
-            </Link>
-          </li>
-
-          <li className="li">
-            <Link
-              href="/containers"
-              className={pathname === '/containers' ? 'nav-active' : ''}
-            >
-              Containers
-            </Link>
-          </li>
-
-          <li className="li">
-            <Link
-              href="/images"
-              className={pathname === '/images' ? 'nav-active' : ''}
-            >
-              Images
-            </Link>
-          </li>
-
-          <li className="li">
-            <Link
-              href="/crypto/strategies"
-              className={pathname === '/crypto/strategies' ? 'nav-active' : ''}
-            >
-              strategies
-            </Link>
-          </li>
-
-          <li className="li">
-            <Link
-              href="/crypto/spot-orders"
-              className={pathname === '/crypto/spot-orders' ? 'nav-active' : ''}
-            >
-              spot
-            </Link>
-          </li>
-
-          <li className="li">
-            <Link
-              href="/crypto/balances"
-              className={pathname === '/crypto/balances' ? 'nav-active' : ''}
-            >
-              balances
-            </Link>
-          </li>
+          {routers.map((item) => {
+            return (
+              <li key={item.patch} className="li">
+                <Link
+                  href={item.patch}
+                  className={pathname === item.patch ? 'nav-active' : ''}
+                >
+                  {item.name}
+                </Link>
+              </li>
+            )
+          })}
         </ul>
 
         <ul className="right-ul">
