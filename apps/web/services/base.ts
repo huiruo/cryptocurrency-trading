@@ -35,7 +35,6 @@ export const fetchWithAuth = async <T>(
     token = getParameterByName('codeToken', window.location.href)
     if (token) setCookie('token', token)
   }
-  console.log('test-2:', token)
 
   try {
     const response = await fetch(url, {

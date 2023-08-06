@@ -32,7 +32,6 @@ const routers = [
 
 export function Header() {
   const { pathname } = useRouter()
-  console.log('Header pathname', pathname)
   const [user] = useState({ isLoggedIn: false, avatarUrl: '' })
   const router = useRouter()
 
