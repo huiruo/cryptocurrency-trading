@@ -19,6 +19,7 @@ import { Exchange } from './exchange'
 import { ResultWithData } from 'src/types'
 import { success } from 'src/common/constant'
 import { SyncSpotOrderParams } from '../spot/spot.type'
+import { SyncFutureOrderParams } from '../future/future.type'
 
 @Injectable()
 export class BinanceService {
@@ -293,5 +294,29 @@ export class BinanceService {
       }
     }
     return await this.client.myTrades(options)
+  }
+
+  async getFutureTrades(
+    futureOrderParams: SyncFutureOrderParams,
+  ): Promise<QueryFuturesOrderResult> {
+    const { symbol, startTime, endTime } = futureOrderParams
+    let options = {} as SyncFutureOrderParams
+    if (startTime && endTime) {
+      options = {
+        symbol,
+        recvWindow: 59999,
+        startTime,
+        endTime,
+      }
+    } else {
+      options = {
+        symbol,
+        recvWindow: 59999,
+        startTime: null,
+        endTime: null,
+      }
+    }
+
+    return await this.client.futuresAllOrders(options)
   }
 }

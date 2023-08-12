@@ -10,15 +10,19 @@ const routers = [
   },
   {
     patch: '/crypto/strategies',
-    name: 'strategies',
+    name: 'Strategies',
   },
   {
     patch: '/crypto/spot-orders',
-    name: 'spot',
+    name: 'Spot',
+  },
+  {
+    patch: '/crypto/future-orders',
+    name: 'Future',
   },
   {
     patch: '/crypto/balances',
-    name: 'balances',
+    name: 'Balances',
   },
   {
     patch: '/containers',

@@ -1,14 +1,13 @@
 import React, { useState } from 'react'
 import dayjs, { Dayjs } from 'dayjs'
 import { Button, DatePicker, Select, message } from 'antd'
-import AddAsset from './AddAsset'
 import useFetchAssets from './useFetchAssets'
-import { spotApi } from '@services/spot'
 import { SUCCESS } from '@common/constants'
 import store from '@stores/index'
 import { appStoreActions, spotFilterState } from '@stores/appSlice'
 import { fetchSpotOrders } from '@stores/thunkAction'
 import { useAppSelector } from '@stores/hooks'
+import { futureApi } from '@services/future'
 
 // in milliseconds
 const startTimeDefault = dayjs().startOf('day')
@@ -18,7 +17,6 @@ const dateFormat = 'YYYY-MM-DD HH:mm:ss'
 const { RangePicker } = DatePicker
 
 export default function SpotOperation() {
-  const [isModalOpen, setIsModalOpen] = useState(false)
   const { symbol } = useAppSelector(spotFilterState)
   const [syncAssetValue, setSyncAssetValue] = useState<string>('ARUSDT')
   const [assets] = useFetchAssets()
@@ -28,9 +26,9 @@ export default function SpotOperation() {
     endTimeDefault,
   ])
 
-  const syncSpotOrder = async () => {
+  const syncFutureOrder = async () => {
     const [startOfSelectedDay, endOfSelectedDay] = selectedDates
-    console.log('syncSpotOrder:', startOfSelectedDay, endOfSelectedDay)
+    console.log('syncFutureOrder:', startOfSelectedDay, endOfSelectedDay)
     const params = {
       symbol: syncAssetValue,
       startTime: startOfSelectedDay.valueOf(),
@@ -44,12 +42,14 @@ export default function SpotOperation() {
       endTime: 1678031999999,
     }
     */
-    // const params = {
-    //   endTime: 1677513599999,
-    //   startTime: 1677427200000,
-    //   symbol: syncAssetValue,
-    // }
-    const res = await spotApi.syncSpotOrder(params)
+    /*
+    const params = {
+      endTime: 1677513599999,
+      startTime: 1677427200000,
+      symbol: syncAssetValue,
+    }
+    */
+    const res = await futureApi.syncFutureOrder(params)
     if (res.code === SUCCESS) {
       message.success(res.msg)
       store.dispatch(appStoreActions.setSpotFilter({ symbol: syncAssetValue }))
@@ -57,14 +57,6 @@ export default function SpotOperation() {
     } else {
       message.error(res.msg || 'error')
     }
-  }
-
-  const onAddAsset = () => {
-    setIsModalOpen(true)
-  }
-
-  const addAssetCallBack = (isModalOpen: boolean) => {
-    setIsModalOpen(isModalOpen)
   }
 
   const onChangeAsset = (value: string, type: number) => {
@@ -117,12 +109,10 @@ export default function SpotOperation() {
             className="common-x-mg"
           />
 
-          <Button onClick={() => syncSpotOrder()} className="bright-btn">
-            Sync spot orders
+          <Button onClick={() => syncFutureOrder()} className="bright-btn">
+            Sync future orders
           </Button>
         </div>
-
-        <Button onClick={onAddAsset}>Add symbol</Button>
       </div>
 
       <div className="common-bottom-mg">
@@ -148,8 +138,6 @@ export default function SpotOperation() {
           Search
         </Button>
       </div>
-
-      <AddAsset isModalOpen={isModalOpen} addAssetCallBack={addAssetCallBack} />
     </div>
   )
 }

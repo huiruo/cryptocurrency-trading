@@ -5,6 +5,7 @@ import { RootState } from './rootReducer'
 import { StgOrders } from '@services/strategy.type'
 import { ResType } from '@services/base'
 import { spotApi } from '@services/spot'
+import { futureApi } from '@services/future'
 
 export type FetchStgOrdersAction = {
   payload: ResType<StgOrders>
@@ -16,12 +17,22 @@ export type FetchSpotOrdersAction = {
   type: string
 }
 
+export type FetchFutureOrdersAction = {
+  payload: ResType<StgOrders>
+  type: string
+}
+
 export type StgOrdersParams = {
   current?: number
   page?: number
 }
 
 export type SpotOrdersParams = {
+  current?: number
+  page?: number
+}
+
+export type FutureOrdersParams = {
   current?: number
   page?: number
 }
@@ -62,6 +73,31 @@ export const fetchSpotOrders = createAsyncThunk(
     const res = await spotApi.getSpotOrders({
       currentPage: spotOrdersParams.current || currentPage,
       pageSize: spotOrdersParams.page || pageSize,
+      symbol,
+    })
+    if (res.code === SUCCESS) {
+      return res
+    } else {
+      console.log('fetchSpotOrders error:', res)
+      // message.error(res.msg || 'error')
+      // throw new Error(res.msg || 'error')
+      return res
+    }
+  },
+)
+
+export const fetchFutureOrders = createAsyncThunk(
+  'fetchFutureOrders',
+  async (options: FutureOrdersParams, thunkAPI) => {
+    const state: RootState = thunkAPI.getState() as RootState
+    const {
+      spotFilter: { symbol },
+      spotOrders: { currentPage, pageSize },
+    } = state.appStore
+
+    const res = await futureApi.getFutureOrders({
+      currentPage: options.current || currentPage,
+      pageSize: options.page || pageSize,
       symbol,
     })
     if (res.code === SUCCESS) {

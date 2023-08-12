@@ -2,9 +2,14 @@ import { configureStore, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from './index'
 import { SpotOrders } from '@services/spot.type'
 import { StgOrders } from '@services/strategy.type'
-import { fetchSpotOrders, fetchStgOrders } from './thunkAction'
+import {
+  fetchFutureOrders,
+  fetchSpotOrders,
+  fetchStgOrders,
+} from './thunkAction'
 import { ResType } from '@services/base'
 import { SUCCESS } from '@common/constants'
+import { FutureOrders } from '@services/future.type'
 
 interface StgFilter {
   status: number
@@ -20,6 +25,7 @@ export interface AppState {
   loading: boolean
   error: string | null
   spotOrders: SpotOrders
+  futureOrders: FutureOrders
   stgOrders: StgOrders
   stgFilter: StgFilter
   spotFilter: SpotFilter
@@ -30,6 +36,12 @@ const initialState: AppState = {
   loading: false,
   error: null,
   spotOrders: {
+    data: [],
+    total: 0,
+    currentPage: 1,
+    pageSize: 10,
+  },
+  futureOrders: {
     data: [],
     total: 0,
     currentPage: 1,
@@ -111,6 +123,25 @@ const appStoreSlice = createSlice({
       state.error = action.error.message || 'error'
     })
     // spot end
+    // future
+    builder.addCase(fetchFutureOrders.pending, (state) => {
+      state.loading = true
+      state.error = null
+    })
+    builder.addCase(
+      fetchFutureOrders.fulfilled,
+      (state, action: PayloadAction<ResType<FutureOrders>>) => {
+        state.loading = false
+        if (action.payload.code === SUCCESS) {
+          state.futureOrders = action.payload.data
+        }
+      },
+    )
+    builder.addCase(fetchFutureOrders.rejected, (state, action) => {
+      state.loading = false
+      state.error = action.error.message || 'error'
+    })
+    // future end
   },
 })
 
@@ -122,6 +153,8 @@ export const appStoreActions = appStoreSlice.actions
 
 export const countState = (state: RootState) => state.appStore.count
 export const spotOrdersState = (state: RootState) => state.appStore.spotOrders
+export const futureOrdersState = (state: RootState) =>
+  state.appStore.futureOrders
 export const stgOrdersState = (state: RootState) => state.appStore.stgOrders
 export const stgFilterState = (state: RootState) => state.appStore.stgFilter
 export const spotFilterState = (state: RootState) => state.appStore.spotFilter
