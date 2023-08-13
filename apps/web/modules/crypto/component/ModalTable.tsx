@@ -23,8 +23,7 @@ export function ModalTable(props: Props) {
     modalCallback,
   } = props
   const { data, total } = straOrders
-  // eslint-disable-next-line no-unused-vars
-  const [pageSize, setPageSize] = useState<number>(10)
+  const [, setPageSize] = useState<number>(10)
   const [currentPage, setCurrentPage] = useState<number>(1)
 
   const columns = [

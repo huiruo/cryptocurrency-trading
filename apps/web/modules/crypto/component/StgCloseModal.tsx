@@ -2,19 +2,26 @@ import React, { useState } from 'react'
 import { Button, Modal, message } from 'antd'
 import NiceModal, { useModal } from '@common/nice-modal'
 import { SpotOrder } from '@services/spot.type'
-import { StgOrder, StgOrders, StgOrdersParams } from '@services/strategy.type'
-import { ModalTable } from './ModalTable'
+import {
+  OrderType,
+  StgOrder,
+  StgOrders,
+  StgOrdersParams,
+} from '@services/strategy.type'
 import { SUCCESS, defaultRunning } from '@common/constants'
 import { strategyApi } from '@services/strategy'
+import { ModalTable } from '@modules/crypto/component/ModalTable'
+import { FutureOrder } from '@services/future.type'
 
 interface Props {
   modalCallBack(): void
   title: string
-  closeOrders: SpotOrder[]
+  orderType: OrderType
+  closeOrders: SpotOrder[] | FutureOrder[]
 }
 
 export const StgCloseModal = NiceModal.create((props: Props) => {
-  const { closeOrders, title, modalCallBack } = props
+  const { closeOrders, title, orderType, modalCallBack } = props
   const { visible, hide, remove } = useModal()
   const [straOrders, setStgOrders] = useState<StgOrders>({
     data: [],
@@ -92,8 +99,9 @@ export const StgCloseModal = NiceModal.create((props: Props) => {
     }
 
     const res = await strategyApi.closeStg({
-      spotOrders: closeOrders,
+      orders: closeOrders,
       stgOrder: selectRow,
+      orderType,
     })
 
     if (res.code === SUCCESS) {

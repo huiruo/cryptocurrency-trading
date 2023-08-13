@@ -40,15 +40,16 @@ const initialState: AppState = {
     pageSize: 10,
   },
   stgFilter: {
-    status: 1,
+    status: 2,
     asset: '',
   },
   futureFilter: {
-    symbol: 'CHZUSDT',
+    // CHZUSDT
+    symbol: '',
   },
   spotFilter: {
     // test MKRUSDT ARUSDT
-    symbol: 'MKRUSDT',
+    symbol: '',
   },
   stgOrders: {
     data: [],

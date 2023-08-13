@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { Button, Select } from 'antd'
-import { SelectStatusType } from '@services/strategy.type'
+import { SelectStatusType, StgStatus } from '@services/strategy.type'
 import useFetchAssets from '../spot-orders/spot-operation/useFetchAssets'
 import store from '@stores/index'
 import { appStoreActions, stgFilterState } from '@stores/appSlice'
@@ -29,7 +29,7 @@ export function StrategieyFilter() {
   const onChangeStatus = (value: number) => {
     store.dispatch(
       appStoreActions.setStgFilter({
-        status: value,
+        status: value as StgStatus,
         asset,
       }),
     )

@@ -8,14 +8,14 @@ import { isEmpty } from 'lodash'
 import store from '@stores/index'
 import { strategyApi } from '@services/strategy'
 import NiceModal from '@common/nice-modal'
-import { StgCloseModal } from '../strategies/StgCloseModal'
 import { fetchFutureOrders } from '@stores/thunkAction'
-import { MergeOrderModal } from '../strategies/mergeOrderModal'
 import {
   FetchFutureOrdersAction,
   FutureOrder,
   FutureOrdersParams,
 } from '@services/future.type'
+import { MergeOrderModal } from '../component/MergeOrderModal'
+import { StgCloseModal } from '../component/StgCloseModal'
 
 export function FutureTable() {
   const { total, data } = useAppSelector(futureOrdersState)
@@ -46,7 +46,7 @@ export function FutureTable() {
   }
 
   const createStrategyUtil = async (order: FutureOrder[]) => {
-    const res = await strategyApi.createSpotStg(order)
+    const res = await strategyApi.createFutureStg(order)
     if (res.code === SUCCESS) {
       getFutureOrdersUtil({})
       setSelectRowData([])
@@ -85,7 +85,7 @@ export function FutureTable() {
 
     const res = await strategyApi.resetStg({
       strategyId,
-      orderType: 'spot',
+      orderType: 'future',
     })
     if (res.code === SUCCESS) {
       getFutureOrdersUtil({})
@@ -178,7 +178,16 @@ export function FutureTable() {
       key: 'isBuyer',
       width: 100,
       render(item: FutureOrder) {
-        return <div>{item.side}</div>
+        // return <div>{item.side}</div>
+        return (
+          <div>
+            {item.side === 'SELL' ? (
+              <span className="warm-c">SELL</span>
+            ) : (
+              <span className="primary-c">BUY</span>
+            )}
+          </div>
+        )
       },
     },
     /*
@@ -379,6 +388,7 @@ export function FutureTable() {
         id="mergeOrderModal"
         mergeOrders={selectRowData}
         title="Close strategy"
+        orderType="future"
         modalCallBack={modalCallBack}
       />
 
@@ -386,6 +396,7 @@ export function FutureTable() {
         id="closeStrategyModal"
         closeOrders={selectRowData}
         title="Merge order"
+        orderType="future"
         modalCallBack={modalCallBack}
       />
 

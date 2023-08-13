@@ -1,16 +1,6 @@
 import { PaginationType, ResType } from './base'
+import { FutureOrder } from './future.type'
 import { SpotOrder } from './spot.type'
-
-export interface Api {
-  getStgOrders: (
-    StgOrdersParams: StgOrdersParams,
-  ) => Promise<ResType<StgOrders>>
-  createSpotStg: (spotOrders: SpotOrder[]) => Promise<ResType<null>>
-  resetStg: (resetStg: ResetStg) => Promise<ResType<null>>
-  closeStg: (spotStgOperation: SpotStgOperation) => Promise<ResType<null>>
-  mergeOrder: (spotStgOperation: SpotStgOperation) => Promise<ResType<null>>
-  syncStgPrice: (syncStgPriceType: SyncStgPriceType[]) => Promise<ResType<null>>
-}
 
 export interface SelectStatusType {
   label: string
@@ -79,9 +69,10 @@ export interface ResetStg {
   orderType: OrderType
 }
 
-export interface SpotStgOperation {
-  spotOrders: SpotOrder[]
+export interface StgOperation {
+  orders: SpotOrder[] | FutureOrder[]
   stgOrder: StgOrder
+  orderType: OrderType
 }
 
 export type FetchStgOrdersParams = {
@@ -94,7 +85,9 @@ export type FetchStgOrdersAction = {
   type: string
 }
 
+export type StgStatus = 2 | 1 | 0
+
 export interface StgFilter {
-  status: number
+  status: StgStatus
   asset: string
 }

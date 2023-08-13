@@ -13,9 +13,9 @@ import { isEmpty } from 'lodash'
 import store from '@stores/index'
 import { strategyApi } from '@services/strategy'
 import NiceModal from '@common/nice-modal'
-import { StgCloseModal } from '../strategies/StgCloseModal'
 import { fetchSpotOrders } from '@stores/thunkAction'
-import { MergeOrderModal } from '../strategies/mergeOrderModal'
+import { MergeOrderModal } from '../component/MergeOrderModal'
+import { StgCloseModal } from '../component/StgCloseModal'
 
 export default function SpotTable() {
   const { total, data } = useAppSelector(spotOrdersState)
@@ -176,7 +176,15 @@ export default function SpotTable() {
       key: 'isBuyer',
       width: 100,
       render(item: SpotOrder) {
-        return <div>{item.isBuyer ? <span>BUY</span> : <span>SELL</span>}</div>
+        return (
+          <div>
+            {item.isBuyer ? (
+              <span className="primary-c">BUY</span>
+            ) : (
+              <span className="warm-c">SELL</span>
+            )}
+          </div>
+        )
       },
     },
     /*
@@ -383,6 +391,7 @@ export default function SpotTable() {
         id="mergeOrderModal"
         mergeOrders={selectRowData}
         title="Close strategy"
+        orderType="spot"
         modalCallBack={modalCallBack}
       />
 
@@ -390,6 +399,7 @@ export default function SpotTable() {
         id="closeStrategyModal"
         closeOrders={selectRowData}
         title="Merge order"
+        orderType="spot"
         modalCallBack={modalCallBack}
       />
 

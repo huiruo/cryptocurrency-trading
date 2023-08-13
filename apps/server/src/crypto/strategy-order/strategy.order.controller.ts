@@ -4,10 +4,11 @@ import { StrategyOrderService } from './strategy.order.service'
 import {
   StgOrderParams,
   ResetStg,
-  SpotStgOperation,
   SyncStgPriceType,
+  StgOperation,
 } from './strategy.order.type'
 import { SpotOrder } from '../entity/spot-order.entity'
+import { FutureOrder } from '../entity/future-order.entity'
 
 @Controller('stg')
 export class StrategyOrderController {
@@ -19,8 +20,13 @@ export class StrategyOrderController {
   }
 
   @Post('createSpotStg')
-  async createSpotStra(@Body() spotOrders: SpotOrder[]): Promise<Result> {
-    return await this.strategyOrderService.createSpotStg(spotOrders)
+  async createSpotStra(@Body() opntions: SpotOrder[]): Promise<Result> {
+    return await this.strategyOrderService.combineCreateSteg(opntions, 'spot')
+  }
+
+  @Post('createFutureStg')
+  async createFutureStg(@Body() opntions: FutureOrder[]): Promise<Result> {
+    return await this.strategyOrderService.combineCreateSteg(opntions, 'future')
   }
 
   @Post('reset')
@@ -29,15 +35,13 @@ export class StrategyOrderController {
   }
 
   @Post('close')
-  async closeStg(@Body() spotStgOperation: SpotStgOperation): Promise<Result> {
-    return await this.strategyOrderService.closeStg(spotStgOperation)
+  async closeStg(@Body() options: StgOperation): Promise<Result> {
+    return await this.strategyOrderService.closeStg(options)
   }
 
   @Post('mergeOrder')
-  async mergeOrder(
-    @Body() spotStgOperation: SpotStgOperation,
-  ): Promise<Result> {
-    return await this.strategyOrderService.mergeOrder(spotStgOperation)
+  async mergeOrder(@Body() options: StgOperation): Promise<Result> {
+    return await this.strategyOrderService.mergeOrder(options)
   }
 
   @Post('syncPrice')

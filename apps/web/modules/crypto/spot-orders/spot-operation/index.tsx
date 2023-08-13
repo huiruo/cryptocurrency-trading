@@ -20,7 +20,7 @@ const { RangePicker } = DatePicker
 export default function SpotOperation() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const { symbol } = useAppSelector(spotFilterState)
-  const [syncAssetValue, setSyncAssetValue] = useState<string>('ARUSDT')
+  const [syncAssetValue, setSyncAssetValue] = useState<string>('')
   const [assets] = useFetchAssets()
 
   const [selectedDates, setSelectedDates] = useState<[Dayjs, Dayjs]>([

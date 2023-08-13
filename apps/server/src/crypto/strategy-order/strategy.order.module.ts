@@ -8,6 +8,7 @@ import { SpotOrder } from '../entity/spot-order.entity'
 import { TraderApi } from '../entity/api.entity'
 import { DailyProfit } from '../entity/daily.profit.entity'
 import { ProfitStatistics } from '../entity/profit.statistics.entity'
+import { FutureOrder } from '../entity/future-order.entity'
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ProfitStatistics } from '../entity/profit.statistics.entity'
       StrategyOrder,
       StrategyOrderId,
       SpotOrder,
+      FutureOrder,
       TraderApi,
       DailyProfit,
       ProfitStatistics,

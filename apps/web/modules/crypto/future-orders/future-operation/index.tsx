@@ -18,7 +18,7 @@ const { RangePicker } = DatePicker
 
 export function FutureOperation() {
   const { symbol } = useAppSelector(futureFilterState)
-  const [syncAssetValue, setSyncAssetValue] = useState<string>('CHZUSDT')
+  const [syncAssetValue, setSyncAssetValue] = useState<string>('')
   const [assets] = useFetchAssets()
 
   const [selectedDates, setSelectedDates] = useState<[Dayjs, Dayjs]>([

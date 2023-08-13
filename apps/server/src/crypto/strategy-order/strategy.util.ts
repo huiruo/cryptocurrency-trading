@@ -1,31 +1,67 @@
+import { FutureOrder } from '../entity/future-order.entity'
 import { SpotOrder } from '../entity/spot-order.entity'
 import {
   CalculateStrategiesOrderType,
+  OrderType,
   StrategyProfit,
 } from './strategy.order.type'
 
-export function calculateSpotStrategiesOrder(
-  spotOrders: SpotOrder[],
+export function getStrategySide(
+  order: SpotOrder | FutureOrder,
+  orderType: OrderType,
+): number {
+  // side: orderType === 'spot' ? isBuyer : (side === 'SELL' ? 0 : 1),
+  if (orderType === 'future') {
+    const { side } = order as FutureOrder
+
+    return side === 'SELL' ? 0 : 1
+  }
+
+  const { isBuyer } = order as SpotOrder
+  return isBuyer
+}
+
+export function calculateStrategiesOrder(
+  orders: SpotOrder[] | FutureOrder[],
   targetSymbol: string,
+  orderType: OrderType,
 ): CalculateStrategiesOrderType {
   let qtyTotal = 0
   let quoteQtyTotal = 0
   let isTheSameSymbol = true
 
-  spotOrders.forEach((item) => {
-    const { qty, quoteQty, symbol, isBuyer } = item
-    if (targetSymbol !== symbol) {
-      isTheSameSymbol = false
-    }
+  if (orderType === 'spot') {
+    ;(orders as SpotOrder[]).forEach((item) => {
+      const { qty, quoteQty, symbol, isBuyer } = item
+      if (targetSymbol !== symbol) {
+        isTheSameSymbol = false
+      }
 
-    if (isBuyer) {
+      if (isBuyer) {
+        qtyTotal = Number(qty) + qtyTotal
+        quoteQtyTotal = Number(quoteQty) + quoteQtyTotal
+      } else {
+        qtyTotal = qtyTotal - Number(qty)
+        quoteQtyTotal = quoteQtyTotal - Number(quoteQty)
+      }
+    })
+  } else if (orderType === 'future') {
+    ;(orders as FutureOrder[]).forEach((item) => {
+      const { origQty: qty, cumQuote: quoteQty, symbol } = item
+      if (targetSymbol !== symbol) {
+        isTheSameSymbol = false
+      }
+
+      // TODO: future is calculated in a variety of ways
+      // if (isBuyer) {
       qtyTotal = Number(qty) + qtyTotal
       quoteQtyTotal = Number(quoteQty) + quoteQtyTotal
-    } else {
-      qtyTotal = qtyTotal - Number(qty)
-      quoteQtyTotal = quoteQtyTotal - Number(quoteQty)
-    }
-  })
+      // } else {
+      //   qtyTotal = qtyTotal - Number(qty)
+      //   quoteQtyTotal = quoteQtyTotal - Number(quoteQty)
+      // }
+    })
+  }
 
   return {
     qty: qtyTotal.toString(),

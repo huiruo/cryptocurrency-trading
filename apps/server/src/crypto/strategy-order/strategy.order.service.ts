@@ -3,10 +3,11 @@ import { BinanceService } from '../common/binance-service'
 import {
   StgOrderParams,
   ResetStg,
-  SpotStgOperation,
   CalculateCloseStrategyOrderType,
   SyncStgPriceType,
   CalculateStrategiesOrderType,
+  StgOperation,
+  OrderType,
 } from './strategy.order.type'
 import { PaginationResType, Result, ResultWithData } from 'src/types'
 import { StrategyOrder } from '../entity/strategy-order.entity'
@@ -17,14 +18,16 @@ import { fail, success } from 'src/common/constant'
 import { SpotOrder } from '../entity/spot-order.entity'
 import { StrategyOrderId } from '../entity/strategy-orderid.entity'
 import {
-  calculateSpotStrategiesOrder,
+  calculateStrategiesOrder,
   calculateStrategyProfit,
+  getStrategySide,
 } from './strategy.util'
 import { nanoid } from 'nanoid'
 import { TraderApi } from '../entity/api.entity'
 import { DailyProfit } from '../entity/daily.profit.entity'
 import { ProfitStatistics } from '../entity/profit.statistics.entity'
 import { formatTimestamp } from 'src/common/utils'
+import { FutureOrder } from '../entity/future-order.entity'
 
 @Injectable()
 export class StrategyOrderService {
@@ -39,6 +42,9 @@ export class StrategyOrderService {
 
     @InjectRepository(SpotOrder)
     private readonly spotOrderRepo: Repository<SpotOrder>,
+
+    @InjectRepository(FutureOrder)
+    private readonly futureOrderRepo: Repository<FutureOrder>,
 
     @InjectRepository(TraderApi)
     private readonly traderApiRepo: Repository<TraderApi>,
@@ -114,6 +120,9 @@ export class StrategyOrderService {
       if (orderType === 'spot') {
         const sql = `update spot_order set strategyId="",strategyStatus = 0  WHERE strategyId = "${strategyId}"`
         await this.spotOrderRepo.query(sql)
+      } else if (orderType === 'future') {
+        const sql = `update future_order set strategyId="",strategyStatus = 0  WHERE strategyId = "${strategyId}"`
+        await this.futureOrderRepo.query(sql)
       }
 
       await this.deleteStrategyOrder(strategyId)
@@ -131,9 +140,9 @@ export class StrategyOrderService {
     }
   }
 
-  async mergeOrder(spotStgOperation: SpotStgOperation): Promise<Result> {
+  async mergeOrder(options: StgOperation): Promise<Result> {
     try {
-      const { spotOrders, stgOrder } = spotStgOperation
+      const { orders, stgOrder, orderType } = options
       const { userId, strategyId, symbol, time, side } = stgOrder
       /*
       const spotPrice = await this.getSpotPrice(symbol);
@@ -149,7 +158,7 @@ export class StrategyOrderService {
         entryPrice,
         isTheSameSymbol,
         free = 0,
-      } = await this.calculateSpotOrderMergeStrategy(spotOrders, stgOrder)
+      } = await this.calculateOrderMergeSteg(orders, stgOrder, orderType)
       if (!isTheSameSymbol) {
         return {
           code: 500,
@@ -161,7 +170,7 @@ export class StrategyOrderService {
         symbol,
         price: '',
         side,
-        orderType: 1,
+        orderType: orderType === 'spot' ? 1 : 2,
         leverage: 1,
 
         entryPrice,
@@ -201,9 +210,9 @@ export class StrategyOrderService {
       }
 
       const running = 1
-      spotOrders.forEach((item) => {
+      orders.forEach((item) => {
         const { id: idUpdate } = item
-        this.updateOrderStatus('spot', idUpdate, strategyId, running)
+        this.updateOrderStatus(orderType, idUpdate, strategyId, running)
       })
 
       return {
@@ -219,15 +228,11 @@ export class StrategyOrderService {
     }
   }
 
-  async closeStg(spotStgOperation: SpotStgOperation): Promise<Result> {
+  async closeStg(options: StgOperation): Promise<Result> {
     try {
-      const { spotOrders, stgOrder } = spotStgOperation
-      const ordersLength = spotOrders.length
-      const lastOrder = get(
-        spotOrders,
-        `[${ordersLength - 1}]`,
-        {},
-      ) as SpotOrder
+      const { orders, stgOrder, orderType } = options
+      const ordersLength = orders.length
+      const lastOrder = get(orders, `[${ordersLength - 1}]`, {}) as SpotOrder
 
       const {
         sellingQty,
@@ -238,7 +243,7 @@ export class StrategyOrderService {
         isTheSameSymbol,
         isTheSameSide,
         free,
-      } = await this.calculateSpotOrderCloseStrategy(spotOrders, stgOrder)
+      } = await this.calculateOrderCloseSteg(orders, stgOrder, orderType)
       if (!isTheSameSymbol) {
         return {
           code: 500,
@@ -253,13 +258,20 @@ export class StrategyOrderService {
         }
       }
 
-      const { userId, strategyId, symbol, time } = stgOrder
+      const {
+        userId,
+        strategyId,
+        symbol,
+        time,
+        side,
+        orderType: orderTypeStg,
+      } = stgOrder
       const sellingTime = Number(lastOrder.time)
       const strategiesOrder = {
         symbol,
         price: '',
-        side: 1,
-        orderType: 1,
+        side,
+        orderType: orderTypeStg,
         leverage: 1,
 
         entryPrice: '',
@@ -310,16 +322,11 @@ export class StrategyOrderService {
         return { code: 500, msg: res.msg }
       }
 
-      // update order spot order strategyStatus
+      // update order
       const ended = 2
-      const sql = `update spot_order set strategyStatus = ${ended} WHERE strategyId = "${strategyId}"`
-      await this.spotOrderRepo.query(sql)
-      // end
-
-      // update close spot order
-      spotOrders.forEach((item) => {
+      orders.forEach((item) => {
         const { id: idUpdate } = item
-        this.updateOrderStatus('spot', idUpdate, strategyId, ended)
+        this.updateOrderStatus(orderType, idUpdate, strategyId, ended)
       })
       // end
 
@@ -336,10 +343,13 @@ export class StrategyOrderService {
     }
   }
 
-  async createSpotStg(spotOrders: SpotOrder[]): Promise<Result> {
+  async combineCreateSteg(
+    options: SpotOrder[] | FutureOrder[],
+    orderType: OrderType,
+  ): Promise<Result> {
     try {
-      const firstOrder = spotOrders[0]
-      const { orderId, userId, time, symbol, isBuyer } = firstOrder
+      const firstOrder = options[0]
+      const { orderId, userId, time, symbol } = firstOrder
       const strategyOrderId = await this.findStrategyOrderIdUtil(orderId)
       if (isEmpty(strategyOrderId)) {
         console.log('=== not exist strategy,insert... ===')
@@ -349,13 +359,43 @@ export class StrategyOrderService {
         const spotPrices = await this.getSpotPrice(symbol)
         const price = get(spotPrices, `${symbol}`, '')
 
-        const { qty, quoteQty, entryPrice, isTheSameSymbol } =
-          calculateSpotStrategiesOrder(spotOrders, symbol)
-        if (!isTheSameSymbol) {
-          return {
-            code: 500,
-            msg: 'The selected order not the same Symbol',
+        let qty = ''
+        let quoteQty = ''
+        let entryPrice = ''
+        if (orderType === 'future') {
+          console.log('combineCreateSteg-->1:', orderType)
+          const {
+            qty: qtyCal,
+            quoteQty: quoteQtyCal,
+            entryPrice: entryPriceCal,
+            isTheSameSymbol,
+          } = calculateStrategiesOrder(options, symbol, orderType)
+          if (!isTheSameSymbol) {
+            return {
+              code: 500,
+              msg: 'The selected order not the same Symbol',
+            }
           }
+          qty = qtyCal
+          quoteQty = quoteQtyCal
+          entryPrice = entryPriceCal
+        } else if (orderType === 'spot') {
+          console.log('combineCreateSteg-->2:', orderType)
+          const {
+            qty: qtyCal,
+            quoteQty: quoteQtyCal,
+            entryPrice: entryPriceCal,
+            isTheSameSymbol,
+          } = calculateStrategiesOrder(options, symbol, orderType)
+          if (!isTheSameSymbol) {
+            return {
+              code: 500,
+              msg: 'The selected order not the same Symbol',
+            }
+          }
+          qty = qtyCal
+          quoteQty = quoteQtyCal
+          entryPrice = entryPriceCal
         }
 
         const realizedFree = 0
@@ -374,8 +414,8 @@ export class StrategyOrderService {
         const strategiesOrder = {
           symbol,
           price,
-          side: isBuyer,
-          orderType: 1,
+          side: getStrategySide(firstOrder, orderType),
+          orderType: orderType === 'spot' ? 1 : 2,
           leverage: 1,
 
           entryPrice,
@@ -409,13 +449,18 @@ export class StrategyOrderService {
           time,
         }
 
-        await this.createStrategyOrderIdUtil({ userId, strategyId, orderId })
+        await this.createStrategyOrderIdUtil({
+          userId,
+          strategyId,
+          orderId,
+        })
 
         await this.createStrategyOrderUtil(strategiesOrder)
+
         const running = 1
-        spotOrders.forEach((item) => {
+        options.forEach((item) => {
           const { id: idUpdate } = item
-          this.updateOrderStatus('spot', idUpdate, strategyId, running)
+          this.updateOrderStatus(orderType, idUpdate, strategyId, running)
         })
       } else {
         console.log('=== exist strategyOrderId,update... ===')
@@ -472,12 +517,10 @@ export class StrategyOrderService {
         await this.spotOrderRepo.query(sql)
       }
 
-      // /*
       if (type === 'future') {
-        // const sql = `update futures_order set strategyId="${strategyId}",strategyStatus = "${strategyStatus}"  WHERE id = "${id}"`;
-        // await this.futuresOrderRepo.query(sql);
+        const sql = `update future_order set strategyId="${strategyId}",strategyStatus = "${strategyStatus}"  WHERE id = "${id}"`
+        await this.futureOrderRepo.query(sql)
       }
-      // */
 
       return { code: success, msg: 'add asset successfully' }
     } catch (error) {
@@ -504,13 +547,14 @@ export class StrategyOrderService {
     await this.strategyOrderIdRepo.query(sql)
   }
 
-  private async calculateSpotOrderCloseStrategy(
-    spotOrders: SpotOrder[],
+  private async calculateOrderCloseSteg(
+    orders: SpotOrder[] | FutureOrder[],
     strategyOrder: StrategyOrder,
+    orderType: OrderType,
   ): Promise<CalculateCloseStrategyOrderType> {
     const {
       symbol,
-      side,
+      side: sideStg,
       entryPrice,
       userId,
       free: realizedFree,
@@ -521,19 +565,36 @@ export class StrategyOrderService {
     const targetSymbol = symbol
     let isTheSameSide = false
 
-    spotOrders.forEach((item) => {
-      const { qty, quoteQty, symbol, isBuyer } = item
-      if (targetSymbol !== symbol) {
-        isTheSameSymbol = false
-      }
+    if (orderType === 'spot') {
+      ;(orders as SpotOrder[]).forEach((item) => {
+        const { qty, quoteQty, symbol, isBuyer } = item
+        if (targetSymbol !== symbol) {
+          isTheSameSymbol = false
+        }
 
-      if (side === isBuyer) {
-        isTheSameSide = true
-      }
+        if (sideStg === isBuyer) {
+          isTheSameSide = true
+        }
 
-      qtyTotal = Number(qty) + qtyTotal
-      quoteQtyTotal = Number(quoteQty) + quoteQtyTotal
-    })
+        qtyTotal = Number(qty) + qtyTotal
+        quoteQtyTotal = Number(quoteQty) + quoteQtyTotal
+      })
+    } else if (orderType === 'future') {
+      ;(orders as FutureOrder[]).forEach((item) => {
+        const { origQty: qty, cumQuote: quoteQty, symbol, side } = item
+        if (targetSymbol !== symbol) {
+          isTheSameSymbol = false
+        }
+
+        const realSide = side === 'SELL' ? 0 : 1
+        if (realSide === sideStg) {
+          isTheSameSide = true
+        }
+
+        qtyTotal = Number(qty) + qtyTotal
+        quoteQtyTotal = Number(quoteQty) + quoteQtyTotal
+      })
+    }
 
     const sellingPrice = (quoteQtyTotal / qtyTotal).toFixed(8)
     const sellingQty = qtyTotal.toString()
@@ -552,7 +613,7 @@ export class StrategyOrderService {
         Number(spotFree),
       )
 
-    console.log('calculateSpotOrderCloseStrategy==>', { profit, profitRate })
+    console.log('calculateOrderCloseSteg==>', orderType, { profit, profitRate })
 
     return {
       sellingQty,
@@ -716,11 +777,19 @@ export class StrategyOrderService {
     }
   }
 
-  private async calculateSpotOrderMergeStrategy(
-    spotOrders: SpotOrder[],
+  private async calculateOrderMergeSteg(
+    orders: SpotOrder[] | FutureOrder[],
     strategyOrder: StrategyOrder,
+    orderType: OrderType,
   ): Promise<CalculateStrategiesOrderType> {
-    const { symbol, qty, quoteQty, userId, free: realizedFree } = strategyOrder
+    const {
+      symbol,
+      qty,
+      quoteQty,
+      userId,
+      free: realizedFree,
+      side: sideStg,
+    } = strategyOrder
     let qtyTotal = 0
     let free = 0
     let quoteQtyTotal = 0
@@ -729,24 +798,57 @@ export class StrategyOrderService {
 
     const spotFree = await this.getUserSpotFree(userId)
 
-    spotOrders.forEach((item) => {
-      const { qty: qtyItem, quoteQty: quoteQtyItem, symbol, isBuyer } = item
-      const qtyItemInt = Number(qtyItem)
-      const quoteQtyItemInt = Number(quoteQtyItem)
-      if (targetSymbol !== symbol) {
-        isTheSameSymbol = false
-      }
+    if (orderType === 'spot') {
+      ;(orders as SpotOrder[]).forEach((item) => {
+        const { qty: qtyItem, quoteQty: quoteQtyItem, symbol, isBuyer } = item
+        const qtyItemInt = Number(qtyItem)
+        const quoteQtyItemInt = Number(quoteQtyItem)
+        if (targetSymbol !== symbol) {
+          isTheSameSymbol = false
+        }
 
-      free = quoteQtyItemInt * Number(spotFree) + free
+        free = quoteQtyItemInt * Number(spotFree) + free
 
-      if (isBuyer) {
-        qtyTotal = qtyItemInt + qtyTotal
-        quoteQtyTotal = quoteQtyItemInt + quoteQtyTotal
-      } else {
-        qtyTotal = qtyTotal - qtyItemInt
-        quoteQtyTotal = quoteQtyTotal - quoteQtyItemInt
-      }
-    })
+        if (isBuyer) {
+          qtyTotal = qtyItemInt + qtyTotal
+          quoteQtyTotal = quoteQtyItemInt + quoteQtyTotal
+        } else {
+          qtyTotal = qtyTotal - qtyItemInt
+          quoteQtyTotal = quoteQtyTotal - quoteQtyItemInt
+        }
+      })
+    } else if (orderType === 'future') {
+      ;(orders as FutureOrder[]).forEach((item) => {
+        const { origQty: qtyItem, cumQuote: quoteQtyItem, symbol, side } = item
+        const qtyItemInt = Number(qtyItem)
+        const quoteQtyItemInt = Number(quoteQtyItem)
+        if (targetSymbol !== symbol) {
+          isTheSameSymbol = false
+        }
+
+        free = quoteQtyItemInt * Number(spotFree) + free
+
+        const realSide = side === 'SELL' ? 0 : 1
+        const isIncreasePosition = realSide === sideStg
+        if (isIncreasePosition) {
+          console.log('calculateOrderMergeSteg-Increase future Position', {
+            symbol,
+            sideStg,
+            realSide,
+          })
+          qtyTotal = qtyItemInt + qtyTotal
+          quoteQtyTotal = quoteQtyItemInt + quoteQtyTotal
+        } else {
+          console.log('calculateOrderMergeSteg-Reduce future Position', {
+            symbol,
+            sideStg,
+            realSide,
+          })
+          qtyTotal = qtyTotal - qtyItemInt
+          quoteQtyTotal = quoteQtyTotal - quoteQtyItemInt
+        }
+      })
+    }
 
     const finalqty = Number(qty) + qtyTotal
     const finalQuoteQty = Number(quoteQty) + quoteQtyTotal
