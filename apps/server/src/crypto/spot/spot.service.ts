@@ -85,7 +85,7 @@ export class SpotService {
      `,
       }
     } catch (error) {
-      return { code: fail, msg: error.sqlMessage || 'syncSpotOrder error' }
+      return { code: fail, msg: error.toString() || 'syncSpotOrder error' }
     }
   }
 

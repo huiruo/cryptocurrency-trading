@@ -60,7 +60,7 @@ export class FutureService {
       }
     } catch (error) {
       console.log('syncFutureOrder error:', error)
-      return { code: fail, msg: error.sqlMessage || 'syncFutureOrder error' }
+      return { code: fail, msg: error.toString() || 'syncFutureOrder error' }
     }
   }
 
