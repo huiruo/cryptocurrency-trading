@@ -8,16 +8,12 @@ export class FutureController {
   constructor(private readonly futureService: FutureService) {}
 
   @Post('syncOrder')
-  async syncSpotOrder(
-    @Body() spotOrderParams: SyncFutureOrderParams,
-  ): Promise<Result> {
-    return await this.futureService.syncFutureOrder(spotOrderParams)
+  async syncOrder(@Body() options: SyncFutureOrderParams): Promise<Result> {
+    return await this.futureService.syncFutureOrder(options)
   }
 
   @Post('orders')
-  async getSpotOrder(
-    @Body() getSpotOrderParams: GetFutureOrderParams,
-  ): Promise<Result> {
-    return await this.futureService.getFutureOrders(getSpotOrderParams)
+  async getFutureOrder(@Body() options: GetFutureOrderParams): Promise<Result> {
+    return await this.futureService.getFutureOrders(options)
   }
 }

@@ -2,7 +2,11 @@ import React, { useEffect, useState } from 'react'
 import { spotOrdersState } from '@stores/appSlice'
 import { useAppSelector } from '@stores/hooks'
 import { Button, Pagination, Table, message } from 'antd'
-import { SpotOrder } from '@services/spot.type'
+import {
+  FetchSpotOrdersAction,
+  SpotOrder,
+  SpotOrdersParams,
+} from '@services/spot.type'
 import { formatUnixTime } from '@common/utils'
 import { SUCCESS, strategyStatusMap } from '@common/constants'
 import { isEmpty } from 'lodash'
@@ -10,11 +14,7 @@ import store from '@stores/index'
 import { strategyApi } from '@services/strategy'
 import NiceModal from '@common/nice-modal'
 import { StgCloseModal } from '../strategies/StgCloseModal'
-import {
-  FetchSpotOrdersAction,
-  SpotOrdersParams,
-  fetchSpotOrders,
-} from '@stores/thunkAction'
+import { fetchSpotOrders } from '@stores/thunkAction'
 import { MergeOrderModal } from '../strategies/mergeOrderModal'
 
 export default function SpotTable() {
@@ -193,6 +193,28 @@ export default function SpotTable() {
       },
     },
     {
+      id: 'price',
+      title: 'Price',
+      dataIndex: 'price',
+      key: 'price',
+      width: 100,
+    },
+    {
+      id: 'qty',
+      title: 'qty',
+      dataIndex: '',
+      key: 'qty',
+      width: 100,
+      render(item: SpotOrder) {
+        return (
+          <div>
+            <div>{item.qty}</div>
+            <div>{item.quoteQty}</div>
+          </div>
+        )
+      },
+    },
+    {
       id: 'action',
       title: 'Action',
       dataIndex: '',
@@ -227,26 +249,17 @@ export default function SpotTable() {
       },
     },
     {
-      id: 'price',
-      title: 'Price',
-      dataIndex: 'price',
-      key: 'price',
+      id: 'commission',
+      title: 'Commission',
+      dataIndex: 'commission',
+      key: 'commission',
       width: 100,
     },
     {
-      id: 'qty',
-      title: 'qty',
-      dataIndex: '',
-      key: 'qty',
-      width: 100,
-      render(item: SpotOrder) {
-        return (
-          <div>
-            <div>{item.qty}</div>
-            <div>{item.quoteQty}</div>
-          </div>
-        )
-      },
+      id: 'commissionAsset',
+      title: 'CommissionAsset',
+      dataIndex: 'commissionAsset',
+      key: 'commissionAsset',
     },
     {
       id: 'orderId',
@@ -269,19 +282,6 @@ export default function SpotTable() {
           </div>
         )
       },
-    },
-    {
-      id: 'commission',
-      title: 'Commission',
-      dataIndex: 'commission',
-      key: 'commission',
-      width: 100,
-    },
-    {
-      id: 'commissionAsset',
-      title: 'CommissionAsset',
-      dataIndex: 'commissionAsset',
-      key: 'commissionAsset',
     },
     {
       id: 'isMaker',

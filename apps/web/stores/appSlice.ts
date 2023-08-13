@@ -1,7 +1,7 @@
 import { configureStore, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from './index'
-import { SpotOrders } from '@services/spot.type'
-import { StgOrders } from '@services/strategy.type'
+import { SpotFilter, SpotOrders } from '@services/spot.type'
+import { StgFilter, StgOrders } from '@services/strategy.type'
 import {
   fetchFutureOrders,
   fetchSpotOrders,
@@ -9,16 +9,7 @@ import {
 } from './thunkAction'
 import { ResType } from '@services/base'
 import { SUCCESS } from '@common/constants'
-import { FutureOrders } from '@services/future.type'
-
-interface StgFilter {
-  status: number
-  asset: string
-}
-
-interface SpotFilter {
-  symbol: string
-}
+import { FutureFilter, FutureOrders } from '@services/future.type'
 
 export interface AppState {
   count: number
@@ -29,6 +20,7 @@ export interface AppState {
   stgOrders: StgOrders
   stgFilter: StgFilter
   spotFilter: SpotFilter
+  futureFilter: FutureFilter
 }
 
 const initialState: AppState = {
@@ -50,6 +42,9 @@ const initialState: AppState = {
   stgFilter: {
     status: 1,
     asset: '',
+  },
+  futureFilter: {
+    symbol: 'CHZUSDT',
   },
   spotFilter: {
     // test MKRUSDT ARUSDT
@@ -84,6 +79,10 @@ const appStoreSlice = createSlice({
     setSpotFilter(state, action: PayloadAction<SpotFilter>) {
       console.log('store==>SpotFilter:', action.payload)
       state.spotFilter = action.payload
+    },
+    setFutureFilter(state, action: PayloadAction<FutureFilter>) {
+      console.log('store==>futureFilter:', action.payload)
+      state.futureFilter = action.payload
     },
   },
   extraReducers(builder) {
@@ -158,5 +157,7 @@ export const futureOrdersState = (state: RootState) =>
 export const stgOrdersState = (state: RootState) => state.appStore.stgOrders
 export const stgFilterState = (state: RootState) => state.appStore.stgFilter
 export const spotFilterState = (state: RootState) => state.appStore.spotFilter
+export const futureFilterState = (state: RootState) =>
+  state.appStore.futureFilter
 
 export default appStoreSlice.reducer

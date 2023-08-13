@@ -6,7 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { GetFutureOrderParams, SyncFutureOrderParams } from './future.type'
 import { PaginationResType, Result, ResultWithData } from 'src/types'
 import { fail, success } from 'src/common/constant'
-import { get } from 'lodash'
+import { get, isEmpty } from 'lodash'
 
 @Injectable()
 export class FutureService {
@@ -28,12 +28,12 @@ export class FutureService {
   ): Promise<Result> {
     try {
       const { symbol, startTime, endTime } = syncFutureOrderParams
-      console.log('syncFutureOrder options:', syncFutureOrderParams)
       const data = await BinanceService.getInstance().getFutureTrades({
         symbol,
         startTime,
         endTime,
       })
+
       console.log(
         'syncFutureOrderParams:',
         syncFutureOrderParams,
@@ -41,31 +41,23 @@ export class FutureService {
         data,
       )
 
-      return {
-        code: success,
-        msg: 'test Ok',
-      }
-
       // TODO: userId
-      /*
       const userId = 1
       for (const item of data) {
-        const { id } = item
-        const existFutureOrder = await this.findFutureOrderUtil(id)
+        const { orderId } = item
+        const existFutureOrder = await this.findFutureOrderUtil(orderId)
         if (isEmpty(existFutureOrder)) {
-          console.log('=== not exist spotOrder,insert... ===')
+          console.log('=== not exist futureOrder,insert... ===')
           await this.savaFutureOrderUtil(item as unknown as FutureOrder, userId)
         } else {
-          console.log('=== exist spotOrder,skip... ===')
+          console.log('=== exist futureOrder,skip... ===')
         }
       }
 
       return {
         code: success,
-        // msg: `Sync successful,You have ${data.length} ${symbol} orders on this day`,
-        msg: 'ok',
+        msg: `Sync successful,You have ${data.length} ${symbol} orders on this day`,
       }
-      */
     } catch (error) {
       console.log('syncFutureOrder error:', error)
       return { code: fail, msg: error.sqlMessage || 'syncFutureOrder error' }
@@ -105,25 +97,25 @@ export class FutureService {
     }
   }
 
-  private async findFutureOrderUtil(id: number): Promise<FutureOrder> {
-    const sql = `select symbol,orderId from future_order where id='${id}'`
+  private async findFutureOrderUtil(orderId: number): Promise<FutureOrder> {
+    const sql = `select symbol,orderId from future_order where orderId='${orderId}'`
     const futureOrder = await this.futureOrderRepo.query(sql)
     return get(futureOrder, '[0]', {})
   }
 
   private async savaFutureOrderUtil(
-    spotOrder: FutureOrder,
+    futureOrder: FutureOrder,
     userId: number,
   ): Promise<void> {
-    spotOrder.userId = userId
-    const isBuyer = spotOrder.isBuyer ? 1 : 0
-    const isMaker = spotOrder.isBuyer ? 1 : 0
-    const isBestMatch = spotOrder.isBuyer ? 1 : 0
+    futureOrder.userId = userId
+    const reduceOnly = futureOrder.reduceOnly ? 1 : 0
+    const closePosition = futureOrder.closePosition ? 1 : 0
+    const priceProtect = futureOrder.priceProtect ? 1 : 0
     await this.futureOrderRepo.save({
-      ...spotOrder,
-      isBuyer,
-      isMaker,
-      isBestMatch,
+      ...futureOrder,
+      reduceOnly,
+      closePosition,
+      priceProtect,
     })
   }
 }

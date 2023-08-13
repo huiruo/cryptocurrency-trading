@@ -83,3 +83,18 @@ export interface SpotStgOperation {
   spotOrders: SpotOrder[]
   stgOrder: StgOrder
 }
+
+export type FetchStgOrdersParams = {
+  current?: number
+  page?: number
+}
+
+export type FetchStgOrdersAction = {
+  payload: ResType<StgOrders>
+  type: string
+}
+
+export interface StgFilter {
+  status: number
+  asset: string
+}

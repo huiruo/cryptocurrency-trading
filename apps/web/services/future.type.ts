@@ -5,7 +5,7 @@ export interface Api {
     syncSpotOrderParams: SyncFutureOrderParams,
   ) => Promise<ResType<null>>
   getFutureOrders: (
-    getSpotOrderParams: GetFutureOrderParams,
+    options: GetFutureOrderParams,
   ) => Promise<ResType<FutureOrders>>
 }
 
@@ -21,23 +21,32 @@ export interface GetFutureOrderParams extends PaginationType {
 }
 
 export interface FutureOrder {
-  id: number
-  userId: number
+  id: string
+  userId: string
   strategyId: string
-  orderId: number
+  orderId: string
   symbol: string
+  status: string
+  clientOrderId: string
   price: string
-  qty: string
-  quoteQty: string
-  commission: string
-  commissionAsset: string
-  isBuyer: number | boolean
+  avgPrice: string
+  origQty: string
+  executedQty: string
+  cumQuote: string
+  type: string
+  reduceOnly: number | boolean
+  closePosition: number | boolean
+  side: string
+  positionSide: string
+  stopPrice: string
+  workingType: string
+  priceProtect: number | boolean
+  origType: string
+  time: string
+  updateTime: string
   strategyStatus: number
-  isMaker: boolean
-  isBestMatch: boolean
-  time: number
-  updatedAt: number
-  createdAt: number
+  updatedAt: string
+  createdAt: string
 }
 
 export interface FutureOrders {
@@ -45,4 +54,18 @@ export interface FutureOrders {
   total: number
   currentPage: number
   pageSize: number
+}
+
+export type FutureOrdersParams = {
+  current?: number
+  page?: number
+}
+
+export type FetchFutureOrdersAction = {
+  payload: ResType<FutureOrders>
+  type: string
+}
+
+export interface FutureFilter {
+  symbol: string
 }

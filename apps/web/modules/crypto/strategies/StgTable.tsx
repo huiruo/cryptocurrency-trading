@@ -6,13 +6,13 @@ import { formatUnixTime, generateBianceUri } from '@common/utils'
 import { SUCCESS } from '@common/constants'
 import { isEmpty } from 'lodash'
 import store from '@stores/index'
-import { StgOrder } from '@services/strategy.type'
-import { strategyApi } from '@services/strategy'
 import {
   FetchStgOrdersAction,
-  StgOrdersParams,
-  fetchStgOrders,
-} from '@stores/thunkAction'
+  FetchStgOrdersParams,
+  StgOrder,
+} from '@services/strategy.type'
+import { strategyApi } from '@services/strategy'
+import { fetchStgOrders } from '@stores/thunkAction'
 
 export function StgTable() {
   const { total, data } = useAppSelector(stgOrdersState)
@@ -285,7 +285,7 @@ export function StgTable() {
     },
   }
 
-  const getStgOrdersUtil = async (stgOrdersParams: StgOrdersParams) => {
+  const getStgOrdersUtil = async (stgOrdersParams: FetchStgOrdersParams) => {
     const { payload } = (await store.dispatch(
       fetchStgOrders(stgOrdersParams),
     )) as FetchStgOrdersAction

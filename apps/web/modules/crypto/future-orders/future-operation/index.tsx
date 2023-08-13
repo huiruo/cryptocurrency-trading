@@ -4,8 +4,8 @@ import { Button, DatePicker, Select, message } from 'antd'
 import useFetchAssets from './useFetchAssets'
 import { SUCCESS } from '@common/constants'
 import store from '@stores/index'
-import { appStoreActions, spotFilterState } from '@stores/appSlice'
-import { fetchSpotOrders } from '@stores/thunkAction'
+import { appStoreActions, futureFilterState } from '@stores/appSlice'
+import { fetchFutureOrders } from '@stores/thunkAction'
 import { useAppSelector } from '@stores/hooks'
 import { futureApi } from '@services/future'
 
@@ -16,9 +16,9 @@ const dateFormat = 'YYYY-MM-DD HH:mm:ss'
 
 const { RangePicker } = DatePicker
 
-export default function SpotOperation() {
-  const { symbol } = useAppSelector(spotFilterState)
-  const [syncAssetValue, setSyncAssetValue] = useState<string>('ARUSDT')
+export function FutureOperation() {
+  const { symbol } = useAppSelector(futureFilterState)
+  const [syncAssetValue, setSyncAssetValue] = useState<string>('CHZUSDT')
   const [assets] = useFetchAssets()
 
   const [selectedDates, setSelectedDates] = useState<[Dayjs, Dayjs]>([
@@ -52,8 +52,10 @@ export default function SpotOperation() {
     const res = await futureApi.syncFutureOrder(params)
     if (res.code === SUCCESS) {
       message.success(res.msg)
-      store.dispatch(appStoreActions.setSpotFilter({ symbol: syncAssetValue }))
-      await store.dispatch(fetchSpotOrders({}))
+      store.dispatch(
+        appStoreActions.setFutureFilter({ symbol: syncAssetValue }),
+      )
+      await store.dispatch(fetchFutureOrders({}))
     } else {
       message.error(res.msg || 'error')
     }
@@ -63,13 +65,13 @@ export default function SpotOperation() {
     if (type === 1) {
       setSyncAssetValue(value)
     } else {
-      store.dispatch(appStoreActions.setSpotFilter({ symbol: value }))
+      store.dispatch(appStoreActions.setFutureFilter({ symbol: value }))
     }
   }
 
-  const onSearchSpotOrder = () => {
+  const onSearchFutureOrder = () => {
     store.dispatch(
-      fetchSpotOrders({
+      fetchFutureOrders({
         current: 1,
         page: 10,
       }),
@@ -132,7 +134,7 @@ export default function SpotOperation() {
         />
 
         <Button
-          onClick={onSearchSpotOrder}
+          onClick={onSearchFutureOrder}
           className="bright-btn search-btn common-left-mg"
         >
           Search

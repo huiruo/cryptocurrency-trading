@@ -14,7 +14,7 @@ interface ApiConfig {
 
 const apiConfig: ApiConfig = {
   syncFutureOrder: '/future/syncOrder',
-  getFutureOrders: '/spot/orders',
+  getFutureOrders: '/future/orders',
 }
 
 export const futureApi: Api = {

@@ -61,3 +61,17 @@ export interface SpotOrders {
   currentPage: number
   pageSize: number
 }
+
+export type SpotOrdersParams = {
+  current?: number
+  page?: number
+}
+
+export type FetchSpotOrdersAction = {
+  payload: ResType<SpotOrders>
+  type: string
+}
+
+export interface SpotFilter {
+  symbol: string
+}

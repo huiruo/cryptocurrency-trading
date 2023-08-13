@@ -6,6 +6,7 @@ import Binance, {
   FuturesAccountInfoResult,
   FuturesCancelAllOpenOrdersResult,
   FuturesOrder,
+  GetFuturesOrder,
   MyTrade,
   NewFuturesOrder,
   NewOrderSpot,
@@ -298,7 +299,7 @@ export class BinanceService {
 
   async getFutureTrades(
     futureOrderParams: SyncFutureOrderParams,
-  ): Promise<QueryFuturesOrderResult> {
+  ): Promise<GetFuturesOrder[]> {
     const { symbol, startTime, endTime } = futureOrderParams
     let options = {} as SyncFutureOrderParams
     if (startTime && endTime) {
@@ -317,6 +318,8 @@ export class BinanceService {
       }
     }
 
-    return await this.client.futuresAllOrders(options)
+    return (await this.client.futuresAllOrders(
+      options,
+    )) as unknown as GetFuturesOrder[]
   }
 }

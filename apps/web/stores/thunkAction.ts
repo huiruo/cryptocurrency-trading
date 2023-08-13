@@ -2,44 +2,15 @@ import { SUCCESS } from '@common/constants'
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import { strategyApi } from '@services/strategy'
 import { RootState } from './rootReducer'
-import { StgOrders } from '@services/strategy.type'
-import { ResType } from '@services/base'
+import { FetchStgOrdersParams } from '@services/strategy.type'
 import { spotApi } from '@services/spot'
 import { futureApi } from '@services/future'
-
-export type FetchStgOrdersAction = {
-  payload: ResType<StgOrders>
-  type: string
-}
-
-export type FetchSpotOrdersAction = {
-  payload: ResType<StgOrders>
-  type: string
-}
-
-export type FetchFutureOrdersAction = {
-  payload: ResType<StgOrders>
-  type: string
-}
-
-export type StgOrdersParams = {
-  current?: number
-  page?: number
-}
-
-export type SpotOrdersParams = {
-  current?: number
-  page?: number
-}
-
-export type FutureOrdersParams = {
-  current?: number
-  page?: number
-}
+import { FutureOrdersParams } from '@services/future.type'
+import { SpotOrdersParams } from '@services/spot.type'
 
 export const fetchStgOrders = createAsyncThunk(
   'fetchStgOrders',
-  async (stgOrdersParams: StgOrdersParams, thunkAPI) => {
+  async (stgOrdersParams: FetchStgOrdersParams, thunkAPI) => {
     const state: RootState = thunkAPI.getState() as RootState
     const {
       stgFilter: { asset, status },
@@ -91,8 +62,8 @@ export const fetchFutureOrders = createAsyncThunk(
   async (options: FutureOrdersParams, thunkAPI) => {
     const state: RootState = thunkAPI.getState() as RootState
     const {
-      spotFilter: { symbol },
-      spotOrders: { currentPage, pageSize },
+      futureFilter: { symbol },
+      futureOrders: { currentPage, pageSize },
     } = state.appStore
 
     const res = await futureApi.getFutureOrders({

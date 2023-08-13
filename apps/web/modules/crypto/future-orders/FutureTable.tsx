@@ -9,9 +9,13 @@ import store from '@stores/index'
 import { strategyApi } from '@services/strategy'
 import NiceModal from '@common/nice-modal'
 import { StgCloseModal } from '../strategies/StgCloseModal'
-import { FutureOrdersParams, fetchFutureOrders } from '@stores/thunkAction'
+import { fetchFutureOrders } from '@stores/thunkAction'
 import { MergeOrderModal } from '../strategies/mergeOrderModal'
-import { FutureOrder } from '@services/future.type'
+import {
+  FetchFutureOrdersAction,
+  FutureOrder,
+  FutureOrdersParams,
+} from '@services/future.type'
 
 export function FutureTable() {
   const { total, data } = useAppSelector(futureOrdersState)
@@ -168,13 +172,13 @@ export function FutureTable() {
       width: 100,
     },
     {
-      id: 'isBuyer',
+      id: 'side',
       title: 'Side',
       dataIndex: '',
       key: 'isBuyer',
       width: 100,
       render(item: FutureOrder) {
-        return <div>{item.isBuyer ? <span>BUY</span> : <span>SELL</span>}</div>
+        return <div>{item.side}</div>
       },
     },
     /*
@@ -188,6 +192,28 @@ export function FutureTable() {
       width: 100,
       render(item: FutureOrder) {
         return <span>{strategyStatusMap[item.strategyStatus]}</span>
+      },
+    },
+    {
+      id: 'avgPrice',
+      title: 'avgPrice',
+      dataIndex: 'avgPrice',
+      key: 'avgPrice',
+      width: 100,
+    },
+    {
+      id: 'qty',
+      title: 'qty',
+      dataIndex: '',
+      key: 'qty',
+      width: 100,
+      render(item: FutureOrder) {
+        return (
+          <div>
+            <div>{item.origQty}</div>
+            <div>{item.cumQuote}</div>
+          </div>
+        )
       },
     },
     {
@@ -232,19 +258,18 @@ export function FutureTable() {
       width: 100,
     },
     {
-      id: 'qty',
-      title: 'qty',
-      dataIndex: '',
-      key: 'qty',
+      id: 'type',
+      title: 'type',
+      dataIndex: 'type',
+      key: 'type',
       width: 100,
-      render(item: FutureOrder) {
-        return (
-          <div>
-            <div>{item.qty}</div>
-            <div>{item.quoteQty}</div>
-          </div>
-        )
-      },
+    },
+    {
+      id: 'status',
+      title: 'order status',
+      dataIndex: 'status',
+      key: 'status',
+      width: 100,
     },
     {
       id: 'orderId',
@@ -267,33 +292,6 @@ export function FutureTable() {
           </div>
         )
       },
-    },
-    {
-      id: 'commission',
-      title: 'Commission',
-      dataIndex: 'commission',
-      key: 'commission',
-      width: 100,
-    },
-    {
-      id: 'commissionAsset',
-      title: 'CommissionAsset',
-      dataIndex: 'commissionAsset',
-      key: 'commissionAsset',
-    },
-    {
-      id: 'isMaker',
-      title: 'IsMaker',
-      dataIndex: 'isMaker',
-      key: 'isMaker',
-      width: 100,
-    },
-    {
-      id: 'isBestMatch',
-      title: 'IsBestMatch',
-      dataIndex: 'isBestMatch',
-      key: 'isBestMatch',
-      width: 100,
     },
     {
       id: 'updatedAt',
@@ -362,7 +360,7 @@ export function FutureTable() {
         className="table-box"
         pagination={false}
       />
-      <div className="spot-operation">
+      <div className="future-operation">
         <Button onClick={() => oncreateStrategy()} className="green-btn">
           Create strategy
         </Button>

@@ -1,11 +1,11 @@
 import React from 'react'
-import SpotOperation from './future-operation'
+import { FutureOperation } from './future-operation'
 import { FutureTable } from './FutureTable'
 
 export function FutureOrders() {
   return (
-    <div className="spot-container">
-      <SpotOperation />
+    <div className="future-container">
+      <FutureOperation />
       <FutureTable />
     </div>
   )
