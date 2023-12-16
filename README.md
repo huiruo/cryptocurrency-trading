@@ -13,6 +13,8 @@ Binance Api.
 binanceApiKey=test
 binanceSecretKey=test
 coinBaseURL=https://example.com
+googleOauth_clientID=test-41224612-o33kb1bi3ilhv3fh0qfbfrbbscliid0s.apps.googleusercontent.com
+googleOauth_clientSecret=TEST-GOSPX-HvVvQciXDI1OzF0kEQq1qgumJ
 ```
 
 In the apps\server\ directory,rename .env_example to .env,and set your mysql;
@@ -34,10 +36,10 @@ jwt_secret=xx
 
 web: .env_example --> .env
 ```
-NEXT_PUBLIC_GOOGLE_CLIENT_ID=xx
 NEXT_PUBLIC_DEV_HOST=http://localhost:3888
 NEXT_PUBLIC_PROD_HOST=http://localhost:3888
-SECRET_COOKIE_PASSWORD=xx
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=test-41224612-o33kb1bi3ilhv3fh0qfbfrbbscliid0s.apps.googleusercontent.com
+SECRET_COOKIE_PASSWORD=TEST-GOSPX-HvVvQciXDI1OzF0kEQq1qgumJ
 ```
 
 

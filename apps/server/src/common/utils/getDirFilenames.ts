@@ -1,4 +1,3 @@
-import * as fs from 'fs'
 import * as path from 'path'
 
 type optionsType = {
@@ -21,45 +20,23 @@ export function getDirFilenames(options?: optionsType): string[] {
     ...options,
   }
 
-  const results = []
   const directoryArr = [path.resolve(process.cwd(), 'config/env-common')]
 
+  let directory = ''
+
   if (params.environment === 'prod') {
-    const directory = path.resolve(process.cwd(), 'config/env-prod')
-    directoryArr.push(directory)
+    directory = path.resolve(
+      process.cwd(),
+      'config/env-prod/application-prod.env',
+    )
   } else {
-    const directory = path.resolve(process.cwd(), 'config/env-dev')
-    directoryArr.push(directory)
+    directory = path.resolve(
+      process.cwd(),
+      'config/env-dev/application-dev.env',
+    )
   }
 
-  try {
-    directoryArr.forEach((dirPathItem) => {
-      for (const dirContent of fs.readdirSync(dirPathItem)) {
-        const dirContentPath = path.resolve(dirPathItem, dirContent)
-        if (fs.statSync(dirContentPath).isFile()) {
-          if (dirContent.endsWith('.env')) {
-            if (params.prefix) {
-              //计算前缀start
-              if (dirContent === '.env') {
-                results.push(`${params.prefix}${dirContent}`)
-              } else {
-                if (params.environment === 'prod') {
-                  results.push(`config/env-prod/${dirContent}`)
-                } else {
-                  results.push(`config/env-dev/${dirContent}`)
-                }
-              }
-              //计算前缀end
-            } else {
-              results.push(dirContent)
-            }
-          }
-        }
-      }
-    })
+  directoryArr.push(directory)
 
-    return results
-  } catch (error) {
-    return results
-  }
+  return [...directoryArr]
 }
