@@ -52,9 +52,8 @@ export class CodeEngineController {
   async getContainerStatus(
     @Body() container: Container,
   ): Promise<ResultWithData<string>> {
-    const status = await this.codeEngineService.isDockerContainerStopped(
-      container,
-    )
+    const status =
+      await this.codeEngineService.isDockerContainerStopped(container)
     return { code: success, msg: 'success', data: status }
   }
 
