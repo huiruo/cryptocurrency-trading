@@ -9,6 +9,10 @@ const routers = [
     name: 'Home',
   },
   {
+    patch: '/crypto/wallet',
+    name: 'wallet',
+  },
+  {
     patch: '/crypto/strategies',
     name: 'Strategies',
   },

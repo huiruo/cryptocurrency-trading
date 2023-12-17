@@ -26,3 +26,8 @@ export interface AssetType {
   code?: string
   tradeUrl?: string
 }
+
+export interface IMonitorAsset {
+  balance: string
+  symbol: string
+}

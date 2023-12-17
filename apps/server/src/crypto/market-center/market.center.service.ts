@@ -7,6 +7,7 @@ import { PaginationType, Result, ResultWithData } from 'src/types'
 import { BinanceService } from '../common/binance-service'
 import {
   AssetType,
+  IMonitorAsset,
   NewAssetBalance,
   StatisticsAccountRes,
 } from './market.center.type'
@@ -16,6 +17,8 @@ import { services } from 'src/common/utils/axios-request'
 import { calculateValue } from './calculate.util'
 import { TradeAsset } from '../entity/asset.entity'
 import { get, isEmpty } from 'lodash'
+import Web3 from 'web3'
+import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class MarketCenterService {
@@ -24,12 +27,51 @@ export class MarketCenterService {
   constructor(
     @InjectRepository(TradeAsset)
     private readonly tradeAssetRepo: Repository<TradeAsset>,
+    private configService: ConfigService,
   ) {
     this.initBinanceApi()
   }
 
   initBinanceApi(): void {
     this.client = BinanceService.getInstance()
+  }
+
+  private async monitorWalletBalance(
+    walletAddress: string,
+  ): Promise<{ balance: string; msg: string }> {
+    // Connect to Ethereum node
+    const infura_mainnet_key = this.configService.get('infura_mainnet_key')
+    if (!infura_mainnet_key) {
+      throw new Error('infura_mainnet_key does not exit')
+    }
+    const url = `https://mainnet.infura.io/v3/${infura_mainnet_key}`
+    const web3 = new Web3(url)
+    try {
+      const currentBalance = await web3.eth.getBalance(walletAddress)
+      const balance = web3.utils.fromWei(currentBalance, 'ether')
+      return { balance, msg: 'ok' }
+    } catch (error) {
+      console.error('monitorWalletBalance', error)
+
+      return { balance: null, msg: error }
+    }
+  }
+
+  async monitorwallet(): Promise<ResultWithData<IMonitorAsset>> {
+    try {
+      const walletAddress = '0x32400084c286cf3e17e7b677ea9583e60a000324'
+      const balance = await this.monitorWalletBalance(walletAddress)
+      if (!balance) return { code: 500, msg: balance.msg, data: null }
+
+      return {
+        code: success,
+        msg: balance.msg,
+        data: { balance: balance.balance, symbol: '' },
+      }
+    } catch (error) {
+      console.log('error:', error)
+      return { code: 500, msg: 'monitor error', data: null }
+    }
   }
 
   async syncBalances(): Promise<ResultWithData<Account>> {

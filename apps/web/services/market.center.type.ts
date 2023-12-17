@@ -49,7 +49,12 @@ export interface StatisticsAccountResponse {
   maxPositionRatio: number
 }
 
+export interface IMonitorwallet {
+  balance: string
+  symbol: string
+}
 export interface Api {
   syncAccount: () => Promise<ResType<Account>>
+  monitorwallet: () => Promise<ResType<IMonitorwallet>>
   statisticsAccount: () => Promise<ResType<StatisticsAccountResponse>>
 }
