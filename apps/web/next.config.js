@@ -2,13 +2,11 @@
 const path = require('path')
 /**
  * office
- * http://172.16.39.156
- * 172.16.39.156
+ *
  * home
- * http://172.20.10.2
+ * http://192.168.1.100
  */
-// const BASE_URL = 'http://172.16.39.156:3888'
-const BASE_URL = 'http://192.168.31.150:3888'
+const BASE_URL = 'http://192.168.1.100:3888'
 
 module.exports = {
   sassOptions: {

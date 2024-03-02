@@ -37,6 +37,7 @@ export class UserController {
   signIn(
     @Body() signInDto: { username: string; password: string },
   ): Promise<{ access_token: string; msg?: string }> {
+    console.log('%c=====login', 'color:red')
     return this.authService.signIn(signInDto.username, signInDto.password)
   }
 
@@ -49,6 +50,7 @@ export class UserController {
     @Req() req: Request,
     @Res() res: Response,
   ): Promise<void> {
+    console.log('%c=====google/auth/code', 'color:red')
     const { client_id, client_secret } =
       this.authService.getGoogleOauth_clientID()
     if (!client_id || !client_secret) {
@@ -109,6 +111,7 @@ export class UserController {
     @Req() req: Request,
     @Res() res: Response,
   ): Promise<void> {
+    console.log('%c=====auth/verify', 'color:red')
     const authorization = req.headers['authorization']
     try {
       let authToken = ''

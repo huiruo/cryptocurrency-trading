@@ -55,3 +55,10 @@ cd apps/server
 yarn install
 yarn dev
 ```
+
+Modify the value of the BASE_URL variable to your local IP:
+* apps/web/next.config.js
+* apps/web/common/constants.ts
+```ts
+const BASE_URL = 'http://192.192.1.111:3888'
+```
